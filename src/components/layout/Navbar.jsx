@@ -97,14 +97,7 @@ const Navbar = () => {
             <Link href="/" className="flex items-center">
               {/* ✅ CORREGIDO - Contenedor con tamaño fijo y fill */}
               <div className="relative w-[75px] h-[75px]">
-                <Image
-                  src="/images/logo.jpeg"
-                  alt="Logo"
-                  fill
-                  className="object-cover rounded"
-                  priority
-                  sizes="75px"
-                />
+                <h3 className="">PolleríaPatagonia</h3>
               </div>
             </Link>
           </div>
