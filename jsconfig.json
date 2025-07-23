@@ -1,0 +1,9 @@
+// jsconfig.json (en la raíz)
+{
+  "compilerOptions": {
+    "baseUrl": "src", // <-- apuntamos directamente a /src
+    "paths": {
+      "@/*": ["*"] // <-- @/components/... → src/components/...
+    }
+  }
+}
