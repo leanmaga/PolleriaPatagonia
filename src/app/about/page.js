@@ -1,33 +1,36 @@
+"use client";
 import { motion } from "framer-motion";
 import { Clock, Heart, Truck, Shield } from "lucide-react";
+import Image from "next/image";
+import imagenAbout from "/public/images/2.jpg";
 
-export default function AboutSection() {
-  const features = [
-    {
-      icon: <Heart className="w-8 h-8" />,
-      title: "Calidad Rural",
-      description:
-        "Seleccionamos los mejores productos con el cuidado y tradición del campo",
-    },
-    {
-      icon: <Clock className="w-8 h-8" />,
-      title: "Eficiencia Urbana",
-      description: "Rapidez y practicidad para tu ritmo de vida en la ciudad",
-    },
-    {
-      icon: <Truck className="w-8 h-8" />,
-      title: "Delivery Rápido",
-      description:
-        "Llevamos productos frescos directo a tu puerta en tiempo récord",
-    },
-    {
-      icon: <Shield className="w-8 h-8" />,
-      title: "Garantía Total",
-      description:
-        "Respaldamos cada producto con nuestra garantía de frescura y calidad",
-    },
-  ];
+const features = [
+  {
+    icon: <Heart className="w-8 h-8" />,
+    title: "Calidad Rural",
+    description:
+      "Seleccionamos los mejores productos con el cuidado y tradición del campo",
+  },
+  {
+    icon: <Clock className="w-8 h-8" />,
+    title: "Eficiencia Urbana",
+    description: "Rapidez y practicidad para tu ritmo de vida en la ciudad",
+  },
+  {
+    icon: <Truck className="w-8 h-8" />,
+    title: "Delivery Rápido",
+    description:
+      "Llevamos productos frescos directo a tu puerta en tiempo récord",
+  },
+  {
+    icon: <Shield className="w-8 h-8" />,
+    title: "Garantía Total",
+    description:
+      "Respaldamos cada producto con nuestra garantía de frescura y calidad",
+  },
+];
 
+const AboutPage = () => {
   return (
     <section id="nosotros" className="section-padding bg-white">
       <div className="container-max">
@@ -87,8 +90,8 @@ export default function AboutSection() {
             className="relative"
           >
             <div className="aspect-square rounded-2xl overflow-hidden shadow-2xl">
-              <img
-                src="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800"
+              <Image
+                src={imagenAbout}
                 alt="Productos frescos Granja Urbana"
                 className="w-full h-full object-cover"
               />
@@ -128,4 +131,6 @@ export default function AboutSection() {
       </div>
     </section>
   );
-}
+};
+
+export default AboutPage;

@@ -69,12 +69,14 @@ body {
 /* Añade esto a tu archivo CSS global */
 @layer components {
   .btn-drop {
-    @apply relative bg-black text-white py-3 font-medium overflow-hidden transition-all duration-300 inline-block;
+    background-color: #444;
+    @apply relative text-white py-3 font-medium overflow-hidden transition-all duration-300 inline-block;
   }
 
   .btn-drop:before {
     content: "";
-    @apply absolute bottom-0 right-0 w-2 h-2 bg-indigo-500 transition-all duration-500 ease-out;
+    background-color: #ffd54f;
+    @apply absolute bottom-0 right-0 w-2 h-2 transition-all duration-500 ease-out;
     z-index: 1;
   }
 

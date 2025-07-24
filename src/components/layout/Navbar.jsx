@@ -95,10 +95,9 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
-              {/* ✅ CORREGIDO - Contenedor con tamaño fijo y fill */}
-              <div className="relative w-[75px] h-[75px]">
-                <h3 className="">PolleríaPatagonia</h3>
-              </div>
+              <h3 className="text-2xl font-bold font-drop">
+                PolleríaPatagonia
+              </h3>
             </Link>
           </div>
 
@@ -113,6 +112,16 @@ const Navbar = () => {
               }`}
             >
               INICIO
+            </Link>
+            <Link
+              href="/about"
+              className={`text-sm font-medium hover:text-indigo-600 transition px-1 py-1 ${
+                isActive("/contact")
+                  ? "text-indigo-600 border-b-2 border-indigo-500"
+                  : "text-gray-700"
+              }`}
+            >
+              SOBRE NOSOTROS
             </Link>
             <Link
               href="/products"
@@ -192,7 +201,7 @@ const Navbar = () => {
                   {isAdmin && (
                     <Link
                       href="/admin/products/add"
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-md text-sm font-medium flex items-center mr-2"
+                      className="bg-amber-300 hover:bg-amber-400 text-white px-3 py-2 rounded-md text-sm font-medium flex items-center mr-2"
                     >
                       <span className="mr-1">+</span> Producto
                     </Link>
@@ -388,6 +397,16 @@ const Navbar = () => {
                       <span className="text-sm font-medium">Inicio</span>
                     </Link>
                     <Link
+                      href="/about"
+                      className={`text-sm font-medium hover:text-indigo-600 transition px-1 py-1 ${
+                        isActive("/contact")
+                          ? "text-indigo-600 border-b-2 border-indigo-500"
+                          : "text-gray-700"
+                      }`}
+                    >
+                      SOBRE NOSOTROS
+                    </Link>
+                    <Link
                       href="/products"
                       className={`flex items-center px-3 py-3 rounded-lg ${
                         isActive("/products")
@@ -500,7 +519,7 @@ const Navbar = () => {
                       </Link>
                       <Link
                         href="/admin/products/add"
-                        className="flex items-center px-3 py-3 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+                        className="flex items-center px-3 py-3 rounded-lg bg-amber-200 text-white hover:bg-amber-400"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         <span className="text-lg mr-2">+</span>
