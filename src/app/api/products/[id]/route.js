@@ -1,4 +1,4 @@
-// app/api/products/[id]/route.js - COMPATIBLE CON TU MODELO
+// app/api/products/[id]/route.js - API LIMPIA PARA POLLERÍA
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Product from "@/models/Product";
@@ -8,7 +8,7 @@ import { getServerSession } from "next-auth/next";
 // GET para obtener un producto específico por ID
 export async function GET(request, { params }) {
   try {
-    const { id } = await params; // IMPORTANTE: await params
+    const { id } = await params;
 
     await connectDB();
 
@@ -30,7 +30,7 @@ export async function GET(request, { params }) {
   }
 }
 
-// PUT para actualizar un producto - COMPATIBLE CON TU MODELO
+// PUT para actualizar un producto - POLLERÍA
 export async function PUT(request, { params }) {
   try {
     const session = await getServerSession(authOptions);
@@ -40,7 +40,7 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ message: "No autorizado" }, { status: 403 });
     }
 
-    const { id } = await params; // IMPORTANTE: await params
+    const { id } = await params;
     const data = await request.json();
 
     await connectDB();
@@ -54,7 +54,7 @@ export async function PUT(request, { params }) {
       );
     }
 
-    // Validaciones de campos obligatorios únicamente
+    // Validaciones de campos obligatorios
     if (!data.title || !data.salePrice || !data.category) {
       const missingFields = [];
       if (!data.title) missingFields.push("Nombre del producto");
@@ -81,7 +81,28 @@ export async function PUT(request, { params }) {
       );
     }
 
-    // Preparar datos del producto para actualizar según tu modelo
+    // Validar categorías válidas para pollería
+    const validCategories = [
+      "pollos-enteros",
+      "cortes-pollo",
+      "huevos",
+      "marinados",
+      "embutidos",
+      "menudencias",
+      "productos-organicos",
+      "preparados",
+      "promociones",
+      "otros",
+    ];
+
+    if (!validCategories.includes(data.category)) {
+      return NextResponse.json(
+        { message: "Categoría no válida para pollería" },
+        { status: 400 }
+      );
+    }
+
+    // Preparar datos del producto para actualizar
     const productData = {
       title: data.title.trim(),
       description: data.description || "",
@@ -94,25 +115,43 @@ export async function PUT(request, { params }) {
     if (data.imageUrl) {
       productData.imageUrl = data.imageUrl;
     }
-    // Si no se envía nueva imagen, mantener la existente
 
-    // 🔧 PROCESAR IMÁGENES ADICIONALES SEGÚN TU MODELO
+    // Información adicional de Cloudinary para imagen principal
+    if (data.imageCloudinaryInfo) {
+      productData.imageCloudinaryInfo = {
+        publicId: data.imageCloudinaryInfo.publicId,
+        format: data.imageCloudinaryInfo.format,
+        width: data.imageCloudinaryInfo.width,
+        height: data.imageCloudinaryInfo.height,
+        bytes: data.imageCloudinaryInfo.bytes,
+      };
+    }
+
+    // Procesar imágenes adicionales
     if (data.additionalImages !== undefined) {
       if (Array.isArray(data.additionalImages)) {
         productData.additionalImages = data.additionalImages.map((img) => ({
-          color: img.color || "",
           imageUrl: img.imageUrl,
+          color: img.color || "",
+          ...(img.imageCloudinaryInfo && {
+            imageCloudinaryInfo: {
+              publicId: img.imageCloudinaryInfo.publicId,
+              format: img.imageCloudinaryInfo.format,
+              width: img.imageCloudinaryInfo.width,
+              height: img.imageCloudinaryInfo.height,
+              bytes: img.imageCloudinaryInfo.bytes,
+            },
+          }),
         }));
       } else {
         productData.additionalImages = [];
       }
     }
-    // Si no se envían additionalImages, mantener las existentes
 
     // Campos financieros opcionales
     if (data.promoPrice !== undefined) {
       if (data.promoPrice === "" || data.promoPrice === null) {
-        productData.promoPrice = 0; // Limpiar si se envía vacío
+        productData.promoPrice = 0;
       } else {
         productData.promoPrice = parseFloat(data.promoPrice) || 0;
       }
@@ -120,7 +159,7 @@ export async function PUT(request, { params }) {
 
     if (data.cost !== undefined) {
       if (data.cost === "" || data.cost === null) {
-        productData.cost = 0; // Limpiar si se envía vacío
+        productData.cost = 0;
       } else {
         productData.cost = parseFloat(data.cost) || 0;
       }
@@ -128,13 +167,13 @@ export async function PUT(request, { params }) {
 
     if (data.profitMargin !== undefined) {
       if (data.profitMargin === "" || data.profitMargin === null) {
-        productData.profitMargin = 0; // Limpiar si se envía vacío
+        productData.profitMargin = 0;
       } else {
         productData.profitMargin = parseFloat(data.profitMargin) || 0;
       }
     }
 
-    // Stock
+    // Stock - Simple para pollería
     if (data.stock !== undefined) {
       if (data.stock === "" || data.stock === null) {
         productData.stock = 0;
@@ -143,71 +182,7 @@ export async function PUT(request, { params }) {
       }
     }
 
-    // Campos de indumentaria según tu modelo
-    const clothingCategories = [
-      "ropa",
-      "camisetas",
-      "pantalones",
-      "calzado",
-      "abrigos",
-      "accesorios",
-    ];
-
-    if (clothingCategories.includes(data.category)) {
-      if (data.gender !== undefined) productData.gender = data.gender || "";
-      if (data.material !== undefined)
-        productData.material = data.material || "";
-      if (data.style !== undefined) productData.style = data.style || "";
-      if (data.season !== undefined) productData.season = data.season || "";
-    }
-
-    // Campos para productos con variantes
-    const variantCategories = ["camisetas", "pantalones", "calzado", "abrigos"];
-    if (
-      variantCategories.includes(data.category) &&
-      data.sizes &&
-      Array.isArray(data.sizes) &&
-      data.sizes.length > 0 &&
-      data.colors &&
-      Array.isArray(data.colors) &&
-      data.colors.length > 0
-    ) {
-      productData.sizes = data.sizes;
-      productData.colors = data.colors;
-      productData.variants = data.variants || [];
-
-      // Calcular stock total basado en las variantes
-      if (Array.isArray(data.variants) && data.variants.length > 0) {
-        productData.stock = data.variants.reduce(
-          (total, variant) => total + (parseInt(variant.stock) || 0),
-          0
-        );
-      }
-    } else {
-      // Limpiar campos de variantes si la categoría no los necesita
-      productData.sizes = [];
-      productData.colors = [];
-      productData.variants = [];
-    }
-
-    // Campos específicos para pantalones según tu modelo
-    if (data.category === "pantalones") {
-      if (data.waistType !== undefined)
-        productData.waistType = data.waistType || "";
-      if (data.fit !== undefined) productData.fit = data.fit || "";
-    }
-
-    // Campos específicos para calzado según tu modelo
-    if (data.category === "calzado") {
-      if (data.heelHeight !== undefined) {
-        productData.heelHeight =
-          data.heelHeight === "" ? 0 : parseFloat(data.heelHeight) || 0;
-      }
-      if (data.soleType !== undefined)
-        productData.soleType = data.soleType || "";
-    }
-
-    // Actualizar el producto con findByIdAndUpdate
+    // Actualizar el producto
     const updatedProduct = await Product.findByIdAndUpdate(id, productData, {
       new: true, // Devuelve el documento actualizado
       runValidators: true, // Ejecuta las validaciones del modelo
@@ -258,7 +233,7 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ message: "No autorizado" }, { status: 401 });
     }
 
-    const { id } = await params; // IMPORTANTE: await params
+    const { id } = await params;
 
     await connectDB();
 

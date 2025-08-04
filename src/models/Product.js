@@ -23,24 +23,21 @@ const productSchema = new mongoose.Schema(
       default: 0,
       min: [0, "El precio promocional no puede ser negativo"],
     },
-    // Costo interno (no se muestra en tienda) - AHORA OPCIONAL
+    // Costo interno (no se muestra en tienda) - OPCIONAL
     cost: {
       type: Number,
-      // required: [true, "Por favor proporcione el costo del producto"], // REMOVIDO
       min: [0, "El costo no puede ser negativo"],
-      default: 0, // Valor por defecto
+      default: 0,
     },
-    // Margen de ganancia (%) calculado o manual - AHORA OPCIONAL
+    // Margen de ganancia (%) calculado o manual - OPCIONAL
     profitMargin: {
       type: Number,
-      // required: [true, "Por favor proporcione el margen de ganancia"], // REMOVIDO
       min: [0, "El margen no puede ser negativo"],
       max: [100, "El margen no puede exceder el 100%"],
-      default: 0, // Valor por defecto
+      default: 0,
     },
     stock: {
       type: Number,
-      // required: [true, "Por favor proporcione el stock"], // REMOVIDO para hacerlo opcional
       min: [0, "El stock no puede ser negativo"],
       default: 0,
     },
@@ -48,102 +45,214 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: [true, "Por favor proporcione una categoría"],
       enum: [
-        "ropa",
-        "camisetas",
-        "pantalones",
-        "abrigos",
-        "calzado",
-        "accesorios",
-        "electronica",
-        "hogar",
-        "deporte",
-        "ofertas",
+        "pollos-enteros",
+        "cortes-pollo",
+        "huevos",
+        "marinados",
+        "embutidos",
+        "menudencias",
+        "productos-organicos",
+        "preparados",
+        "promociones",
         "otros",
       ],
-      // default: "otros", // Removido para forzar selección
     },
-    // Atributos comunes para productos de indumentaria
-    sizes: {
+
+    // === CAMPOS ESPECÍFICOS PARA POLLERÍA ===
+
+    // Peso del producto (en kg o gramos)
+    weight: {
+      type: Number,
+      min: [0, "El peso no puede ser negativo"],
+      default: 0,
+    },
+    weightUnit: {
+      type: String,
+      enum: ["kg", "g", "unidad", "docena"],
+      default: "kg",
+    },
+
+    // Tipo de producto avícola
+    poultryType: {
+      type: String,
+      enum: [
+        "pollo",
+        "gallina",
+        "gallo",
+        "pollito",
+        "huevos",
+        "embutido",
+        "otro",
+      ],
+      default: "pollo",
+    },
+
+    // Tipo de crianza
+    farmingType: {
+      type: String,
+      enum: ["convencional", "organico", "libre-pastoreo", "sin-antibioticos"],
+      default: "convencional",
+    },
+
+    // Estado del producto
+    productState: {
+      type: String,
+      enum: ["fresco", "congelado", "marinado", "cocido", "ahumado"],
+      default: "fresco",
+    },
+
+    // Para cortes específicos
+    cut: {
+      type: String,
+      enum: [
+        "entero",
+        "trozado",
+        "pechuga",
+        "muslo",
+        "contramuslo",
+        "ala",
+        "cuadril",
+        "rabadilla",
+        "menudencias",
+        "otro",
+      ],
+      default: "entero",
+    },
+
+    // Rangos de peso para productos variables
+    weightRange: {
+      min: {
+        type: Number,
+        default: 0,
+      },
+      max: {
+        type: Number,
+        default: 0,
+      },
+    },
+
+    // Fecha de vencimiento (importante para productos frescos)
+    expirationDays: {
+      type: Number,
+      min: [0, "Los días de vencimiento no pueden ser negativos"],
+      default: 3, // Por defecto 3 días para productos frescos
+    },
+
+    // Información nutricional
+    nutritionalInfo: {
+      calories: {
+        type: Number,
+        default: 0,
+      },
+      protein: {
+        type: Number,
+        default: 0,
+      },
+      fat: {
+        type: Number,
+        default: 0,
+      },
+      // Por cada 100g
+      per100g: {
+        type: Boolean,
+        default: true,
+      },
+    },
+
+    // Ingredientes y alérgenos
+    ingredients: {
       type: [String],
       default: [],
     },
-    colors: {
+    allergens: {
       type: [String],
       default: [],
     },
-    // Variantes para combinaciones de talle y color con stock individual
+
+    // Certificaciones
+    certifications: {
+      type: [String],
+      enum: [
+        "organico",
+        "halal",
+        "kosher",
+        "sin-antibioticos",
+        "bienestar-animal",
+      ],
+      default: [],
+    },
+
+    // Variantes para diferentes pesos o presentaciones
     variants: {
       type: [
         {
-          size: String,
-          color: String,
+          weight: Number,
+          weightUnit: {
+            type: String,
+            enum: ["kg", "g", "unidad", "docena"],
+            default: "kg",
+          },
+          price: Number,
           stock: {
             type: Number,
             default: 0,
             min: 0,
           },
+          sku: String,
         },
       ],
       default: [],
     },
-    // Campos específicos para categorías de indumentaria
-    gender: {
-      type: String,
-      enum: ["hombre", "mujer", "unisex", "niños", "niñas", "bebés", ""],
-      default: "",
-    },
-    material: {
-      type: String,
-      default: "",
-    },
-    style: {
-      type: String,
-      default: "",
-    },
-    season: {
-      type: String,
-      enum: ["verano", "invierno", "primavera", "otoño", "todas", ""],
-      default: "",
-    },
-    // Campos específicos para pantalones
-    waistType: {
-      type: String,
-      enum: ["regular", "alto", "bajo", ""],
-      default: "",
-    },
-    fit: {
-      type: String,
-      enum: ["skinny", "slim", "regular", "relaxed", "bootcut", "wide", ""],
-      default: "",
-    },
-    // Campos específicos para calzado
-    heelHeight: {
-      type: Number,
-      default: 0,
-    },
-    soleType: {
-      type: String,
-      default: "",
-    },
+
     // Campos para fotos y presentación
     imageUrl: {
       type: String,
       required: [true, "Por favor proporcione una imagen"],
     },
-    // Imágenes adicionales para diferentes colores
+
+    // Información adicional de Cloudinary para la imagen principal
+    imageCloudinaryInfo: {
+      publicId: String,
+      format: String,
+      width: Number,
+      height: Number,
+      bytes: Number,
+    },
+
+    // Imágenes adicionales
     additionalImages: {
       type: [
         {
-          color: String,
           imageUrl: String,
+          description: String, // Ej: "producto marinado", "corte específico"
+          imageCloudinaryInfo: {
+            publicId: String,
+            format: String,
+            width: Number,
+            height: Number,
+            bytes: Number,
+          },
         },
       ],
       default: [],
     },
+
     featured: {
       type: Boolean,
       default: false,
     },
+
+    // Disponibilidad por días de la semana
+    availability: {
+      monday: { type: Boolean, default: true },
+      tuesday: { type: Boolean, default: true },
+      wednesday: { type: Boolean, default: true },
+      thursday: { type: Boolean, default: true },
+      friday: { type: Boolean, default: true },
+      saturday: { type: Boolean, default: true },
+      sunday: { type: Boolean, default: true },
+    },
+
     // Campos para valoraciones
     rating: {
       type: Number,
@@ -155,6 +264,19 @@ const productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+
+    // SKU único para inventario
+    sku: {
+      type: String,
+      unique: true,
+      sparse: true, // Permite que sea único solo si existe
+    },
+
+    // Estado del producto (activo/inactivo)
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,
@@ -163,12 +285,17 @@ const productSchema = new mongoose.Schema(
 
 // Crear índices para mejorar el rendimiento de las consultas
 productSchema.index({ category: 1 });
+productSchema.index({ poultryType: 1 });
+productSchema.index({ farmingType: 1 });
+productSchema.index({ productState: 1 });
 productSchema.index({ featured: 1 });
-productSchema.index({ salePrice: 1 }); // Cambiado de price a salePrice
-productSchema.index({ gender: 1 });
-productSchema.index({ "variants.size": 1, "variants.color": 1 });
+productSchema.index({ salePrice: 1 });
+productSchema.index({ isActive: 1 });
+productSchema.index({ sku: 1 });
+productSchema.index({ "variants.weight": 1 });
+productSchema.index({ createdAt: -1 });
 
-// Middleware pre-save para calcular stock total si hay variantes
+// Middleware pre-save para cálculos automáticos
 productSchema.pre("save", function (next) {
   // Si hay variantes, calcular el stock total
   if (this.variants && this.variants.length > 0) {
@@ -178,8 +305,15 @@ productSchema.pre("save", function (next) {
   }
 
   // Si se proporciona costo y precio de venta pero no margen, calcularlo
-  if (this.cost > 0 && this.salePrice > 0 && !this.profitMargin) {
+  if (this.cost > 0 && this.salePrice > 0 && this.profitMargin === 0) {
     this.profitMargin = ((this.salePrice - this.cost) / this.salePrice) * 100;
+  }
+
+  // Generar SKU automático si no existe
+  if (!this.sku) {
+    const categoryCode = this.category.substring(0, 3).toUpperCase();
+    const timestamp = Date.now().toString().slice(-6);
+    this.sku = `${categoryCode}-${timestamp}`;
   }
 
   next();
@@ -199,6 +333,52 @@ productSchema.virtual("discountPercentage").get(function () {
   }
   return 0;
 });
+
+// Virtual para precio efectivo (promocional si existe, sino el de venta)
+productSchema.virtual("effectivePrice").get(function () {
+  return this.hasDiscount ? this.promoPrice : this.salePrice;
+});
+
+// Virtual para verificar si está disponible hoy
+productSchema.virtual("availableToday").get(function () {
+  const today = new Date().getDay(); // 0 = domingo, 1 = lunes, etc.
+  const days = [
+    "sunday",
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+  ];
+  return this.availability[days[today]];
+});
+
+// Virtual para calcular precio por kg (si el producto se vende por peso)
+productSchema.virtual("pricePerKg").get(function () {
+  if (this.weight > 0 && this.weightUnit === "kg") {
+    return this.effectivePrice / this.weight;
+  } else if (this.weight > 0 && this.weightUnit === "g") {
+    return (this.effectivePrice / this.weight) * 1000;
+  }
+  return this.effectivePrice;
+});
+
+// Método para verificar si el producto está próximo a vencer
+productSchema.methods.isNearExpiration = function () {
+  if (!this.createdAt || this.expirationDays === 0) return false;
+
+  const creationDate = new Date(this.createdAt);
+  const expirationDate = new Date(creationDate);
+  expirationDate.setDate(expirationDate.getDate() + this.expirationDays);
+
+  const today = new Date();
+  const daysUntilExpiration = Math.ceil(
+    (expirationDate - today) / (1000 * 60 * 60 * 24)
+  );
+
+  return daysUntilExpiration <= 1; // Próximo a vencer si queda 1 día o menos
+};
 
 // Verificar si el modelo ya existe para evitar sobreescribirlo
 const Product =

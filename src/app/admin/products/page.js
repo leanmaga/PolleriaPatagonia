@@ -171,16 +171,15 @@ export default function ProductsAdminPage() {
           className="cursor-pointer px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
         >
           <option value="all">Todas las categorías</option>
-          <option value="ropa">Ropa</option>
-          <option value="camisetas">Camisetas</option>
-          <option value="pantalones">Pantalones</option>
-          <option value="abrigos">Abrigos</option>
-          <option value="calzado">Calzado</option>
-          <option value="accesorios">Accesorios</option>
-          <option value="electronica">Electrónica</option>
-          <option value="hogar">Hogar</option>
-          <option value="deporte">Deporte</option>
-          <option value="ofertas">Ofertas</option>
+          <option value="pollos-enteros">Pollos Enteros</option>
+          <option value="cortes-pollo">Cortes de Pollo</option>
+          <option value="huevos">Huevos</option>
+          <option value="marinados">Marinados y Adobados</option>
+          <option value="embutidos">Embutidos y Chorizos</option>
+          <option value="menudencias">Menudencias</option>
+          <option value="productos-organicos">Productos Orgánicos</option>
+          <option value="preparados">Preparados y Listos</option>
+          <option value="promociones">Promociones</option>
           <option value="otros">Otros</option>
         </select>
       </div>

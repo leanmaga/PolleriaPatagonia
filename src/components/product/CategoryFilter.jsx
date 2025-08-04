@@ -27,8 +27,8 @@ function CategoryFilterContent() {
       <button
         className={`px-5 py-2 rounded-full border transition-colors text-sm ${
           currentCategory === "all"
-            ? "border-indigo-500 bg-indigo-500 text-white"
-            : "border-gray-300 hover:border-black text-black"
+            ? "border-orange-500 bg-orange-500 text-white"
+            : "border-gray-300 hover:border-orange-400 text-black"
         }`}
         onClick={() => handleCategoryChange("all")}
       >
@@ -36,109 +36,99 @@ function CategoryFilterContent() {
       </button>
       <button
         className={`px-5 py-2 rounded-full border transition-colors text-sm ${
-          currentCategory === "ropa"
-            ? "border-indigo-500 bg-indigo-500 text-white"
-            : "border-gray-300 hover:border-black text-black"
+          currentCategory === "pollos-enteros"
+            ? "border-orange-500 bg-orange-500 text-white"
+            : "border-gray-300 hover:border-orange-400 text-black"
         }`}
-        onClick={() => handleCategoryChange("ropa")}
+        onClick={() => handleCategoryChange("pollos-enteros")}
       >
-        Ropa
+        Pollos Enteros
       </button>
       <button
         className={`px-5 py-2 rounded-full border transition-colors text-sm ${
-          currentCategory === "electronica"
-            ? "border-indigo-500 bg-indigo-500 text-white"
-            : "border-gray-300 hover:border-black text-black"
+          currentCategory === "cortes-pollo"
+            ? "border-orange-500 bg-orange-500 text-white"
+            : "border-gray-300 hover:border-orange-400 text-black"
         }`}
-        onClick={() => handleCategoryChange("electronica")}
+        onClick={() => handleCategoryChange("cortes-pollo")}
       >
-        Electrónica
+        Cortes de Pollo
       </button>
       <button
         className={`px-5 py-2 rounded-full border transition-colors text-sm ${
-          currentCategory === "hogar"
-            ? "border-indigo-500 bg-indigo-500 text-white"
-            : "border-gray-300 hover:border-black text-black"
+          currentCategory === "huevos"
+            ? "border-orange-500 bg-orange-500 text-white"
+            : "border-gray-300 hover:border-orange-400 text-black"
         }`}
-        onClick={() => handleCategoryChange("hogar")}
+        onClick={() => handleCategoryChange("huevos")}
       >
-        Hogar
+        Huevos
       </button>
       <button
         className={`px-5 py-2 rounded-full border transition-colors text-sm ${
-          currentCategory === "ofertas"
-            ? "border-indigo-500 bg-indigo-500 text-white"
-            : "border-gray-300 hover:border-black text-black"
+          currentCategory === "marinados"
+            ? "border-orange-500 bg-orange-500 text-white"
+            : "border-gray-300 hover:border-orange-400 text-black"
         }`}
-        onClick={() => handleCategoryChange("ofertas")}
+        onClick={() => handleCategoryChange("marinados")}
       >
-        Ofertas
+        Marinados
       </button>
       <button
         className={`px-5 py-2 rounded-full border transition-colors text-sm ${
-          currentCategory === "camisetas"
-            ? "border-indigo-500 bg-indigo-500 text-white"
-            : "border-gray-300 hover:border-black text-black"
+          currentCategory === "embutidos"
+            ? "border-orange-500 bg-orange-500 text-white"
+            : "border-gray-300 hover:border-orange-400 text-black"
         }`}
-        onClick={() => handleCategoryChange("camisetas")}
+        onClick={() => handleCategoryChange("embutidos")}
       >
-        Camisetas
+        Embutidos
       </button>
       <button
         className={`px-5 py-2 rounded-full border transition-colors text-sm ${
-          currentCategory === "pantalones"
-            ? "border-indigo-500 bg-indigo-500 text-white"
-            : "border-gray-300 hover:border-black text-black"
+          currentCategory === "menudencias"
+            ? "border-orange-500 bg-orange-500 text-white"
+            : "border-gray-300 hover:border-orange-400 text-black"
         }`}
-        onClick={() => handleCategoryChange("pantalones")}
+        onClick={() => handleCategoryChange("menudencias")}
       >
-        Pantalones
+        Menudencias
       </button>
       <button
         className={`px-5 py-2 rounded-full border transition-colors text-sm ${
-          currentCategory === "abrigos"
-            ? "border-indigo-500 bg-indigo-500 text-white"
-            : "border-gray-300 hover:border-black text-black"
+          currentCategory === "productos-organicos"
+            ? "border-orange-500 bg-orange-500 text-white"
+            : "border-gray-300 hover:border-orange-400 text-black"
         }`}
-        onClick={() => handleCategoryChange("abrigos")}
+        onClick={() => handleCategoryChange("productos-organicos")}
       >
-        Abrigos
+        Orgánicos
       </button>
       <button
         className={`px-5 py-2 rounded-full border transition-colors text-sm ${
-          currentCategory === "calzado"
-            ? "border-indigo-500 bg-indigo-500 text-white"
-            : "border-gray-300 hover:border-black text-black"
+          currentCategory === "preparados"
+            ? "border-orange-500 bg-orange-500 text-white"
+            : "border-gray-300 hover:border-orange-400 text-black"
         }`}
-        onClick={() => handleCategoryChange("calzado")}
+        onClick={() => handleCategoryChange("preparados")}
       >
-        Calzado
+        Preparados
       </button>
       <button
         className={`px-5 py-2 rounded-full border transition-colors text-sm ${
-          currentCategory === "accesorios"
-            ? "border-indigo-500 bg-indigo-500 text-white"
-            : "border-gray-300 hover:border-black text-black"
+          currentCategory === "promociones"
+            ? "border-orange-500 bg-orange-500 text-white"
+            : "border-gray-300 hover:border-orange-400 text-black"
         }`}
-        onClick={() => handleCategoryChange("accesorios")}
+        onClick={() => handleCategoryChange("promociones")}
       >
-        Accesorios
-      </button>
-      <button
-        className={`px-5 py-2 rounded-full border transition-colors text-sm ${
-          currentCategory === "deporte"
-            ? "border-indigo-500 bg-indigo-500 text-white"
-            : "border-gray-300 hover:border-black text-black"
-        }`}
-        onClick={() => handleCategoryChange("deporte")}
-      >
-        Deporte
+        Promociones
       </button>
       <button
         className={`px-5 py-2 rounded-full border transition-colors text-sm ${
           currentCategory === "otros"
-            ? "border-indigo-500 bg-indigo-500 text-white"
-            : "border-gray-300 hover:border-black text-black"
+            ? "border-orange-500 bg-orange-500 text-white"
+            : "border-gray-300 hover:border-orange-400 text-black"
         }`}
         onClick={() => handleCategoryChange("otros")}
       >

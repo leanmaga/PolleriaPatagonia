@@ -3,70 +3,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
-import {
-  XCircleIcon,
-  PlusCircleIcon,
-  ExclamationTriangleIcon,
-} from "@heroicons/react/24/outline";
-import Image from "next/image";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import MultipleImageUploader from "@/components/admin/MultipleImageUploader";
-
-// Categorías que usan variantes (talle + color)
-const variantCategories = ["camisetas", "pantalones", "calzado", "abrigos"];
-
-// Categorías que usan campos específicos
-const clothingCategories = [
-  "camisetas",
-  "pantalones",
-  "calzado",
-  "abrigos",
-  "accesorios",
-];
-
-// Opciones predefinidas de talles y colores por categoría
-const sizeOptions = {
-  camisetas: ["XS", "S", "M", "L", "XL", "XXL", "XXXL"],
-  pantalones: ["36", "38", "40", "42", "44", "46", "48", "50", "52", "54"],
-  calzado: [
-    "35",
-    "36",
-    "37",
-    "38",
-    "39",
-    "40",
-    "41",
-    "42",
-    "43",
-    "44",
-    "45",
-    "46",
-  ],
-  abrigos: ["XS", "S", "M", "L", "XL", "XXL"],
-  accesorios: ["Único"],
-};
-
-const commonColors = [
-  "Negro",
-  "Blanco",
-  "Azul",
-  "Rojo",
-  "Gris",
-  "Marrón",
-  "Verde",
-  "Amarillo",
-  "Naranja",
-  "Púrpura",
-  "Rosa",
-  "Beige",
-  "Navy",
-  "Khaki",
-];
-
-const genderOptions = ["hombre", "mujer", "unisex", "niños", "niñas", "bebés"];
-
-const seasonOptions = ["verano", "invierno", "primavera", "otoño", "todas"];
-const waistTypeOptions = ["regular", "alto", "bajo"];
-const fitOptions = ["skinny", "slim", "regular", "relaxed", "bootcut", "wide"];
 
 export default function AddProductPage() {
   const { data: session, status } = useSession();
@@ -74,7 +12,7 @@ export default function AddProductPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
 
-  // 🔧 ESTADOS CORREGIDOS - Solo URLs de Cloudinary, NO archivos
+  // Estados para imágenes - Solo URLs de Cloudinary
   const [mainImageUrl, setMainImageUrl] = useState("");
   const [mainImageInfo, setMainImageInfo] = useState(null);
   const [additionalImages, setAdditionalImages] = useState([]);
@@ -82,40 +20,18 @@ export default function AddProductPage() {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    // Precio de venta es obligatorio, los demás son opcionales
     salePrice: "",
     promoPrice: "",
     cost: "",
     profitMargin: "",
     stock: "",
-    category: "", // Sin valor por defecto para forzar selección
+    category: "",
     featured: false,
-    // Campos para indumentaria
-    sizes: [],
-    colors: [],
-    variants: [],
-    gender: "",
-    material: "",
-    style: "",
-    season: "",
-    // Campos para pantalones
-    waistType: "",
-    fit: "",
-    // Campos para calzado
-    heelHeight: "",
-    soleType: "",
   });
 
   // Estado para calcular automáticamente el margen
   const [autoCalculateMargin, setAutoCalculateMargin] = useState(true);
   const [showFinancialInfo, setShowFinancialInfo] = useState(false);
-
-  // Estado para opciones de talle y color
-  const [newSize, setNewSize] = useState("");
-  const [newColor, setNewColor] = useState("");
-  const [showVariants, setShowVariants] = useState(false);
-  const [showExtraFields, setShowExtraFields] = useState(false);
-  const [clothingType, setClothingType] = useState("");
 
   // Efecto para calcular el margen automáticamente
   useEffect(() => {
@@ -133,60 +49,7 @@ export default function AddProductPage() {
     }
   }, [formData.salePrice, formData.cost, autoCalculateMargin]);
 
-  // Efecto para mostrar campos específicos según la categoría
-  useEffect(() => {
-    const needsVariants = variantCategories.includes(formData.category);
-    const isClothing = clothingCategories.includes(formData.category);
-
-    setShowVariants(needsVariants);
-    setShowExtraFields(isClothing);
-    setClothingType(formData.category);
-
-    // Si cambia la categoría y no necesita variantes, limpiar las variantes
-    if (!needsVariants) {
-      setFormData((prev) => ({
-        ...prev,
-        sizes: [],
-        colors: [],
-        variants: [],
-      }));
-    }
-  }, [formData.category]);
-
-  // Efecto para autogenerar variantes cuando cambian talles o colores
-  useEffect(() => {
-    if (
-      showVariants &&
-      formData.sizes.length > 0 &&
-      formData.colors.length > 0
-    ) {
-      const newVariants = [];
-      formData.sizes.forEach((size) => {
-        formData.colors.forEach((color) => {
-          const existingVariant = formData.variants.find(
-            (v) => v.size === size && v.color === color
-          );
-
-          if (existingVariant) {
-            newVariants.push(existingVariant);
-          } else {
-            newVariants.push({
-              size,
-              color,
-              stock: 0,
-            });
-          }
-        });
-      });
-
-      setFormData((prev) => ({
-        ...prev,
-        variants: newVariants,
-      }));
-    }
-  }, [showVariants, formData.sizes, formData.colors, formData.variants]);
-
-  // Usar useEffect para la redirección
+  // Redirección de autenticación
   useEffect(() => {
     if (
       status === "unauthenticated" ||
@@ -213,7 +76,7 @@ export default function AddProductPage() {
     }
   };
 
-  // 🔧 FUNCIONES CORREGIDAS - Manejar URLs de Cloudinary directamente
+  // Manejar cambio de imagen principal
   const handleMainImageChange = (info, imageUrl, color) => {
     setMainImageUrl(imageUrl);
     setMainImageInfo(info);
@@ -241,78 +104,6 @@ export default function AddProductPage() {
     setAdditionalImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Manejar cambio en el stock de una variante
-  const handleVariantStockChange = (index, newStock) => {
-    const updatedVariants = [...formData.variants];
-    updatedVariants[index] = {
-      ...updatedVariants[index],
-      stock: parseInt(newStock) || 0,
-    };
-
-    setFormData((prev) => ({
-      ...prev,
-      variants: updatedVariants,
-    }));
-  };
-
-  // Agregar un nuevo talle
-  const handleAddSize = () => {
-    if (newSize && !formData.sizes.includes(newSize)) {
-      setFormData((prev) => ({
-        ...prev,
-        sizes: [...prev.sizes, newSize],
-      }));
-      setNewSize("");
-    }
-  };
-
-  // Agregar un nuevo color
-  const handleAddColor = () => {
-    if (newColor && !formData.colors.includes(newColor)) {
-      setFormData((prev) => ({
-        ...prev,
-        colors: [...prev.colors, newColor],
-      }));
-      setNewColor("");
-    }
-  };
-
-  // Eliminar un talle
-  const handleRemoveSize = (size) => {
-    setFormData((prev) => ({
-      ...prev,
-      sizes: prev.sizes.filter((s) => s !== size),
-    }));
-  };
-
-  // Eliminar un color
-  const handleRemoveColor = (color) => {
-    setFormData((prev) => ({
-      ...prev,
-      colors: prev.colors.filter((c) => c !== color),
-    }));
-  };
-
-  // Agregar un talle predefinido
-  const handleAddPredefinedSize = (size) => {
-    if (!formData.sizes.includes(size)) {
-      setFormData((prev) => ({
-        ...prev,
-        sizes: [...prev.sizes, size],
-      }));
-    }
-  };
-
-  // Agregar un color predefinido
-  const handleAddPredefinedColor = (color) => {
-    if (!formData.colors.includes(color)) {
-      setFormData((prev) => ({
-        ...prev,
-        colors: [...prev.colors, color],
-      }));
-    }
-  };
-
   // Función de validación
   const validateForm = () => {
     const errors = {};
@@ -331,7 +122,6 @@ export default function AddProductPage() {
         "El precio de venta es obligatorio y debe ser mayor a 0";
     }
 
-    // 🔧 VALIDACIÓN CORREGIDA - Verificar URL de imagen, no archivo
     if (!mainImageUrl) {
       errors.image = "Debes subir una imagen principal del producto";
     }
@@ -353,28 +143,14 @@ export default function AddProductPage() {
       errors.promoPrice = "El precio promocional no puede ser negativo";
     }
 
-    // Validar stock según la categoría
-    if (!showVariants) {
-      if (formData.stock && parseInt(formData.stock) < 0) {
-        errors.stock = "El stock no puede ser negativo";
-      }
-    } else {
-      // Para productos con variantes, validar si hay talles y colores (opcional)
-      if (formData.sizes.length > 0 || formData.colors.length > 0) {
-        if (formData.sizes.length === 0) {
-          errors.sizes = "Si agregas colores, debes agregar al menos un talle";
-        }
-        if (formData.colors.length === 0) {
-          errors.colors = "Si agregas talles, debes agregar al menos un color";
-        }
-      }
+    if (formData.stock && parseInt(formData.stock) < 0) {
+      errors.stock = "El stock no puede ser negativo";
     }
 
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  // 🔧 FUNCIÓN HANDLESUBMIT CORREGIDA - Sin subida de archivos
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -394,20 +170,20 @@ export default function AddProductPage() {
     setIsSubmitting(true);
 
     try {
-      // 🎯 PREPARAR DATOS - Solo URLs, no archivos
+      // Preparar datos del producto
       const productData = {
         title: formData.title.trim(),
         description: formData.description.trim(),
         salePrice: parseFloat(formData.salePrice),
         category: formData.category,
         featured: formData.featured,
+        stock: parseInt(formData.stock) || 0,
       };
 
-      // 🔧 IMAGEN PRINCIPAL - URL directa de Cloudinary
+      // Imagen principal
       if (mainImageUrl) {
         productData.imageUrl = mainImageUrl;
 
-        // Agregar info de Cloudinary si está disponible
         if (mainImageInfo) {
           productData.imageCloudinaryInfo = {
             publicId: mainImageInfo.public_id,
@@ -419,11 +195,10 @@ export default function AddProductPage() {
         }
       }
 
-      // 🔧 IMÁGENES ADICIONALES - URLs directas de Cloudinary
+      // Imágenes adicionales
       productData.additionalImages = additionalImages.map((img) => ({
         imageUrl: img.imageUrl,
         color: img.color || "",
-        // Agregar info de Cloudinary si está disponible
         ...(img.info && {
           imageCloudinaryInfo: {
             publicId: img.info.public_id,
@@ -448,38 +223,7 @@ export default function AddProductPage() {
         productData.profitMargin = parseFloat(formData.profitMargin);
       }
 
-      // Campos de indumentaria (solo si tienen valor)
-      if (formData.gender) productData.gender = formData.gender;
-      if (formData.material) productData.material = formData.material;
-      if (formData.style) productData.style = formData.style;
-      if (formData.season) productData.season = formData.season;
-
-      // Campos específicos
-      if (formData.waistType) productData.waistType = formData.waistType;
-      if (formData.fit) productData.fit = formData.fit;
-      if (formData.heelHeight)
-        productData.heelHeight = parseFloat(formData.heelHeight);
-      if (formData.soleType) productData.soleType = formData.soleType;
-
-      // Agregar talles, colores y variantes si corresponde
-      if (
-        showVariants &&
-        formData.sizes.length > 0 &&
-        formData.colors.length > 0
-      ) {
-        productData.sizes = formData.sizes;
-        productData.colors = formData.colors;
-        productData.variants = formData.variants;
-        productData.stock = formData.variants.reduce(
-          (sum, variant) => sum + variant.stock,
-          0
-        );
-      } else if (formData.stock) {
-        productData.stock = parseInt(formData.stock) || 0;
-      }
-
-      // 🔧 CREAR EL PRODUCTO - Sin subir archivos
-
+      // Crear el producto
       const productResponse = await fetch("/api/products", {
         method: "POST",
         headers: {
@@ -513,7 +257,7 @@ export default function AddProductPage() {
     }
   };
 
-  // Si está cargando o no está autenticado, mostrar estado apropiado
+  // Loading state
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -597,16 +341,15 @@ export default function AddProductPage() {
               }`}
             >
               <option value="">Selecciona una categoría</option>
-              <option value="ropa">Ropa (General)</option>
-              <option value="camisetas">Camisetas</option>
-              <option value="pantalones">Pantalones</option>
-              <option value="abrigos">Abrigos</option>
-              <option value="calzado">Calzado</option>
-              <option value="accesorios">Accesorios</option>
-              <option value="electronica">Electrónica</option>
-              <option value="hogar">Hogar</option>
-              <option value="deporte">Deporte</option>
-              <option value="ofertas">Ofertas</option>
+              <option value="pollos-enteros">Pollos Enteros</option>
+              <option value="cortes-pollo">Cortes de Pollo</option>
+              <option value="huevos">Huevos</option>
+              <option value="marinados">Marinados y Adobados</option>
+              <option value="embutidos">Embutidos y Chorizos</option>
+              <option value="menudencias">Menudencias</option>
+              <option value="productos-organicos">Productos Orgánicos</option>
+              <option value="preparados">Preparados y Listos</option>
+              <option value="promociones">Promociones</option>
               <option value="otros">Otros</option>
             </select>
             {validationErrors.category && (
@@ -617,7 +360,7 @@ export default function AddProductPage() {
           </div>
         </div>
 
-        {/* Precio de venta (separado de información financiera) */}
+        {/* Precio de venta y Stock */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label
@@ -647,33 +390,30 @@ export default function AddProductPage() {
             )}
           </div>
 
-          {/* Stock (solo para productos sin variantes) */}
-          {!showVariants && (
-            <div>
-              <label
-                htmlFor="stock"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Stock
-              </label>
-              <input
-                type="number"
-                id="stock"
-                name="stock"
-                value={formData.stock}
-                onChange={handleChange}
-                min="0"
-                className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                  validationErrors.stock ? "border-red-500" : "border-gray-300"
-                }`}
-              />
-              {validationErrors.stock && (
-                <p className="mt-1 text-sm text-red-600">
-                  {validationErrors.stock}
-                </p>
-              )}
-            </div>
-          )}
+          <div>
+            <label
+              htmlFor="stock"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Stock
+            </label>
+            <input
+              type="number"
+              id="stock"
+              name="stock"
+              value={formData.stock}
+              onChange={handleChange}
+              min="0"
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+                validationErrors.stock ? "border-red-500" : "border-gray-300"
+              }`}
+            />
+            {validationErrors.stock && (
+              <p className="mt-1 text-sm text-red-600">
+                {validationErrors.stock}
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Descripción */}
@@ -849,387 +589,7 @@ export default function AddProductPage() {
           )}
         </div>
 
-        {/* Campos adicionales para productos de indumentaria */}
-        {showExtraFields && (
-          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-medium text-gray-800 mb-3">
-              Detalles del producto
-            </h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              {/* Género */}
-              <div>
-                <label
-                  htmlFor="gender"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Género
-                </label>
-                <select
-                  id="gender"
-                  name="gender"
-                  value={formData.gender}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                >
-                  <option value="">Seleccionar</option>
-                  {genderOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option.charAt(0).toUpperCase() + option.slice(1)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Temporada */}
-              <div>
-                <label
-                  htmlFor="season"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Temporada
-                </label>
-                <select
-                  id="season"
-                  name="season"
-                  value={formData.season}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                >
-                  <option value="">Seleccionar</option>
-                  {seasonOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option.charAt(0).toUpperCase() + option.slice(1)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Material */}
-              <div>
-                <label
-                  htmlFor="material"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Material
-                </label>
-                <input
-                  type="text"
-                  id="material"
-                  name="material"
-                  value={formData.material}
-                  onChange={handleChange}
-                  placeholder="Ej: Algodón, Poliéster, Lana..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
-
-              {/* Estilo */}
-              <div>
-                <label
-                  htmlFor="style"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Estilo
-                </label>
-                <input
-                  type="text"
-                  id="style"
-                  name="style"
-                  value={formData.style}
-                  onChange={handleChange}
-                  placeholder="Ej: Casual, Formal, Deportivo..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
-            </div>
-
-            {/* Campos específicos para pantalones */}
-            {formData.category === "pantalones" && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                <div>
-                  <label
-                    htmlFor="waistType"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Tipo de cintura
-                  </label>
-                  <select
-                    id="waistType"
-                    name="waistType"
-                    value={formData.waistType}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  >
-                    <option value="">Seleccionar</option>
-                    {waistTypeOptions.map((option) => (
-                      <option key={option} value={option}>
-                        {option.charAt(0).toUpperCase() + option.slice(1)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="fit"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Corte
-                  </label>
-                  <select
-                    id="fit"
-                    name="fit"
-                    value={formData.fit}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  >
-                    <option value="">Seleccionar</option>
-                    {fitOptions.map((option) => (
-                      <option key={option} value={option}>
-                        {option.charAt(0).toUpperCase() + option.slice(1)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            )}
-
-            {/* Campos específicos para calzado */}
-            {formData.category === "calzado" && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                <div>
-                  <label
-                    htmlFor="heelHeight"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Altura del tacón (cm)
-                  </label>
-                  <input
-                    type="number"
-                    id="heelHeight"
-                    name="heelHeight"
-                    value={formData.heelHeight}
-                    onChange={handleChange}
-                    min="0"
-                    step="0.1"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="soleType"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Tipo de suela
-                  </label>
-                  <input
-                    type="text"
-                    id="soleType"
-                    name="soleType"
-                    value={formData.soleType}
-                    onChange={handleChange}
-                    placeholder="Ej: Goma, Cuero, Sintética..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Sección de talle y color para productos con variantes */}
-        {showVariants && (
-          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-medium text-gray-800 mb-3">
-              Opciones de talle y color
-            </h3>
-
-            {/* Sección de Talles */}
-            <div className="mb-4">
-              <h4 className="text-md font-medium text-gray-700 mb-2">
-                Talles disponibles
-              </h4>
-
-              {/* Añadir talles predefinidos */}
-              <div className="flex flex-wrap gap-2 mb-3">
-                {sizeOptions[formData.category]?.map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    className={`px-3 py-1 rounded-full text-xs ${
-                      formData.sizes.includes(size)
-                        ? "bg-indigo-600 text-white"
-                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    }`}
-                    onClick={() => handleAddPredefinedSize(size)}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-
-              {/* Input para añadir talles personalizados */}
-              <div className="flex items-center mb-2">
-                <input
-                  type="text"
-                  value={newSize}
-                  onChange={(e) => setNewSize(e.target.value)}
-                  placeholder="Añadir talle personalizado"
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                />
-                <button
-                  type="button"
-                  onClick={handleAddSize}
-                  className="ml-2 p-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-                >
-                  <PlusCircleIcon className="h-5 w-5" />
-                </button>
-              </div>
-
-              {/* Lista de talles seleccionados */}
-              <div className="flex flex-wrap gap-2 mb-3">
-                {formData.sizes.map((size) => (
-                  <div
-                    key={size}
-                    className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full flex items-center text-sm"
-                  >
-                    <span>{size}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveSize(size)}
-                      className="ml-1 text-indigo-500 hover:text-indigo-700"
-                    >
-                      <XCircleIcon className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-              {validationErrors.sizes && (
-                <p className="text-sm text-red-600">{validationErrors.sizes}</p>
-              )}
-            </div>
-
-            {/* Sección de Colores */}
-            <div className="mb-4">
-              <h4 className="text-md font-medium text-gray-700 mb-2">
-                Colores disponibles
-              </h4>
-
-              {/* Añadir colores predefinidos */}
-              <div className="flex flex-wrap gap-2 mb-3">
-                {commonColors.map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    className={`px-3 py-1 rounded-full text-xs ${
-                      formData.colors.includes(color)
-                        ? "bg-indigo-600 text-white"
-                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    }`}
-                    onClick={() => handleAddPredefinedColor(color)}
-                  >
-                    {color}
-                  </button>
-                ))}
-              </div>
-
-              {/* Input para añadir colores personalizados */}
-              <div className="flex items-center mb-2">
-                <input
-                  type="text"
-                  value={newColor}
-                  onChange={(e) => setNewColor(e.target.value)}
-                  placeholder="Añadir color personalizado"
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                />
-                <button
-                  type="button"
-                  onClick={handleAddColor}
-                  className="ml-2 p-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-                >
-                  <PlusCircleIcon className="h-5 w-5" />
-                </button>
-              </div>
-
-              {/* Lista de colores seleccionados */}
-              <div className="flex flex-wrap gap-2 mb-3">
-                {formData.colors.map((color) => (
-                  <div
-                    key={color}
-                    className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full flex items-center text-sm"
-                  >
-                    <span>{color}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveColor(color)}
-                      className="ml-1 text-indigo-500 hover:text-indigo-700"
-                    >
-                      <XCircleIcon className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-              {validationErrors.colors && (
-                <p className="text-sm text-red-600">
-                  {validationErrors.colors}
-                </p>
-              )}
-            </div>
-
-            {/* Tabla de Variantes */}
-            {formData.variants.length > 0 && (
-              <div className="mt-4">
-                <h4 className="text-md font-medium text-gray-700 mb-2">
-                  Inventario por variante
-                </h4>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full border divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Talle
-                        </th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Color
-                        </th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Stock
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {formData.variants.map((variant, index) => (
-                        <tr key={`${variant.size}-${variant.color}`}>
-                          <td className="px-4 py-2 whitespace-nowrap">
-                            {variant.size}
-                          </td>
-                          <td className="px-4 py-2 whitespace-nowrap">
-                            {variant.color}
-                          </td>
-                          <td className="px-4 py-2 whitespace-nowrap">
-                            <input
-                              type="number"
-                              min="0"
-                              value={variant.stock}
-                              onChange={(e) =>
-                                handleVariantStockChange(index, e.target.value)
-                              }
-                              className="w-24 px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                            />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/*  SECCIÓN DE IMÁGENES */}
+        {/* Sección de imágenes */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Imágenes del producto <span className="text-red-500">*</span>
@@ -1245,7 +605,7 @@ export default function AddProductPage() {
               onMainImageChange={handleMainImageChange}
               onAddImage={handleAddImage}
               onRemoveImage={handleRemoveImage}
-              colors={formData.colors}
+              colors={[]}
               forceSquareCrop={false}
               showCropPreview={true}
             />

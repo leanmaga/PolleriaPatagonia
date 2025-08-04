@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import LegalModal from "../LegalModal";
 import { legalDocuments } from "../LegalDocuments";
+import Image from "next/image";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -37,13 +38,31 @@ const Footer = () => {
           <div className="w-full flex flex-col sm:flex-row sm:justify-between gap-8 mb-10 sm:mb-16">
             {/* Logo Column - Centrado en móvil, alineado a la izquierda en desktop */}
             <div className="flex flex-col items-center sm:items-start">
-              <Link href="/" className="text-2xl font-bold font-drop">
-                PolleríaPatagonia
-              </Link>
+              <div className="flex items-center sm:items-start">
+                <Link href="/" className="text-2xl font-bold font-drop">
+                  <Image
+                    src="/images/solcampestreblanco.png"
+                    alt="Logo"
+                    width={65}
+                    height={65}
+                    className="object-cover rounded"
+                  />
+                </Link>
+                <Link href="/" className="text-2xl font-bold font-drop">
+                  <Image
+                    src="/images/solcampestre.png"
+                    alt="Logo"
+                    width={120}
+                    height={65}
+                    className="object-contain hidden sm:block mt-4 ml-4"
+                  />
+                </Link>
+              </div>
+
               {/* Copyright */}
               <div className="text-center sm:text-left">
-                <p className="text-xs text-gray-400 font-drop">
-                  © {currentYear} PolleríaPatagonia
+                <p className="text-xs text-gray-400 font-drop mt-2">
+                  © {currentYear} Sol Campestre
                 </p>
               </div>
             </div>

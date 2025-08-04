@@ -95,9 +95,20 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
-              <h3 className="text-2xl font-bold font-drop">
-                PolleríaPatagonia
-              </h3>
+              <Image
+                src="/images/solcampestrecolor.png"
+                alt="Logo"
+                width={65}
+                height={65}
+                className="object-cover rounded"
+              />
+              <Image
+                src="/images/solcampestre.png"
+                alt="Logo"
+                width={120}
+                height={65}
+                className="object-contain hidden sm:block ml-2"
+              />
             </Link>
           </div>
 

@@ -1,4 +1,4 @@
-// app/api/products/route.js - COMPATIBLE CON TU MODELO
+// app/api/products/route.js - API ESPECÍFICA PARA POLLERÍA
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Product from "@/models/Product";
@@ -12,16 +12,71 @@ export async function GET(request) {
     const page = parseInt(searchParams.get("page")) || 1;
     const limit = parseInt(searchParams.get("limit")) || 10;
     const category = searchParams.get("category");
+    const poultryType = searchParams.get("poultryType");
+    const farmingType = searchParams.get("farmingType");
+    const productState = searchParams.get("productState");
+    const featured = searchParams.get("featured");
+    const minPrice = parseFloat(searchParams.get("minPrice")) || 0;
+    const maxPrice = parseFloat(searchParams.get("maxPrice"));
+    const availableToday = searchParams.get("availableToday");
+    const search = searchParams.get("search");
     const skip = (page - 1) * limit;
 
     await connectDB();
 
     // Construir query base
-    let query = {};
+    let query = { isActive: true }; // Solo productos activos
 
-    // Añadir filtro de categoría si está presente y no es "all"
+    // Filtros específicos para pollería
     if (category && category !== "all") {
       query.category = category;
+    }
+
+    if (poultryType && poultryType !== "all") {
+      query.poultryType = poultryType;
+    }
+
+    if (farmingType && farmingType !== "all") {
+      query.farmingType = farmingType;
+    }
+
+    if (productState && productState !== "all") {
+      query.productState = productState;
+    }
+
+    if (featured === "true") {
+      query.featured = true;
+    }
+
+    // Filtro de precio
+    if (minPrice > 0 || maxPrice) {
+      query.salePrice = {};
+      if (minPrice > 0) query.salePrice.$gte = minPrice;
+      if (maxPrice) query.salePrice.$lte = maxPrice;
+    }
+
+    // Filtro de disponibilidad para hoy
+    if (availableToday === "true") {
+      const today = new Date().getDay();
+      const days = [
+        "sunday",
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+      ];
+      query[`availability.${days[today]}`] = true;
+    }
+
+    // Búsqueda por texto
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+        { sku: { $regex: search, $options: "i" } },
+      ];
     }
 
     // Get total count with filters
@@ -29,17 +84,40 @@ export async function GET(request) {
 
     // Get products with pagination and filters
     const products = await Product.find(query)
-      .sort({ createdAt: -1 })
+      .sort({ featured: -1, createdAt: -1 }) // Destacados primero, luego por fecha
       .skip(skip)
       .limit(limit);
 
+    // Agregar información calculada a cada producto
+    const productsWithInfo = products.map((product) => {
+      const productObj = product.toObject();
+
+      // Agregar virtuals manualmente
+      productObj.hasDiscount = product.hasDiscount;
+      productObj.discountPercentage = product.discountPercentage;
+      productObj.effectivePrice = product.effectivePrice;
+      productObj.availableToday = product.availableToday;
+      productObj.pricePerKg = product.pricePerKg;
+      productObj.isNearExpiration = product.isNearExpiration();
+
+      return productObj;
+    });
+
     return NextResponse.json({
-      products,
+      products: productsWithInfo,
       pagination: {
         total,
         page,
         limit,
         pages: Math.ceil(total / limit),
+      },
+      filters: {
+        categories: await Product.distinct("category", { isActive: true }),
+        poultryTypes: await Product.distinct("poultryType", { isActive: true }),
+        farmingTypes: await Product.distinct("farmingType", { isActive: true }),
+        productStates: await Product.distinct("productState", {
+          isActive: true,
+        }),
       },
     });
   } catch (error) {
@@ -51,7 +129,6 @@ export async function GET(request) {
   }
 }
 
-// POST method actualizado para tu modelo
 export async function POST(request) {
   try {
     // Autenticación: sólo admins pueden crear productos
@@ -63,7 +140,7 @@ export async function POST(request) {
     const data = await request.json();
     await connectDB();
 
-    // Validaciones de campos obligatorios según tu modelo
+    // Validaciones de campos obligatorios
     if (!data.title || !data.salePrice || !data.category || !data.imageUrl) {
       const missingFields = [];
       if (!data.title) missingFields.push("Nombre del producto");
@@ -91,7 +168,36 @@ export async function POST(request) {
       );
     }
 
-    // Preparar datos del producto según tu modelo
+    // Validar categorías válidas para pollería
+    const validCategories = [
+      "pollos-enteros",
+      "cortes-pollo",
+      "huevos",
+      "marinados",
+      "embutidos",
+      "menudencias",
+      "productos-organicos",
+      "preparados",
+      "promociones",
+      "otros",
+    ];
+
+    if (!validCategories.includes(data.category)) {
+      return NextResponse.json(
+        { message: "Categoría no válida para pollería" },
+        { status: 400 }
+      );
+    }
+
+    // Validar peso si se proporciona
+    if (data.weight && parseFloat(data.weight) <= 0) {
+      return NextResponse.json(
+        { message: "El peso debe ser mayor a 0" },
+        { status: 400 }
+      );
+    }
+
+    // Preparar datos del producto
     const productData = {
       // Campos obligatorios
       title: data.title.trim(),
@@ -102,85 +208,129 @@ export async function POST(request) {
       // Campos con valores por defecto
       description: data.description || "",
       featured: data.featured || false,
-      stock: 0, // Se calculará después si hay variantes
-      cost: 0, // Valor por defecto según tu modelo
-      profitMargin: 0, // Valor por defecto según tu modelo
-      promoPrice: 0, // Valor por defecto según tu modelo
+      stock: parseInt(data.stock) || 0,
+      cost: parseFloat(data.cost) || 0,
+      profitMargin: parseFloat(data.profitMargin) || 0,
+      promoPrice: parseFloat(data.promoPrice) || 0,
+
+      // Campos específicos de pollería
+      weight: parseFloat(data.weight) || 0,
+      weightUnit: data.weightUnit || "kg",
+      poultryType: data.poultryType || "pollo",
+      farmingType: data.farmingType || "convencional",
+      productState: data.productState || "fresco",
+      cut: data.cut || "entero",
+      expirationDays: parseInt(data.expirationDays) || 3,
+
+      // Información nutricional
+      nutritionalInfo: {
+        calories: parseFloat(data.nutritionalInfo?.calories) || 0,
+        protein: parseFloat(data.nutritionalInfo?.protein) || 0,
+        fat: parseFloat(data.nutritionalInfo?.fat) || 0,
+        per100g: data.nutritionalInfo?.per100g !== false,
+      },
+
+      // Arrays
+      ingredients: Array.isArray(data.ingredients) ? data.ingredients : [],
+      allergens: Array.isArray(data.allergens) ? data.allergens : [],
+      certifications: Array.isArray(data.certifications)
+        ? data.certifications
+        : [],
+
+      // Rango de peso
+      weightRange: {
+        min: parseFloat(data.weightRange?.min) || 0,
+        max: parseFloat(data.weightRange?.max) || 0,
+      },
+
+      // Disponibilidad (por defecto todos los días)
+      availability: {
+        monday: data.availability?.monday !== false,
+        tuesday: data.availability?.tuesday !== false,
+        wednesday: data.availability?.wednesday !== false,
+        thursday: data.availability?.thursday !== false,
+        friday: data.availability?.friday !== false,
+        saturday: data.availability?.saturday !== false,
+        sunday: data.availability?.sunday !== false,
+      },
+
+      // SKU manual o se generará automáticamente
+      sku: data.sku || undefined,
+      isActive: data.isActive !== false,
     };
 
-    // Agregar campos opcionales solo si tienen valor
-    if (data.promoPrice && parseFloat(data.promoPrice) > 0) {
-      productData.promoPrice = parseFloat(data.promoPrice);
+    // Información adicional de Cloudinary para imagen principal
+    if (data.imageCloudinaryInfo) {
+      productData.imageCloudinaryInfo = {
+        publicId: data.imageCloudinaryInfo.publicId,
+        format: data.imageCloudinaryInfo.format,
+        width: data.imageCloudinaryInfo.width,
+        height: data.imageCloudinaryInfo.height,
+        bytes: data.imageCloudinaryInfo.bytes,
+      };
     }
 
-    if (data.cost && parseFloat(data.cost) > 0) {
-      productData.cost = parseFloat(data.cost);
+    // Procesar variantes de peso/precio
+    if (data.variants && Array.isArray(data.variants)) {
+      productData.variants = data.variants.map((variant) => ({
+        weight: parseFloat(variant.weight) || 0,
+        weightUnit: variant.weightUnit || "kg",
+        price: parseFloat(variant.price) || 0,
+        stock: parseInt(variant.stock) || 0,
+        sku: variant.sku || "",
+      }));
     }
 
-    if (data.profitMargin && parseFloat(data.profitMargin) > 0) {
-      productData.profitMargin = parseFloat(data.profitMargin);
-    }
-
-    if (data.stock !== undefined && data.stock !== "") {
-      productData.stock = parseInt(data.stock) || 0;
-    }
-
-    // Campos de indumentaria según tu modelo
-    if (data.gender) productData.gender = data.gender;
-    if (data.material) productData.material = data.material;
-    if (data.style) productData.style = data.style;
-    if (data.season) productData.season = data.season;
-
-    // Campos específicos para pantalones según tu modelo
-    if (data.category === "pantalones") {
-      if (data.waistType) productData.waistType = data.waistType;
-      if (data.fit) productData.fit = data.fit;
-    }
-
-    // Campos específicos para calzado según tu modelo
-    if (data.category === "calzado") {
-      if (data.heelHeight !== undefined && data.heelHeight !== "") {
-        productData.heelHeight = parseFloat(data.heelHeight) || 0;
-      }
-      if (data.soleType) productData.soleType = data.soleType;
-    }
-
-    // Arrays según tu modelo
-    productData.sizes = data.sizes || [];
-    productData.colors = data.colors || [];
-    productData.variants = data.variants || [];
-
-    // 🔧 PROCESAR IMÁGENES ADICIONALES SEGÚN TU MODELO
+    // Procesar imágenes adicionales
     if (data.additionalImages && Array.isArray(data.additionalImages)) {
       productData.additionalImages = data.additionalImages.map((img) => ({
-        color: img.color || "",
         imageUrl: img.imageUrl,
+        description: img.description || "",
+        ...(img.imageCloudinaryInfo && {
+          imageCloudinaryInfo: {
+            publicId: img.imageCloudinaryInfo.publicId,
+            format: img.imageCloudinaryInfo.format,
+            width: img.imageCloudinaryInfo.width,
+            height: img.imageCloudinaryInfo.height,
+            bytes: img.imageCloudinaryInfo.bytes,
+          },
+        }),
       }));
     } else {
       productData.additionalImages = [];
     }
 
-    // Manejar stock
-    const variantCategories = ["camisetas", "pantalones", "calzado", "abrigos"];
-    if (
-      variantCategories.includes(data.category) &&
-      data.variants &&
-      Array.isArray(data.variants) &&
-      data.variants.length > 0
-    ) {
-      // Calcular stock total desde las variantes
-      productData.stock = data.variants.reduce(
-        (total, variant) => total + (parseInt(variant.stock) || 0),
-        0
-      );
+    // Verificar si el SKU ya existe (si se proporcionó)
+    if (productData.sku) {
+      const existingProduct = await Product.findOne({
+        sku: productData.sku,
+        _id: { $ne: productData._id }, // Excluir el producto actual si es edición
+      });
+
+      if (existingProduct) {
+        return NextResponse.json(
+          { message: "El SKU ya existe. Por favor utilice uno diferente." },
+          { status: 400 }
+        );
+      }
     }
+
     // Crear el nuevo producto
     const newProduct = await Product.create(productData);
+
+    // Convertir a objeto y agregar virtuals
+    const productResponse = newProduct.toObject();
+    productResponse.hasDiscount = newProduct.hasDiscount;
+    productResponse.discountPercentage = newProduct.discountPercentage;
+    productResponse.effectivePrice = newProduct.effectivePrice;
+    productResponse.availableToday = newProduct.availableToday;
+    productResponse.pricePerKg = newProduct.pricePerKg;
+    productResponse.isNearExpiration = newProduct.isNearExpiration();
 
     return NextResponse.json(
       {
         message: "Producto creado correctamente",
-        product: newProduct,
+        product: productResponse,
       },
       { status: 201 }
     );
@@ -199,6 +349,14 @@ export async function POST(request) {
           message: "Error de validación",
           errors: validationErrors,
         },
+        { status: 400 }
+      );
+    }
+
+    // Error de duplicado de SKU
+    if (error.code === 11000 && error.keyPattern?.sku) {
+      return NextResponse.json(
+        { message: "El SKU ya existe. Por favor utilice uno diferente." },
         { status: 400 }
       );
     }

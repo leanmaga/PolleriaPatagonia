@@ -3,7 +3,7 @@
 
 import Image from "next/image";
 import { CTAButton } from "@/components/ui";
-import heroImageUrl from "/public/images/5.jpg";
+import heroImageUrl from "/public/images/portada2.jpg";
 
 export default function HeroSection() {
   return (
