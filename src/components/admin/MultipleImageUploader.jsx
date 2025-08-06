@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useRef, useState } from "react";
 import {
   XCircleIcon,
@@ -7,7 +5,7 @@ import {
   PlusCircleIcon,
 } from "@heroicons/react/24/outline";
 
-export default function MultipleImageUploader({
+export default function MultipleImageUploaderDebug({
   mainImage,
   additionalImages = [],
   onMainImageChange,
@@ -21,185 +19,82 @@ export default function MultipleImageUploader({
   const [isLoading, setIsLoading] = useState(false);
   const [mainImageLoading, setMainImageLoading] = useState(false);
   const [mainImageError, setMainImageError] = useState(false);
+  const [debugInfo, setDebugInfo] = useState({
+    cloudinaryLoaded: false,
+    widgetInitialized: false,
+    lastError: null,
+    config: null,
+  });
 
-  // Inicializar ambos widgets una sola vez
+  // Debug: Verificar configuración
   useEffect(() => {
-    if (typeof window === "undefined" || !window.cloudinary) return;
+    const config = {
+      cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+      apiKey: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+      uploadPreset: "PolleríaPatagonia",
+    };
 
-    // Widget para imagen principal con recorte libre
-    if (!mainWidgetRef.current) {
-      mainWidgetRef.current = window.cloudinary.createUploadWidget(
-        {
-          cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-          uploadPreset: "PolleríaPatagonia",
-          sources: ["local", "camera"],
-          multiple: false,
-          maxFiles: 1,
-          folder: "ecommerce_products",
+    setDebugInfo((prev) => ({
+      ...prev,
+      config,
+      cloudinaryLoaded: !!window.cloudinary,
+    }));
 
-          language: "es", // <-- le dices al widget que use el idioma "es"
-          text: {
-            es: {
-              menu: {
-                files: "Mis archivos",
-                camera: "Cámara",
-                url: "Enlace", // si usas sources: ["url", ...]
-                dropbox: "Dropbox",
-                // …
-              },
-              local: {
-                browse: "Examinar", // reemplaza el botón "Browse"
-                dd_title_single: "Arrastra y suelta una imagen aquí",
-                dd_title_multi: "Arrastra y suelta imágenes aquí",
-                drop_title_single: "Suelta un archivo para subir",
-                drop_title_multiple: "Suelta archivos para subir",
-              },
-              or: "O",
-              back: "Atrás",
-              close: "Cerrar",
-              crop: {
-                title: "Cortar", // antes "Crop"
-                crop_btn: "Recortar",
-                skip_btn: "Salir", // antes "Skip"
-                // puedes dejar el resto igual o traducir más si quieres
-              },
-              // … cualquier otra clave que quieras sobrescribir
-            },
-          },
-          // CONFIGURACIÓN PARA RECORTE LIBRE
-          cropping: true,
-          croppingAspectRatio: 0, // 0 = recorte libre
-          croppingDefaultSelectionRatio: 0.8,
-          croppingShowDimensions: true,
-          croppingCoordinatesMode: "custom",
-          showSkipCropButton: true,
-          // Configuraciones adicionales
-          clientAllowedFormats: ["jpg", "jpeg", "png", "webp"],
-          maxImageFileSize: 10000000, // 10MB
-          // Configurar la interfaz
-          showAdvancedOptions: false,
-          theme: "minimal",
-          styles: {
-            palette: {
-              window: "#FFFFFF",
-              windowBorder: "#90A0B3",
-              tabIcon: "#4F46E5",
-              menuIcons: "#5A616A",
-              textDark: "#000000",
-              textLight: "#FFFFFF",
-              link: "#4F46E5",
-              action: "#339933",
-              inactiveTabIcon: "#B3B3B3",
-              error: "#F44235",
-              inProgress: "#0078FF",
-              complete: "#20B832",
-              sourceBg: "#E4EBF1",
-            },
-          },
-        },
-        (error, result) => {
-          if (error) {
-            console.error("MainWidget error:", error);
-            alert("Error al subir la imagen principal");
-            setIsLoading(false);
-            return;
-          }
+    console.log("🔍 Debug Config:", config);
+    console.log("🔍 Cloudinary disponible:", !!window.cloudinary);
+  }, []);
 
-          if (result.event === "success") {
-            // Construir la URL con las transformaciones del recorte si existen
-            let imageUrl = result.info.secure_url;
-
-            // Si hay coordenadas de recorte, aplicarlas
-            if (
-              result.info.coordinates &&
-              result.info.coordinates.custom &&
-              result.info.coordinates.custom.length > 0
-            ) {
-              const coords = result.info.coordinates.custom[0];
-              const transformation = `/c_crop,x_${coords[0]},y_${coords[1]},w_${coords[2]},h_${coords[3]}/`;
-
-              // Insertar la transformación en la URL
-              imageUrl = imageUrl.replace(
-                "/upload/",
-                `/upload${transformation}`
-              );
-            }
-
-            // Resetear estados de error
-            setMainImageError(false);
-            setMainImageLoading(true);
-
-            // Llamar al callback con la URL transformada
-            onMainImageChange(result.info, imageUrl, "");
-          }
-
-          if (result.event === "queues-start") {
-            setIsLoading(true);
-          }
-
-          if (result.event === "queues-end") {
-            setIsLoading(false);
-          }
-        }
-      );
+  // Inicializar widgets con mejor manejo de errores
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.cloudinary) {
+      console.log("❌ Cloudinary no está disponible");
+      return;
     }
 
-    // Widget para imágenes adicionales con recorte libre
-    if (!addWidgetRef.current) {
-      addWidgetRef.current = window.cloudinary.createUploadWidget(
-        {
+    console.log("✅ Inicializando widgets de Cloudinary");
+
+    try {
+      // Widget para imagen principal
+      if (!mainWidgetRef.current) {
+        const config = {
           cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
           uploadPreset: "PolleríaPatagonia",
           sources: ["local", "camera"],
           multiple: false,
           maxFiles: 1,
           folder: "ecommerce_products",
-
-          language: "es", // <-- le dices al widget que use el idioma "es"
+          language: "es",
           text: {
             es: {
               menu: {
                 files: "Mis archivos",
                 camera: "Cámara",
-                url: "Enlace", // si usas sources: ["url", ...]
-                dropbox: "Dropbox",
-                // …
               },
               local: {
-                browse: "Examinar", // reemplaza el botón "Browse"
+                browse: "Examinar",
                 dd_title_single: "Arrastra y suelta una imagen aquí",
-                dd_title_multi: "Arrastra y suelta imágenes aquí",
                 drop_title_single: "Suelta un archivo para subir",
-                drop_title_multiple: "Suelta archivos para subir",
               },
               or: "O",
               back: "Atrás",
               close: "Cerrar",
               crop: {
-                title: "Cortar", // antes "Crop"
+                title: "Cortar",
                 crop_btn: "Recortar",
-                skip_btn: "Salir", // antes "Skip"
-                // puedes dejar el resto igual o traducir más si quieres
+                skip_btn: "Salir",
               },
-              // … cualquier otra clave que quieras sobrescribir
             },
           },
-          // CONFIGURACIÓN PARA RECORTE LIBRE
           cropping: true,
-          croppingAspectRatio: 0, // 0 = recorte libre
+          croppingAspectRatio: 0,
           croppingDefaultSelectionRatio: 0.8,
           croppingShowDimensions: true,
           croppingCoordinatesMode: "custom",
           showSkipCropButton: true,
-
-          // Configuraciones adicionales
           clientAllowedFormats: ["jpg", "jpeg", "png", "webp"],
-          maxImageFileSize: 10000000, // 10MB
-
-          // Configurar la interfaz
+          maxImageFileSize: 10000000,
           showAdvancedOptions: false,
           theme: "minimal",
-
           styles: {
             palette: {
               window: "#FFFFFF",
@@ -217,66 +112,171 @@ export default function MultipleImageUploader({
               sourceBg: "#E4EBF1",
             },
           },
-        },
-        (error, result) => {
-          if (error) {
-            console.error("AddWidget error:", error);
-            alert("Error al subir la imagen adicional");
-            setIsLoading(false);
-            return;
-          }
+        };
 
-          if (result.event === "success") {
-            // Construir la URL con las transformaciones del recorte si existen
-            let imageUrl = result.info.secure_url;
+        console.log("🔧 Configuración del widget principal:", config);
 
-            // Si hay coordenadas de recorte, aplicarlas
-            if (
-              result.info.coordinates &&
-              result.info.coordinates.custom &&
-              result.info.coordinates.custom.length > 0
-            ) {
-              const coords = result.info.coordinates.custom[0];
-              const transformation = `/c_crop,x_${coords[0]},y_${coords[1]},w_${coords[2]},h_${coords[3]}/`;
+        mainWidgetRef.current = window.cloudinary.createUploadWidget(
+          config,
+          (error, result) => {
+            console.log("📥 Main widget callback:", { error, result });
 
-              // Insertar la transformación en la URL
-              imageUrl = imageUrl.replace(
-                "/upload/",
-                `/upload${transformation}`
-              );
+            if (error) {
+              console.error("❌ MainWidget error:", error);
+              setDebugInfo((prev) => ({
+                ...prev,
+                lastError: error,
+              }));
+
+              // Mostrar error más específico
+              if (error.status === "Upload preset not found") {
+                alert(
+                  "Error: El upload preset 'PolleríaPatagonia' no existe. Verifica en tu dashboard de Cloudinary."
+                );
+              } else if (error.status === "Invalid cloud name") {
+                alert(
+                  "Error: Cloud name inválido. Verifica NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME"
+                );
+              } else {
+                alert(
+                  `Error al subir imagen: ${
+                    error.statusText || error.message || "Error desconocido"
+                  }`
+                );
+              }
+
+              setIsLoading(false);
+              return;
             }
 
-            onAddImage(result.info, imageUrl, selectedColor);
-            setSelectedColor("");
-          }
+            if (result.event === "success") {
+              console.log("✅ Imagen subida exitosamente:", result.info);
 
-          if (result.event === "queues-start") {
-            setIsLoading(true);
-          }
+              let imageUrl = result.info.secure_url;
 
-          if (result.event === "queues-end") {
-            setIsLoading(false);
+              if (
+                result.info.coordinates &&
+                result.info.coordinates.custom &&
+                result.info.coordinates.custom.length > 0
+              ) {
+                const coords = result.info.coordinates.custom[0];
+                const transformation = `/c_crop,x_${coords[0]},y_${coords[1]},w_${coords[2]},h_${coords[3]}/`;
+                imageUrl = imageUrl.replace(
+                  "/upload/",
+                  `/upload${transformation}`
+                );
+              }
+
+              setMainImageError(false);
+              setMainImageLoading(true);
+              onMainImageChange(result.info, imageUrl, "");
+            }
+
+            if (result.event === "queues-start") {
+              setIsLoading(true);
+            }
+
+            if (result.event === "queues-end") {
+              setIsLoading(false);
+            }
           }
-        }
-      );
+        );
+
+        setDebugInfo((prev) => ({
+          ...prev,
+          widgetInitialized: true,
+        }));
+      }
+
+      // Widget para imágenes adicionales (configuración similar)
+      if (!addWidgetRef.current) {
+        addWidgetRef.current = window.cloudinary.createUploadWidget(
+          {
+            cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+            uploadPreset: "PolleríaPatagonia",
+            sources: ["local", "camera"],
+            multiple: false,
+            maxFiles: 1,
+            folder: "ecommerce_products",
+            language: "es",
+            cropping: true,
+            croppingAspectRatio: 0,
+            clientAllowedFormats: ["jpg", "jpeg", "png", "webp"],
+            maxImageFileSize: 10000000,
+            theme: "minimal",
+          },
+          (error, result) => {
+            if (error) {
+              console.error("❌ AddWidget error:", error);
+              alert(
+                `Error al subir imagen adicional: ${
+                  error.statusText || error.message
+                }`
+              );
+              setIsLoading(false);
+              return;
+            }
+
+            if (result.event === "success") {
+              let imageUrl = result.info.secure_url;
+
+              if (
+                result.info.coordinates &&
+                result.info.coordinates.custom &&
+                result.info.coordinates.custom.length > 0
+              ) {
+                const coords = result.info.coordinates.custom[0];
+                const transformation = `/c_crop,x_${coords[0]},y_${coords[1]},w_${coords[2]},h_${coords[3]}/`;
+                imageUrl = imageUrl.replace(
+                  "/upload/",
+                  `/upload${transformation}`
+                );
+              }
+
+              onAddImage(result.info, imageUrl, selectedColor);
+              setSelectedColor("");
+            }
+
+            if (result.event === "queues-start") {
+              setIsLoading(true);
+            }
+
+            if (result.event === "queues-end") {
+              setIsLoading(false);
+            }
+          }
+        );
+      }
+    } catch (initError) {
+      console.error("❌ Error al inicializar widgets:", initError);
+      setDebugInfo((prev) => ({
+        ...prev,
+        lastError: initError,
+      }));
     }
   }, [onMainImageChange, onAddImage, selectedColor]);
 
-  // Manejar click en imagen principal
   const handleMainImageClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
 
+    console.log("🖱️ Click en imagen principal");
+    console.log("Widget ref:", mainWidgetRef.current);
+    console.log("Is loading:", isLoading);
+
     if (!isLoading && mainWidgetRef.current) {
       try {
+        console.log("🚀 Abriendo widget principal");
         mainWidgetRef.current.open();
       } catch (error) {
-        console.error("Error opening main widget:", error);
+        console.error("❌ Error opening main widget:", error);
+        alert(`Error al abrir el widget: ${error.message}`);
       }
+    } else {
+      console.log("❌ No se puede abrir: loading o widget no disponible");
     }
   };
 
-  // Manejar click en agregar imagen
   const handleAddImageClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -285,24 +285,22 @@ export default function MultipleImageUploader({
       try {
         addWidgetRef.current.open();
       } catch (error) {
-        console.error("Error opening add widget:", error);
+        console.error("❌ Error opening add widget:", error);
+        alert(`Error al abrir el widget: ${error.message}`);
       }
     }
   };
 
-  // Manejar carga de imagen principal
   const handleMainImageLoad = () => {
     setMainImageLoading(false);
     setMainImageError(false);
   };
 
-  // Manejar error de imagen principal
   const handleMainImageError = () => {
     setMainImageLoading(false);
     setMainImageError(true);
   };
 
-  // Reset del estado de carga cuando cambia la imagen
   useEffect(() => {
     if (mainImage) {
       setMainImageLoading(true);
@@ -312,6 +310,50 @@ export default function MultipleImageUploader({
 
   return (
     <div className="space-y-6">
+      {/* Panel de Debug */}
+      <div className="bg-gray-50 p-4 rounded-lg text-sm">
+        <h4 className="font-medium mb-2">🔍 Información de Debug:</h4>
+        <div className="space-y-1">
+          <div>
+            Cloudinary cargado:{" "}
+            <span
+              className={
+                debugInfo.cloudinaryLoaded ? "text-green-600" : "text-red-600"
+              }
+            >
+              {debugInfo.cloudinaryLoaded ? "✅" : "❌"}
+            </span>
+          </div>
+          <div>
+            Widget inicializado:{" "}
+            <span
+              className={
+                debugInfo.widgetInitialized ? "text-green-600" : "text-red-600"
+              }
+            >
+              {debugInfo.widgetInitialized ? "✅" : "❌"}
+            </span>
+          </div>
+          <div>
+            Cloud Name:{" "}
+            <span className="font-mono">
+              {debugInfo.config?.cloudName || "No configurado"}
+            </span>
+          </div>
+          <div>
+            Upload Preset:{" "}
+            <span className="font-mono">
+              {debugInfo.config?.uploadPreset || "No configurado"}
+            </span>
+          </div>
+          {debugInfo.lastError && (
+            <div className="text-red-600">
+              Último error: {JSON.stringify(debugInfo.lastError, null, 2)}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Imagen principal */}
       <div>
         <div className="flex items-center justify-between mb-2">
@@ -323,7 +365,9 @@ export default function MultipleImageUploader({
         <div
           onClick={handleMainImageClick}
           className={`border-2 border-dashed rounded-lg p-4 w-full text-center relative transition-colors cursor-pointer ${
-            isLoading ? "bg-gray-100 cursor-not-allowed" : "hover:bg-gray-50"
+            isLoading
+              ? "bg-gray-100 cursor-not-allowed border-gray-300"
+              : "hover:bg-gray-50 border-gray-300 hover:border-indigo-400"
           }`}
         >
           {isLoading ? (
@@ -374,8 +418,8 @@ export default function MultipleImageUploader({
               )}
 
               {!mainImageLoading && !mainImageError && (
-                <div className="absolute inset-0  bg-opacity-0 hover:bg-opacity-10 transition-opacity flex items-center justify-center">
-                  <span className="text-white opacity-0 hover:opacity-100 text-sm  bg-opacity-70 px-2 py-1 rounded">
+                <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-10 transition-all flex items-center justify-center">
+                  <span className="text-gray-700 opacity-0 hover:opacity-100 text-sm bg-white bg-opacity-90 px-3 py-1 rounded shadow">
                     Hacer clic para cambiar
                   </span>
                 </div>
@@ -386,6 +430,9 @@ export default function MultipleImageUploader({
               <PhotoIcon className="mx-auto h-12 w-12 text-gray-400" />
               <p className="mt-1 text-sm text-gray-500">
                 Haz clic para subir y recortar la imagen principal
+              </p>
+              <p className="mt-1 text-xs text-gray-400">
+                JPG, PNG, WEBP hasta 10MB
               </p>
             </div>
           )}
@@ -429,7 +476,6 @@ export default function MultipleImageUploader({
         )}
 
         <div className="border rounded p-4">
-          {/* Selector de color para la siguiente subida */}
           {colors.length > 0 && (
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -454,7 +500,9 @@ export default function MultipleImageUploader({
           <div
             onClick={handleAddImageClick}
             className={`border-2 border-dashed rounded-lg p-4 w-full text-center relative transition-colors cursor-pointer ${
-              isLoading ? "bg-gray-100 cursor-not-allowed" : "hover:bg-gray-50"
+              isLoading
+                ? "bg-gray-100 cursor-not-allowed border-gray-300"
+                : "hover:bg-gray-50 border-gray-300 hover:border-indigo-400"
             }`}
           >
             {isLoading ? (
