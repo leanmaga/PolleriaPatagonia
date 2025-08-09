@@ -1,9 +1,510 @@
-// app/api/products/route.js - API ESPECÍFICA PARA POLLERÍA
+// app/api/products/route.js - API ESPECÍFICA PARA POLLERÍA (CORREGIDA)
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
-import Product from "@/models/Product";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth/next";
+import mongoose from "mongoose";
+
+// Función para obtener o crear el modelo Product
+function getProductModel() {
+  // Si el modelo ya existe, lo devolvemos
+  if (mongoose.models.Product) {
+    console.log("✅ Modelo Product ya existe en cache");
+    return mongoose.models.Product;
+  }
+
+  // Si no existe, lo creamos dinámicamente
+  console.log("🔧 Creando modelo Product dinámicamente");
+
+  const productSchema = new mongoose.Schema(
+    {
+      title: {
+        type: String,
+        required: [true, "Por favor proporcione un título"],
+        trim: true,
+      },
+      description: {
+        type: String,
+        trim: true,
+      },
+      // Precio de venta (precio principal en tienda) - OBLIGATORIO
+      salePrice: {
+        type: Number,
+        required: [true, "Por favor proporcione el precio de venta"],
+        min: [0, "El precio no puede ser negativo"],
+      },
+      // Precio promocional opcional
+      promoPrice: {
+        type: Number,
+        default: 0,
+        min: [0, "El precio promocional no puede ser negativo"],
+      },
+      // Costo interno (no se muestra en tienda) - OPCIONAL
+      cost: {
+        type: Number,
+        min: [0, "El costo no puede ser negativo"],
+        default: 0,
+      },
+      // Margen de ganancia (%) calculado o manual - OPCIONAL
+      profitMargin: {
+        type: Number,
+        min: [0, "El margen no puede ser negativo"],
+        max: [100, "El margen no puede exceder el 100%"],
+        default: 0,
+      },
+      stock: {
+        type: Number,
+        min: [0, "El stock no puede ser negativo"],
+        default: 0,
+      },
+      category: {
+        type: String,
+        required: [true, "Por favor proporcione una categoría"],
+        enum: [
+          // Categorías de pollería
+          "pollos-enteros",
+          "cortes-pollo",
+          "huevos",
+          "marinados-pollo",
+          "embutidos-pollo",
+          "menudencias-pollo",
+
+          // Categorías de carnicería
+          "cortes-vacunos",
+          "cortes-cerdo",
+          "cortes-cordero",
+          "milanesas",
+          "carne-picada",
+          "embutidos-vacunos",
+          "vísceras",
+
+          // Categorías generales
+          "productos-organicos",
+          "preparados",
+          "promociones",
+          "otros",
+        ],
+      },
+
+      // === CAMPOS ESPECÍFICOS PARA POLLERÍA ===
+
+      // Peso del producto (en kg o gramos)
+      weight: {
+        type: Number,
+        min: [0, "El peso no puede ser negativo"],
+        default: 0,
+      },
+      weightUnit: {
+        type: String,
+        enum: ["kg", "g", "unidad", "docena"],
+        default: "kg",
+      },
+
+      // Tipo de producto (más general que poultryType)
+      productType: {
+        type: String,
+        enum: [
+          // Productos avícolas
+          "pollo",
+          "gallina",
+          "gallo",
+          "pollito",
+          "huevos",
+
+          // Productos vacunos
+          "carne-vacuna",
+          "ternera",
+
+          // Productos porcinos
+          "cerdo",
+          "lechón",
+
+          // Productos ovinos
+          "cordero",
+          "oveja",
+
+          // Productos procesados
+          "embutido",
+          "milanesa",
+          "preparado",
+          "otro",
+        ],
+        default: "pollo",
+      },
+
+      // Tipo de crianza/origen
+      farmingType: {
+        type: String,
+        enum: [
+          "convencional",
+          "organico",
+          "libre-pastoreo",
+          "sin-antibioticos",
+          "grass-fed", // Para carnes vacunas
+          "grain-fed", // Para carnes vacunas
+          "natural",
+          "premium",
+        ],
+        default: "convencional",
+      },
+
+      // Estado del producto
+      productState: {
+        type: String,
+        enum: [
+          "fresco",
+          "congelado",
+          "marinado",
+          "cocido",
+          "ahumado",
+          "madurado", // Para carnes vacunas
+          "empanizado", // Para milanesas
+          "procesado",
+        ],
+        default: "fresco",
+      },
+
+      // Para cortes específicos (ahora incluye vacunos)
+      cut: {
+        type: String,
+        enum: [
+          // Cortes de pollo
+          "entero",
+          "trozado",
+          "pechuga",
+          "muslo",
+          "contramuslo",
+          "ala",
+          "cuadril-pollo",
+          "rabadilla",
+          "menudencias",
+
+          // Cortes vacunos (basado en las imágenes)
+          "tortuguita",
+          "bola-de-lomo",
+          "peceto",
+          "cuadril",
+          "colita-de-cuadril",
+          "bife-ancho",
+          "bife-angosto",
+          "osobuco",
+          "cuadrada",
+          "picaña",
+          "nalga",
+          "paleta",
+          "roast-beef",
+          "lomo",
+          "entraña",
+          "vacío",
+          "falda",
+          "aguja",
+          "cogote",
+
+          // Cortes de cerdo
+          "bondiola",
+          "costeleta",
+          "matambre-cerdo",
+          "paleta-cerdo",
+
+          // Otros
+          "carne-picada",
+          "milanesa-suprema",
+          "milanesa-nalga",
+          "milanesa-peceto",
+          "otro",
+        ],
+        default: "entero",
+      },
+
+      // Rangos de peso para productos variables
+      weightRange: {
+        min: {
+          type: Number,
+          default: 0,
+        },
+        max: {
+          type: Number,
+          default: 0,
+        },
+      },
+
+      // Fecha de vencimiento (importante para productos frescos)
+      expirationDays: {
+        type: Number,
+        min: [0, "Los días de vencimiento no pueden ser negativos"],
+        default: 3, // Por defecto 3 días para productos frescos
+      },
+
+      // Información nutricional
+      nutritionalInfo: {
+        calories: {
+          type: Number,
+          default: 0,
+        },
+        protein: {
+          type: Number,
+          default: 0,
+        },
+        fat: {
+          type: Number,
+          default: 0,
+        },
+        // Por cada 100g
+        per100g: {
+          type: Boolean,
+          default: true,
+        },
+      },
+
+      // Ingredientes y alérgenos
+      ingredients: {
+        type: [String],
+        default: [],
+      },
+      allergens: {
+        type: [String],
+        default: [],
+      },
+
+      // Certificaciones
+      certifications: {
+        type: [String],
+        enum: [
+          "organico",
+          "halal",
+          "kosher",
+          "sin-antibioticos",
+          "bienestar-animal",
+          "grass-fed",
+          "angus",
+          "hereford",
+          "wagyu",
+          "premium",
+          "natural",
+        ],
+        default: [],
+      },
+
+      // Grado de carne (para vacunos)
+      meatGrade: {
+        type: String,
+        enum: ["premium", "primera", "segunda", "especial", "comercial", ""],
+        default: "",
+      },
+
+      // Preparación especial (para milanesas, marinados, etc.)
+      specialPreparation: {
+        type: String,
+        enum: [
+          "panko",
+          "tradicional",
+          "marinado-especias",
+          "marinado-vino",
+          "adobado",
+          "",
+        ],
+        default: "",
+      },
+
+      // Variantes para diferentes pesos o presentaciones
+      variants: {
+        type: [
+          {
+            weight: Number,
+            weightUnit: {
+              type: String,
+              enum: ["kg", "g", "unidad", "docena"],
+              default: "kg",
+            },
+            price: Number,
+            stock: {
+              type: Number,
+              default: 0,
+              min: 0,
+            },
+            sku: String,
+          },
+        ],
+        default: [],
+      },
+
+      // Campos para fotos y presentación
+      imageUrl: {
+        type: String,
+        required: [true, "Por favor proporcione una imagen"],
+      },
+
+      // Información adicional de Cloudinary para la imagen principal
+      imageCloudinaryInfo: {
+        publicId: String,
+        format: String,
+        width: Number,
+        height: Number,
+        bytes: Number,
+      },
+
+      // Imágenes adicionales
+      additionalImages: {
+        type: [
+          {
+            imageUrl: String,
+            description: String, // Ej: "producto marinado", "corte específico"
+            imageCloudinaryInfo: {
+              publicId: String,
+              format: String,
+              width: Number,
+              height: Number,
+              bytes: Number,
+            },
+          },
+        ],
+        default: [],
+      },
+
+      featured: {
+        type: Boolean,
+        default: false,
+      },
+
+      // Disponibilidad por días de la semana
+      availability: {
+        monday: { type: Boolean, default: true },
+        tuesday: { type: Boolean, default: true },
+        wednesday: { type: Boolean, default: true },
+        thursday: { type: Boolean, default: true },
+        friday: { type: Boolean, default: true },
+        saturday: { type: Boolean, default: true },
+        sunday: { type: Boolean, default: true },
+      },
+
+      // Campos para valoraciones
+      rating: {
+        type: Number,
+        default: 0,
+        min: 0,
+        max: 5,
+      },
+      numReviews: {
+        type: Number,
+        default: 0,
+      },
+
+      // SKU único para inventario
+      sku: {
+        type: String,
+        unique: true,
+        sparse: true, // Permite que sea único solo si existe
+      },
+
+      // Estado del producto (activo/inactivo)
+      isActive: {
+        type: Boolean,
+        default: true,
+      },
+    },
+    {
+      timestamps: true,
+    }
+  );
+
+  // Crear índices para mejorar el rendimiento de las consultas
+  productSchema.index({ category: 1 });
+  productSchema.index({ productType: 1 }); // Cambio de poultryType a productType
+  productSchema.index({ farmingType: 1 });
+  productSchema.index({ productState: 1 });
+  productSchema.index({ featured: 1 });
+  productSchema.index({ salePrice: 1 });
+  productSchema.index({ isActive: 1 });
+  productSchema.index({ "variants.weight": 1 });
+  productSchema.index({ createdAt: -1 });
+
+  // Virtual para verificar si tiene descuento
+  productSchema.virtual("hasDiscount").get(function () {
+    return this.promoPrice > 0 && this.promoPrice < this.salePrice;
+  });
+
+  // Virtual para calcular porcentaje de descuento
+  productSchema.virtual("discountPercentage").get(function () {
+    if (this.hasDiscount) {
+      return Math.round(
+        ((this.salePrice - this.promoPrice) / this.salePrice) * 100
+      );
+    }
+    return 0;
+  });
+
+  // Virtual para precio efectivo (promocional si existe, sino el de venta)
+  productSchema.virtual("effectivePrice").get(function () {
+    return this.hasDiscount ? this.promoPrice : this.salePrice;
+  });
+
+  // Virtual para verificar si está disponible hoy
+  productSchema.virtual("availableToday").get(function () {
+    const today = new Date().getDay(); // 0 = domingo, 1 = lunes, etc.
+    const days = [
+      "sunday",
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+    ];
+    return this.availability[days[today]];
+  });
+
+  // Virtual para calcular precio por kg (si el producto se vende por peso)
+  productSchema.virtual("pricePerKg").get(function () {
+    if (this.weight > 0 && this.weightUnit === "kg") {
+      return this.effectivePrice / this.weight;
+    } else if (this.weight > 0 && this.weightUnit === "g") {
+      return (this.effectivePrice / this.weight) * 1000;
+    }
+    return this.effectivePrice;
+  });
+
+  // Método para verificar si el producto está próximo a vencer
+  productSchema.methods.isNearExpiration = function () {
+    if (!this.createdAt || this.expirationDays === 0) return false;
+
+    const creationDate = new Date(this.createdAt);
+    const expirationDate = new Date(creationDate);
+    expirationDate.setDate(expirationDate.getDate() + this.expirationDays);
+
+    const today = new Date();
+    const daysUntilExpiration = Math.ceil(
+      (expirationDate - today) / (1000 * 60 * 60 * 24)
+    );
+
+    return daysUntilExpiration <= 1; // Próximo a vencer si queda 1 día o menos
+  };
+
+  // Middleware pre-save para cálculos automáticos
+  productSchema.pre("save", function (next) {
+    // Si hay variantes, calcular el stock total
+    if (this.variants && this.variants.length > 0) {
+      this.stock = this.variants.reduce((total, variant) => {
+        return total + (variant.stock || 0);
+      }, 0);
+    }
+
+    // Si se proporciona costo y precio de venta pero no margen, calcularlo
+    if (this.cost > 0 && this.salePrice > 0 && this.profitMargin === 0) {
+      this.profitMargin = ((this.salePrice - this.cost) / this.salePrice) * 100;
+    }
+
+    // Generar SKU automático si no existe
+    if (!this.sku) {
+      const categoryCode = this.category.substring(0, 3).toUpperCase();
+      const timestamp = Date.now().toString().slice(-6);
+      this.sku = `${categoryCode}-${timestamp}`;
+    }
+
+    next();
+  });
+
+  return mongoose.model("Product", productSchema);
+}
 
 export async function GET(request) {
   try {
@@ -12,7 +513,8 @@ export async function GET(request) {
     const page = parseInt(searchParams.get("page")) || 1;
     const limit = parseInt(searchParams.get("limit")) || 10;
     const category = searchParams.get("category");
-    const poultryType = searchParams.get("poultryType");
+    const productType =
+      searchParams.get("productType") || searchParams.get("poultryType"); // Compatibilidad
     const farmingType = searchParams.get("farmingType");
     const productState = searchParams.get("productState");
     const featured = searchParams.get("featured");
@@ -22,7 +524,12 @@ export async function GET(request) {
     const search = searchParams.get("search");
     const skip = (page - 1) * limit;
 
+    // Conectar a la base de datos
     await connectDB();
+
+    // Obtener el modelo Product
+    const Product = getProductModel();
+    console.log("🔍 Modelo Product:", typeof Product, Product.name);
 
     // Construir query base
     let query = { isActive: true }; // Solo productos activos
@@ -32,8 +539,8 @@ export async function GET(request) {
       query.category = category;
     }
 
-    if (poultryType && poultryType !== "all") {
-      query.poultryType = poultryType;
+    if (productType && productType !== "all") {
+      query.productType = productType;
     }
 
     if (farmingType && farmingType !== "all") {
@@ -79,14 +586,19 @@ export async function GET(request) {
       ];
     }
 
+    console.log("🔍 Query construido:", JSON.stringify(query, null, 2));
+
     // Get total count with filters
     const total = await Product.countDocuments(query);
+    console.log("📊 Total productos encontrados:", total);
 
     // Get products with pagination and filters
     const products = await Product.find(query)
       .sort({ featured: -1, createdAt: -1 }) // Destacados primero, luego por fecha
       .skip(skip)
       .limit(limit);
+
+    console.log("📦 Productos obtenidos:", products.length);
 
     // Agregar información calculada a cada producto
     const productsWithInfo = products.map((product) => {
@@ -103,6 +615,15 @@ export async function GET(request) {
       return productObj;
     });
 
+    // Obtener filtros únicos para el frontend
+    const [categories, productTypes, farmingTypes, productStates] =
+      await Promise.all([
+        Product.distinct("category", { isActive: true }),
+        Product.distinct("productType", { isActive: true }),
+        Product.distinct("farmingType", { isActive: true }),
+        Product.distinct("productState", { isActive: true }),
+      ]);
+
     return NextResponse.json({
       products: productsWithInfo,
       pagination: {
@@ -112,18 +633,24 @@ export async function GET(request) {
         pages: Math.ceil(total / limit),
       },
       filters: {
-        categories: await Product.distinct("category", { isActive: true }),
-        poultryTypes: await Product.distinct("poultryType", { isActive: true }),
-        farmingTypes: await Product.distinct("farmingType", { isActive: true }),
-        productStates: await Product.distinct("productState", {
-          isActive: true,
-        }),
+        categories,
+        productTypes, // Cambio de poultryTypes a productTypes
+        farmingTypes,
+        productStates,
       },
     });
   } catch (error) {
-    console.error("Error al obtener productos:", error);
+    console.error("❌ Error al obtener productos:", error);
+    console.error("Stack trace:", error.stack);
+
     return NextResponse.json(
-      { message: "Error al obtener productos" },
+      {
+        message: "Error al obtener productos",
+        error:
+          process.env.NODE_ENV === "development"
+            ? error.message
+            : "Error interno del servidor",
+      },
       { status: 500 }
     );
   }
@@ -138,7 +665,18 @@ export async function POST(request) {
     }
 
     const data = await request.json();
+
+    // Conectar a la base de datos
     await connectDB();
+
+    // Obtener el modelo Product
+    const Product = getProductModel();
+    console.log("🔍 Modelo Product en POST:", typeof Product, Product.name);
+
+    console.log(
+      "📝 Datos recibidos para crear producto:",
+      JSON.stringify(data, null, 2)
+    );
 
     // Validaciones de campos obligatorios
     if (!data.title || !data.salePrice || !data.category || !data.imageUrl) {
@@ -168,14 +706,26 @@ export async function POST(request) {
       );
     }
 
-    // Validar categorías válidas para pollería
+    // Validar categorías válidas para pollería y carnicería
     const validCategories = [
+      // Categorías de pollería
       "pollos-enteros",
       "cortes-pollo",
       "huevos",
-      "marinados",
-      "embutidos",
-      "menudencias",
+      "marinados-pollo",
+      "embutidos-pollo",
+      "menudencias-pollo",
+
+      // Categorías de carnicería
+      "cortes-vacunos",
+      "cortes-cerdo",
+      "cortes-cordero",
+      "milanesas",
+      "carne-picada",
+      "embutidos-vacunos",
+      "vísceras",
+
+      // Categorías generales
       "productos-organicos",
       "preparados",
       "promociones",
@@ -184,7 +734,7 @@ export async function POST(request) {
 
     if (!validCategories.includes(data.category)) {
       return NextResponse.json(
-        { message: "Categoría no válida para pollería" },
+        { message: "Categoría no válida" },
         { status: 400 }
       );
     }
@@ -213,14 +763,18 @@ export async function POST(request) {
       profitMargin: parseFloat(data.profitMargin) || 0,
       promoPrice: parseFloat(data.promoPrice) || 0,
 
-      // Campos específicos de pollería
+      // Campos específicos de pollería y carnicería
       weight: parseFloat(data.weight) || 0,
       weightUnit: data.weightUnit || "kg",
-      poultryType: data.poultryType || "pollo",
+      productType: data.productType || data.poultryType || "pollo", // Compatibilidad hacia atrás
       farmingType: data.farmingType || "convencional",
       productState: data.productState || "fresco",
       cut: data.cut || "entero",
       expirationDays: parseInt(data.expirationDays) || 3,
+
+      // Nuevos campos para carnicería
+      meatGrade: data.meatGrade || "",
+      specialPreparation: data.specialPreparation || "",
 
       // Información nutricional
       nutritionalInfo: {
@@ -304,7 +858,6 @@ export async function POST(request) {
     if (productData.sku) {
       const existingProduct = await Product.findOne({
         sku: productData.sku,
-        _id: { $ne: productData._id }, // Excluir el producto actual si es edición
       });
 
       if (existingProduct) {
@@ -315,8 +868,15 @@ export async function POST(request) {
       }
     }
 
+    console.log(
+      "💾 Creando producto con datos:",
+      JSON.stringify(productData, null, 2)
+    );
+
     // Crear el nuevo producto
     const newProduct = await Product.create(productData);
+
+    console.log("✅ Producto creado exitosamente:", newProduct._id);
 
     // Convertir a objeto y agregar virtuals
     const productResponse = newProduct.toObject();
@@ -336,6 +896,7 @@ export async function POST(request) {
     );
   } catch (error) {
     console.error("❌ Error al crear producto:", error);
+    console.error("Stack trace:", error.stack);
 
     // Manejo de errores más específico
     if (error.name === "ValidationError") {
@@ -362,7 +923,13 @@ export async function POST(request) {
     }
 
     return NextResponse.json(
-      { message: "Error al crear producto: " + error.message },
+      {
+        message: "Error al crear producto",
+        error:
+          process.env.NODE_ENV === "development"
+            ? error.message
+            : "Error interno del servidor",
+      },
       { status: 500 }
     );
   }

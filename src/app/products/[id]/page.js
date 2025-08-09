@@ -66,17 +66,20 @@ async function ProductContent({ id }) {
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       {/* Breadcrumb */}
       <div className="mb-6 text-sm text-gray-500 flex items-center space-x-2">
-        <Link href="/" className="hover:text-[#F6C343]">
+        <Link href="/" className="hover:text-[#D4A63A] transition-colors">
           Inicio
         </Link>
         <span>/</span>
-        <Link href="/products" className="hover:text-[#F6C343]">
+        <Link
+          href="/products"
+          className="hover:text-[#D4A63A] transition-colors"
+        >
           Productos
         </Link>
         <span>/</span>
         <Link
           href={`/products?category=${product.category}`}
-          className="hover:text-[#F6C343]"
+          className="hover:text-[#D4A63A] transition-colors"
         >
           {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
         </Link>
@@ -95,8 +98,7 @@ async function ProductContent({ id }) {
             <div className="mb-2">
               <Link
                 href={`/products?category=${product.category}`}
-                className="text-sm font-medium hover:text-[#E6B339]"
-                style={{ color: "#F6C343" }}
+                className="text-sm font-medium text-[#F6C343] hover:text-[#D4A63A] transition-colors"
               >
                 {product.category.charAt(0).toUpperCase() +
                   product.category.slice(1)}
@@ -180,7 +182,7 @@ async function ProductContent({ id }) {
                       {product.sizes.map((size) => (
                         <button
                           key={size}
-                          className="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-[#F6C343] hover:text-[#F6C343] focus:outline-none focus:ring-2 focus:ring-[#F6C343]"
+                          className="px-3 py-1 border border-gray-300 rounded-md text-sm bg-[#F1ECE8] hover:bg-[#E8DFD6] hover:border-[#D4A63A] hover:text-[#D4A63A] focus:outline-none focus:ring-2 focus:ring-[#F6C343] transition-all duration-200"
                         >
                           {size}
                         </button>
@@ -198,7 +200,7 @@ async function ProductContent({ id }) {
                       {product.colors.map((color) => (
                         <button
                           key={color}
-                          className="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-[#F6C343] hover:text-[#F6C343] focus:outline-none focus:ring-2 focus:ring-[#F6C343]"
+                          className="px-3 py-1 border border-gray-300 rounded-md text-sm bg-[#F1ECE8] hover:bg-[#E8DFD6] hover:border-[#D4A63A] hover:text-[#D4A63A] focus:outline-none focus:ring-2 focus:ring-[#F6C343] transition-all duration-200"
                         >
                           {color}
                         </button>

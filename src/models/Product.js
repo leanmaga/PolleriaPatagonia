@@ -45,12 +45,24 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: [true, "Por favor proporcione una categoría"],
       enum: [
+        // Categorías de pollería
         "pollos-enteros",
         "cortes-pollo",
         "huevos",
-        "marinados",
-        "embutidos",
-        "menudencias",
+        "marinados-pollo",
+        "embutidos-pollo",
+        "menudencias-pollo",
+
+        // Categorías de carnicería
+        "cortes-vacunos",
+        "cortes-cerdo",
+        "cortes-cordero",
+        "milanesas",
+        "carne-picada",
+        "embutidos-vacunos",
+        "vísceras",
+
+        // Categorías generales
         "productos-organicos",
         "preparados",
         "promociones",
@@ -58,7 +70,7 @@ const productSchema = new mongoose.Schema(
       ],
     },
 
-    // === CAMPOS ESPECÍFICOS PARA POLLERÍA ===
+    // === CAMPOS ESPECÍFICOS PARA POLLERÍA Y CARNICERÍA ===
 
     // Peso del producto (en kg o gramos)
     weight: {
@@ -72,48 +84,117 @@ const productSchema = new mongoose.Schema(
       default: "kg",
     },
 
-    // Tipo de producto avícola
-    poultryType: {
+    // Tipo de producto (más general que poultryType)
+    productType: {
       type: String,
       enum: [
+        // Productos avícolas
         "pollo",
         "gallina",
         "gallo",
         "pollito",
         "huevos",
+
+        // Productos vacunos
+        "carne-vacuna",
+        "ternera",
+
+        // Productos porcinos
+        "cerdo",
+        "lechón",
+
+        // Productos ovinos
+        "cordero",
+        "oveja",
+
+        // Productos procesados
         "embutido",
+        "milanesa",
+        "preparado",
         "otro",
       ],
       default: "pollo",
     },
 
-    // Tipo de crianza
+    // Tipo de crianza/origen
     farmingType: {
       type: String,
-      enum: ["convencional", "organico", "libre-pastoreo", "sin-antibioticos"],
+      enum: [
+        "convencional",
+        "organico",
+        "libre-pastoreo",
+        "sin-antibioticos",
+        "grass-fed", // Para carnes vacunas
+        "grain-fed", // Para carnes vacunas
+        "natural",
+        "premium",
+      ],
       default: "convencional",
     },
 
     // Estado del producto
     productState: {
       type: String,
-      enum: ["fresco", "congelado", "marinado", "cocido", "ahumado"],
+      enum: [
+        "fresco",
+        "congelado",
+        "marinado",
+        "cocido",
+        "ahumado",
+        "madurado", // Para carnes vacunas
+        "empanizado", // Para milanesas
+        "procesado",
+      ],
       default: "fresco",
     },
 
-    // Para cortes específicos
+    // Para cortes específicos (ahora incluye vacunos)
     cut: {
       type: String,
       enum: [
+        // Cortes de pollo
         "entero",
         "trozado",
         "pechuga",
         "muslo",
         "contramuslo",
         "ala",
-        "cuadril",
+        "cuadril-pollo",
         "rabadilla",
         "menudencias",
+
+        // Cortes vacunos (basado en las imágenes)
+        "tortuguita",
+        "bola-de-lomo",
+        "peceto",
+        "cuadril",
+        "colita-de-cuadril",
+        "bife-ancho",
+        "bife-angosto",
+        "osobuco",
+        "cuadrada",
+        "picaña",
+        "nalga",
+        "paleta",
+        "roast-beef",
+        "lomo",
+        "entraña",
+        "vacío",
+        "falda",
+        "aguja",
+        "cogote",
+
+        // Cortes de cerdo
+        "bondiola",
+        "costeleta",
+        "matambre-cerdo",
+        "paleta-cerdo",
+
+        // Otros
+        "carne-picada",
+        "milanesa-suprema",
+        "milanesa-nalga",
+        "milanesa-peceto",
         "otro",
       ],
       default: "entero",
@@ -178,8 +259,35 @@ const productSchema = new mongoose.Schema(
         "kosher",
         "sin-antibioticos",
         "bienestar-animal",
+        "grass-fed",
+        "angus",
+        "hereford",
+        "wagyu",
+        "premium",
+        "natural",
       ],
       default: [],
+    },
+
+    // Grado de carne (para vacunos)
+    meatGrade: {
+      type: String,
+      enum: ["premium", "primera", "segunda", "especial", "comercial", ""],
+      default: "",
+    },
+
+    // Preparación especial (para milanesas, marinados, etc.)
+    specialPreparation: {
+      type: String,
+      enum: [
+        "panko",
+        "tradicional",
+        "marinado-especias",
+        "marinado-vino",
+        "adobado",
+        "",
+      ],
+      default: "",
     },
 
     // Variantes para diferentes pesos o presentaciones
@@ -285,13 +393,14 @@ const productSchema = new mongoose.Schema(
 
 // Crear índices para mejorar el rendimiento de las consultas
 productSchema.index({ category: 1 });
-productSchema.index({ poultryType: 1 });
+productSchema.index({ productType: 1 }); // Cambié de poultryType a productType
 productSchema.index({ farmingType: 1 });
 productSchema.index({ productState: 1 });
+productSchema.index({ cut: 1 }); // Índice para cortes
 productSchema.index({ featured: 1 });
 productSchema.index({ salePrice: 1 });
 productSchema.index({ isActive: 1 });
-productSchema.index({ sku: 1 });
+productSchema.index({ meatGrade: 1 }); // Nuevo índice para grado de carne
 productSchema.index({ "variants.weight": 1 });
 productSchema.index({ createdAt: -1 });
 

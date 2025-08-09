@@ -5,53 +5,28 @@ import {
   PlusCircleIcon,
 } from "@heroicons/react/24/outline";
 
-export default function MultipleImageUploaderDebug({
+export default function MultipleImageUploader({
   mainImage,
   additionalImages = [],
   onMainImageChange,
   onAddImage,
   onRemoveImage,
   colors = [],
+  descriptions = false, // Para permitir descripciones en imágenes adicionales
 }) {
   const mainWidgetRef = useRef(null);
   const addWidgetRef = useRef(null);
   const [selectedColor, setSelectedColor] = useState("");
+  const [selectedDescription, setSelectedDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [mainImageLoading, setMainImageLoading] = useState(false);
   const [mainImageError, setMainImageError] = useState(false);
-  const [debugInfo, setDebugInfo] = useState({
-    cloudinaryLoaded: false,
-    widgetInitialized: false,
-    lastError: null,
-    config: null,
-  });
 
-  // Debug: Verificar configuración
-  useEffect(() => {
-    const config = {
-      cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-      apiKey: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
-      uploadPreset: "PolleríaPatagonia",
-    };
-
-    setDebugInfo((prev) => ({
-      ...prev,
-      config,
-      cloudinaryLoaded: !!window.cloudinary,
-    }));
-
-    console.log("🔍 Debug Config:", config);
-    console.log("🔍 Cloudinary disponible:", !!window.cloudinary);
-  }, []);
-
-  // Inicializar widgets con mejor manejo de errores
+  // Inicializar widgets de Cloudinary
   useEffect(() => {
     if (typeof window === "undefined" || !window.cloudinary) {
-      console.log("❌ Cloudinary no está disponible");
       return;
     }
-
-    console.log("✅ Inicializando widgets de Cloudinary");
 
     try {
       // Widget para imagen principal
@@ -114,21 +89,12 @@ export default function MultipleImageUploaderDebug({
           },
         };
 
-        console.log("🔧 Configuración del widget principal:", config);
-
         mainWidgetRef.current = window.cloudinary.createUploadWidget(
           config,
           (error, result) => {
-            console.log("📥 Main widget callback:", { error, result });
-
             if (error) {
-              console.error("❌ MainWidget error:", error);
-              setDebugInfo((prev) => ({
-                ...prev,
-                lastError: error,
-              }));
+              console.error("❌ Error en imagen principal:", error);
 
-              // Mostrar error más específico
               if (error.status === "Upload preset not found") {
                 alert(
                   "Error: El upload preset 'PolleríaPatagonia' no existe. Verifica en tu dashboard de Cloudinary."
@@ -150,10 +116,9 @@ export default function MultipleImageUploaderDebug({
             }
 
             if (result.event === "success") {
-              console.log("✅ Imagen subida exitosamente:", result.info);
-
               let imageUrl = result.info.secure_url;
 
+              // Aplicar recorte si existe
               if (
                 result.info.coordinates &&
                 result.info.coordinates.custom &&
@@ -169,7 +134,7 @@ export default function MultipleImageUploaderDebug({
 
               setMainImageError(false);
               setMainImageLoading(true);
-              onMainImageChange(result.info, imageUrl, "");
+              onMainImageChange(result.info, imageUrl);
             }
 
             if (result.event === "queues-start") {
@@ -181,14 +146,9 @@ export default function MultipleImageUploaderDebug({
             }
           }
         );
-
-        setDebugInfo((prev) => ({
-          ...prev,
-          widgetInitialized: true,
-        }));
       }
 
-      // Widget para imágenes adicionales (configuración similar)
+      // Widget para imágenes adicionales
       if (!addWidgetRef.current) {
         addWidgetRef.current = window.cloudinary.createUploadWidget(
           {
@@ -207,7 +167,7 @@ export default function MultipleImageUploaderDebug({
           },
           (error, result) => {
             if (error) {
-              console.error("❌ AddWidget error:", error);
+              console.error("❌ Error en imagen adicional:", error);
               alert(
                 `Error al subir imagen adicional: ${
                   error.statusText || error.message
@@ -220,6 +180,7 @@ export default function MultipleImageUploaderDebug({
             if (result.event === "success") {
               let imageUrl = result.info.secure_url;
 
+              // Aplicar recorte si existe
               if (
                 result.info.coordinates &&
                 result.info.coordinates.custom &&
@@ -233,8 +194,14 @@ export default function MultipleImageUploaderDebug({
                 );
               }
 
-              onAddImage(result.info, imageUrl, selectedColor);
+              onAddImage(
+                result.info,
+                imageUrl,
+                selectedColor,
+                selectedDescription
+              );
               setSelectedColor("");
+              setSelectedDescription("");
             }
 
             if (result.event === "queues-start") {
@@ -249,31 +216,20 @@ export default function MultipleImageUploaderDebug({
       }
     } catch (initError) {
       console.error("❌ Error al inicializar widgets:", initError);
-      setDebugInfo((prev) => ({
-        ...prev,
-        lastError: initError,
-      }));
     }
-  }, [onMainImageChange, onAddImage, selectedColor]);
+  }, [onMainImageChange, onAddImage, selectedColor, selectedDescription]);
 
   const handleMainImageClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
 
-    console.log("🖱️ Click en imagen principal");
-    console.log("Widget ref:", mainWidgetRef.current);
-    console.log("Is loading:", isLoading);
-
     if (!isLoading && mainWidgetRef.current) {
       try {
-        console.log("🚀 Abriendo widget principal");
         mainWidgetRef.current.open();
       } catch (error) {
         console.error("❌ Error opening main widget:", error);
         alert(`Error al abrir el widget: ${error.message}`);
       }
-    } else {
-      console.log("❌ No se puede abrir: loading o widget no disponible");
     }
   };
 
@@ -310,50 +266,6 @@ export default function MultipleImageUploaderDebug({
 
   return (
     <div className="space-y-6">
-      {/* Panel de Debug */}
-      <div className="bg-gray-50 p-4 rounded-lg text-sm">
-        <h4 className="font-medium mb-2">🔍 Información de Debug:</h4>
-        <div className="space-y-1">
-          <div>
-            Cloudinary cargado:{" "}
-            <span
-              className={
-                debugInfo.cloudinaryLoaded ? "text-green-600" : "text-red-600"
-              }
-            >
-              {debugInfo.cloudinaryLoaded ? "✅" : "❌"}
-            </span>
-          </div>
-          <div>
-            Widget inicializado:{" "}
-            <span
-              className={
-                debugInfo.widgetInitialized ? "text-green-600" : "text-red-600"
-              }
-            >
-              {debugInfo.widgetInitialized ? "✅" : "❌"}
-            </span>
-          </div>
-          <div>
-            Cloud Name:{" "}
-            <span className="font-mono">
-              {debugInfo.config?.cloudName || "No configurado"}
-            </span>
-          </div>
-          <div>
-            Upload Preset:{" "}
-            <span className="font-mono">
-              {debugInfo.config?.uploadPreset || "No configurado"}
-            </span>
-          </div>
-          {debugInfo.lastError && (
-            <div className="text-red-600">
-              Último error: {JSON.stringify(debugInfo.lastError, null, 2)}
-            </div>
-          )}
-        </div>
-      </div>
-
       {/* Imagen principal */}
       <div>
         <div className="flex items-center justify-between mb-2">
@@ -459,6 +371,11 @@ export default function MultipleImageUploaderDebug({
                     {img.color}
                   </span>
                 )}
+                {img.description && (
+                  <span className="absolute bottom-2 left-2 bg-black bg-opacity-70 text-white px-2 py-1 text-xs rounded">
+                    {img.description}
+                  </span>
+                )}
                 <button
                   type="button"
                   onClick={(e) => {
@@ -476,26 +393,44 @@ export default function MultipleImageUploaderDebug({
         )}
 
         <div className="border rounded p-4">
-          {colors.length > 0 && (
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Asociar a color (opcional)
-              </label>
-              <select
-                className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                value={selectedColor}
-                onChange={(e) => setSelectedColor(e.target.value)}
-                disabled={isLoading}
-              >
-                <option value="">Sin color específico</option>
-                {colors.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+          <div className="grid grid-cols-1 gap-4 mb-4">
+            {colors.length > 0 && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Asociar a color (opcional)
+                </label>
+                <select
+                  className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  value={selectedColor}
+                  onChange={(e) => setSelectedColor(e.target.value)}
+                  disabled={isLoading}
+                >
+                  <option value="">Sin color específico</option>
+                  {colors.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {descriptions && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Descripción de la imagen (opcional)
+                </label>
+                <input
+                  type="text"
+                  className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="Ej: producto marinado, corte específico..."
+                  value={selectedDescription}
+                  onChange={(e) => setSelectedDescription(e.target.value)}
+                  disabled={isLoading}
+                />
+              </div>
+            )}
+          </div>
 
           <div
             onClick={handleAddImageClick}
@@ -515,6 +450,9 @@ export default function MultipleImageUploaderDebug({
                 <PlusCircleIcon className="mx-auto h-12 w-12 text-gray-400" />
                 <p className="mt-1 text-sm text-gray-500">
                   Haz clic para subir y recortar imagen adicional
+                </p>
+                <p className="mt-1 text-xs text-gray-400">
+                  JPG, PNG, WEBP hasta 10MB
                 </p>
               </>
             )}

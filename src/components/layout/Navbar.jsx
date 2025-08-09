@@ -116,52 +116,105 @@ const Navbar = () => {
           <div className="hidden md:flex items-center justify-center space-x-10 flex-grow">
             <Link
               href="/"
-              className={`text-sm font-medium hover:text-indigo-600 transition px-1 py-1 ${
-                isActive("/")
-                  ? "text-indigo-600 border-b-2 border-indigo-500"
-                  : "text-gray-700"
+              className={`text-sm font-medium transition px-1 py-1 ${
+                isActive("/") ? "text-black border-b-2" : "text-gray-700"
               }`}
+              style={isActive("/") ? { borderBottomColor: "#F6C343" } : {}}
+              onMouseEnter={(e) => {
+                if (!isActive("/")) {
+                  e.target.style.color = "#F6C343";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive("/")) {
+                  e.target.style.color = "#374151";
+                }
+              }}
             >
               INICIO
             </Link>
             <Link
               href="/about"
-              className={`text-sm font-medium hover:text-indigo-600 transition px-1 py-1 ${
-                isActive("/contact")
-                  ? "text-indigo-600 border-b-2 border-indigo-500"
-                  : "text-gray-700"
+              className={`text-sm font-medium transition px-1 py-1 ${
+                isActive("/about") ? "text-black border-b-2" : "text-gray-700"
               }`}
+              style={isActive("/about") ? { borderBottomColor: "#F6C343" } : {}}
+              onMouseEnter={(e) => {
+                if (!isActive("/about")) {
+                  e.target.style.color = "#F6C343";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive("/about")) {
+                  e.target.style.color = "#374151";
+                }
+              }}
             >
               SOBRE NOSOTROS
             </Link>
             <Link
               href="/products"
-              className={`text-sm font-medium hover:text-indigo-600 transition px-1 py-1 ${
+              className={`text-sm font-medium transition px-1 py-1 ${
                 isActive("/products")
-                  ? "text-indigo-600 border-b-2 border-indigo-500"
+                  ? "text-black border-b-2"
                   : "text-gray-700"
               }`}
+              style={
+                isActive("/products") ? { borderBottomColor: "#F6C343" } : {}
+              }
+              onMouseEnter={(e) => {
+                if (!isActive("/products")) {
+                  e.target.style.color = "#F6C343";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive("/products")) {
+                  e.target.style.color = "#374151";
+                }
+              }}
             >
               PRODUCTOS
             </Link>
             <Link
               href="/contact"
-              className={`text-sm font-medium hover:text-indigo-600 transition px-1 py-1 ${
-                isActive("/contact")
-                  ? "text-indigo-600 border-b-2 border-indigo-500"
-                  : "text-gray-700"
+              className={`text-sm font-medium transition px-1 py-1 ${
+                isActive("/contact") ? "text-black border-b-2" : "text-gray-700"
               }`}
+              style={
+                isActive("/contact") ? { borderBottomColor: "#F6C343" } : {}
+              }
+              onMouseEnter={(e) => {
+                if (!isActive("/contact")) {
+                  e.target.style.color = "#F6C343";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive("/contact")) {
+                  e.target.style.color = "#374151";
+                }
+              }}
             >
               CONTACTO
             </Link>
             {isAdmin && (
               <Link
                 href="/admin"
-                className={`text-sm font-medium hover:text-indigo-600 transition px-1 py-1 flex items-center ${
-                  isActive("/admin")
-                    ? "text-indigo-600 border-b-2 border-indigo-500"
-                    : "text-gray-700"
+                className={`text-sm font-medium transition px-1 py-1 flex items-center ${
+                  isActive("/admin") ? "text-black border-b-2" : "text-gray-700"
                 }`}
+                style={
+                  isActive("/admin") ? { borderBottomColor: "#F6C343" } : {}
+                }
+                onMouseEnter={(e) => {
+                  if (!isActive("/admin")) {
+                    e.target.style.color = "#F6C343";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive("/admin")) {
+                    e.target.style.color = "#374151";
+                  }
+                }}
               >
                 <ShieldCheckIcon className="h-4 w-4 mr-1" />
                 ADMIN
@@ -178,11 +231,20 @@ const Navbar = () => {
                 <div className="mr-8">
                   <Link
                     href="/cart"
-                    className="relative p-2 text-gray-600 hover:text-indigo-600"
+                    className="relative p-2 text-gray-600 transition"
+                    onMouseEnter={(e) => {
+                      e.target.style.color = "#F6C343";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.color = "#4B5563";
+                    }}
                   >
                     <ShoppingCartIcon className="h-6 w-6" />
                     {cartItemsCount > 0 && (
-                      <span className="absolute top-3 left-2 bg-yellow-500 text-xs font-medium rounded-full h-5 w-5 flex items-center justify-center shadow-sm">
+                      <span
+                        className="absolute top-3 left-2 text-xs font-medium rounded-full h-5 w-5 flex items-center justify-center shadow-sm text-black"
+                        style={{ backgroundColor: "#F6C343" }}
+                      >
                         {cartItemsCount}
                       </span>
                     )}
@@ -195,13 +257,26 @@ const Navbar = () => {
                 <div className="flex items-center space-x-4">
                   <button
                     onClick={openLoginModal}
-                    className="text-sm font-medium text-gray-700 hover:text-indigo-600"
+                    className="text-sm font-medium text-gray-700 transition"
+                    onMouseEnter={(e) => {
+                      e.target.style.color = "#F6C343";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.color = "#374151";
+                    }}
                   >
                     Iniciar Sesión
                   </button>
                   <button
                     onClick={openRegisterModal}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                    className="text-white px-4 py-2 rounded-md text-sm font-medium transition"
+                    style={{ backgroundColor: "#F6C343" }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = "#E6B039";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = "#F6C343";
+                    }}
                   >
                     Registrarse
                   </button>
@@ -212,7 +287,14 @@ const Navbar = () => {
                   {isAdmin && (
                     <Link
                       href="/admin/products/add"
-                      className="bg-amber-300 hover:bg-amber-400 text-white px-3 py-2 rounded-md text-sm font-medium flex items-center mr-2"
+                      className="text-black px-3 py-2 rounded-md text-sm font-medium flex items-center mr-2 transition"
+                      style={{ backgroundColor: "#F6C343" }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = "#E6B039";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = "#F6C343";
+                      }}
                     >
                       <span className="mr-1">+</span> Producto
                     </Link>
@@ -237,8 +319,11 @@ const Navbar = () => {
                           />
                         </div>
                       ) : (
-                        <div className="h-9 w-9 bg-indigo-600 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
-                          <UserIcon className="h-5 w-5 text-white" />
+                        <div
+                          className="h-9 w-9 rounded-full flex items-center justify-center border-2 border-white shadow-sm"
+                          style={{ backgroundColor: "#F6C343" }}
+                        >
+                          <UserIcon className="h-5 w-5 text-black" />
                         </div>
                       )}
                       <ChevronDownIcon className="h-4 w-4 text-gray-600" />
@@ -258,19 +343,40 @@ const Navbar = () => {
                         <div className="py-1">
                           <Link
                             href="/profile"
-                            className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
+                            className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition"
+                            style={{
+                              "&:hover": { color: "#F6C343" },
+                            }}
+                            onMouseEnter={(e) => {
+                              e.target.style.color = "#F6C343";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.color = "#374151";
+                            }}
                           >
                             Mi Perfil
                           </Link>
                           <Link
                             href="/profile/orders"
-                            className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
+                            className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition"
+                            onMouseEnter={(e) => {
+                              e.target.style.color = "#F6C343";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.color = "#374151";
+                            }}
                           >
                             Mis Pedidos
                           </Link>
                           <Link
                             href="/profile/settings"
-                            className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
+                            className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition"
+                            onMouseEnter={(e) => {
+                              e.target.style.color = "#F6C343";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.color = "#374151";
+                            }}
                           >
                             Configuración
                           </Link>
@@ -296,11 +402,20 @@ const Navbar = () => {
               {!isAdmin && (
                 <Link
                   href="/cart"
-                  className="relative p-2 text-gray-600 hover:text-indigo-600"
+                  className="relative p-2 text-gray-600 transition"
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "#F6C343";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "#4B5563";
+                  }}
                 >
                   <ShoppingCartIcon className="h-6 w-6" />
                   {cartItemsCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-yellow-500 text-xs font-medium rounded-full h-5 w-5 flex items-center justify-center shadow-sm">
+                    <span
+                      className="absolute -top-2 -right-2 text-xs font-medium rounded-full h-5 w-5 flex items-center justify-center shadow-sm text-black"
+                      style={{ backgroundColor: "#F6C343" }}
+                    >
                       {cartItemsCount}
                     </span>
                   )}
@@ -308,9 +423,15 @@ const Navbar = () => {
               )}
               {/* Menú hamburguesa */}
               <button
-                className="p-2 rounded-md text-gray-600 hover:text-indigo-600 hover:bg-gray-100"
+                className="p-2 rounded-md text-gray-600 hover:bg-gray-100 transition"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 aria-label="Menú"
+                onMouseEnter={(e) => {
+                  e.target.style.color = "#F6C343";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.color = "#4B5563";
+                }}
               >
                 {isMobileMenuOpen ? (
                   <XMarkIcon className="h-6 w-6" />
@@ -336,7 +457,6 @@ const Navbar = () => {
                 className="flex items-center"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                {/* ✅ CORREGIDO - Contenedor con tamaño fijo y fill */}
                 <div className="relative w-[65px] h-[65px]">
                   <Image
                     src="/images/logo.jpeg"
@@ -349,8 +469,14 @@ const Navbar = () => {
               </Link>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="p-2 rounded-md text-gray-600 hover:text-indigo-600 hover:bg-gray-100"
+                className="p-2 rounded-md text-gray-600 hover:bg-gray-100 transition"
                 aria-label="Cerrar menú"
+                onMouseEnter={(e) => {
+                  e.target.style.color = "#F6C343";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.color = "#4B5563";
+                }}
               >
                 <XMarkIcon className="h-6 w-6" />
               </button>
@@ -373,8 +499,11 @@ const Navbar = () => {
                         />
                       </div>
                     ) : (
-                      <div className="h-10 w-10 bg-indigo-600 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
-                        <UserIcon className="h-6 w-6 text-white" />
+                      <div
+                        className="h-10 w-10 rounded-full flex items-center justify-center border-2 border-white shadow-sm"
+                        style={{ backgroundColor: "#F6C343" }}
+                      >
+                        <UserIcon className="h-6 w-6 text-black" />
                       </div>
                     )}
                     <div className="ml-3">
@@ -400,30 +529,44 @@ const Navbar = () => {
                       href="/"
                       className={`flex items-center px-3 py-3 rounded-lg ${
                         isActive("/")
-                          ? "bg-indigo-50 text-indigo-600"
+                          ? "text-black"
                           : "text-gray-700 hover:bg-gray-50"
                       }`}
+                      style={
+                        isActive("/") ? { backgroundColor: "#F6C343" } : {}
+                      }
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       <span className="text-sm font-medium">Inicio</span>
                     </Link>
                     <Link
                       href="/about"
-                      className={`text-sm font-medium hover:text-indigo-600 transition px-1 py-1 ${
-                        isActive("/contact")
-                          ? "text-indigo-600 border-b-2 border-indigo-500"
-                          : "text-gray-700"
+                      className={`flex items-center px-3 py-3 rounded-lg ${
+                        isActive("/about")
+                          ? "text-black"
+                          : "text-gray-700 hover:bg-gray-50"
                       }`}
+                      style={
+                        isActive("/about") ? { backgroundColor: "#F6C343" } : {}
+                      }
+                      onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      SOBRE NOSOTROS
+                      <span className="text-sm font-medium">
+                        Sobre Nosotros
+                      </span>
                     </Link>
                     <Link
                       href="/products"
                       className={`flex items-center px-3 py-3 rounded-lg ${
                         isActive("/products")
-                          ? "bg-indigo-50 text-indigo-600"
+                          ? "text-black"
                           : "text-gray-700 hover:bg-gray-50"
                       }`}
+                      style={
+                        isActive("/products")
+                          ? { backgroundColor: "#F6C343" }
+                          : {}
+                      }
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       <span className="text-sm font-medium">Productos</span>
@@ -432,9 +575,14 @@ const Navbar = () => {
                       href="/contact"
                       className={`flex items-center px-3 py-3 rounded-lg ${
                         isActive("/contact")
-                          ? "bg-indigo-50 text-indigo-600"
+                          ? "text-black"
                           : "text-gray-700 hover:bg-gray-50"
                       }`}
+                      style={
+                        isActive("/contact")
+                          ? { backgroundColor: "#F6C343" }
+                          : {}
+                      }
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       <span className="text-sm font-medium">Contacto</span>
@@ -444,15 +592,23 @@ const Navbar = () => {
                         href="/cart"
                         className={`flex items-center px-3 py-3 rounded-lg ${
                           isActive("/cart")
-                            ? "bg-yellow-50 text-yellow-700"
+                            ? "text-black"
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
+                        style={
+                          isActive("/cart")
+                            ? { backgroundColor: "#F6C343" }
+                            : {}
+                        }
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         <ShoppingCartIcon className="h-5 w-5 mr-3" />
                         <span className="text-sm font-medium">Mi Carrito</span>
                         {cartItemsCount > 0 && (
-                          <span className="ml-auto bg-yellow-500 text-xs font-medium rounded-full h-5 w-5 flex items-center justify-center">
+                          <span
+                            className="ml-auto text-xs font-medium rounded-full h-5 w-5 flex items-center justify-center text-black"
+                            style={{ backgroundColor: "#F6C343" }}
+                          >
                             {cartItemsCount}
                           </span>
                         )}
@@ -472,9 +628,14 @@ const Navbar = () => {
                         href="/profile"
                         className={`flex items-center px-3 py-3 rounded-lg ${
                           isActive("/profile")
-                            ? "bg-indigo-50 text-indigo-600"
+                            ? "text-black"
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
+                        style={
+                          isActive("/profile")
+                            ? { backgroundColor: "#F6C343" }
+                            : {}
+                        }
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         <span className="text-sm font-medium">Mi Perfil</span>
@@ -483,9 +644,14 @@ const Navbar = () => {
                         href="/profile/orders"
                         className={`flex items-center px-3 py-3 rounded-lg ${
                           isActive("/profile/orders")
-                            ? "bg-indigo-50 text-indigo-600"
+                            ? "text-black"
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
+                        style={
+                          isActive("/profile/orders")
+                            ? { backgroundColor: "#F6C343" }
+                            : {}
+                        }
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         <span className="text-sm font-medium">Mis Pedidos</span>
@@ -494,9 +660,14 @@ const Navbar = () => {
                         href="/profile/settings"
                         className={`flex items-center px-3 py-3 rounded-lg ${
                           isActive("/profile/settings")
-                            ? "bg-indigo-50 text-indigo-600"
+                            ? "text-black"
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
+                        style={
+                          isActive("/profile/settings")
+                            ? { backgroundColor: "#F6C343" }
+                            : {}
+                        }
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         <span className="text-sm font-medium">
@@ -518,9 +689,14 @@ const Navbar = () => {
                         href="/admin"
                         className={`flex items-center px-3 py-3 rounded-lg ${
                           isActive("/admin")
-                            ? "bg-indigo-50 text-indigo-600"
+                            ? "text-black"
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
+                        style={
+                          isActive("/admin")
+                            ? { backgroundColor: "#F6C343" }
+                            : {}
+                        }
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         <ShieldCheckIcon className="h-5 w-5 mr-3" />
@@ -530,8 +706,15 @@ const Navbar = () => {
                       </Link>
                       <Link
                         href="/admin/products/add"
-                        className="flex items-center px-3 py-3 rounded-lg bg-amber-200 text-white hover:bg-amber-400"
+                        className="flex items-center px-3 py-3 rounded-lg text-black transition"
+                        style={{ backgroundColor: "#F6C343" }}
                         onClick={() => setIsMobileMenuOpen(false)}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = "#E6B039";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = "#F6C343";
+                        }}
                       >
                         <span className="text-lg mr-2">+</span>
                         <span className="text-sm font-medium">
@@ -563,7 +746,14 @@ const Navbar = () => {
                   </button>
                   <button
                     onClick={openRegisterModal}
-                    className="w-full py-2.5 px-4 rounded-lg bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700"
+                    className="w-full py-2.5 px-4 rounded-lg text-sm font-medium text-black transition"
+                    style={{ backgroundColor: "#F6C343" }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = "#E6B039";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = "#F6C343";
+                    }}
                   >
                     Registrarse
                   </button>
