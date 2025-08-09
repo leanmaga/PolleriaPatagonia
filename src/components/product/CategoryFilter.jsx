@@ -22,118 +22,67 @@ function CategoryFilterContent() {
     router.push(`${pathname}?${params.toString()}`);
   };
 
+  // Función para obtener los estilos del botón
+  const getButtonStyles = (category) => {
+    const isActive = currentCategory === category;
+
+    if (isActive) {
+      return {
+        className:
+          "px-5 py-2 rounded-full border transition-colors text-sm text-black font-medium",
+        style: {
+          borderColor: "#F6C343",
+          backgroundColor: "#F6C343",
+        },
+      };
+    } else {
+      return {
+        className:
+          "px-5 py-2 rounded-full border border-gray-300 transition-colors text-sm text-black hover:border-opacity-80",
+        style: {
+          "&:hover": { borderColor: "#F6C343" },
+        },
+        onMouseEnter: (e) => {
+          e.target.style.borderColor = "#F6C343";
+        },
+        onMouseLeave: (e) => {
+          e.target.style.borderColor = "#d1d5db";
+        },
+      };
+    }
+  };
+
+  const categories = [
+    { key: "all", label: "Todos" },
+    { key: "pollos-enteros", label: "Pollos Enteros" },
+    { key: "cortes-pollo", label: "Cortes de Pollo" },
+    { key: "huevos", label: "Huevos" },
+    { key: "marinados", label: "Marinados" },
+    { key: "embutidos", label: "Embutidos" },
+    { key: "menudencias", label: "Menudencias" },
+    { key: "productos-organicos", label: "Orgánicos" },
+    { key: "preparados", label: "Preparados" },
+    { key: "promociones", label: "Promociones" },
+    { key: "otros", label: "Otros" },
+  ];
+
   return (
     <div className="flex flex-wrap justify-center mb-8 gap-3">
-      <button
-        className={`px-5 py-2 rounded-full border transition-colors text-sm ${
-          currentCategory === "all"
-            ? "border-orange-500 bg-orange-500 text-white"
-            : "border-gray-300 hover:border-orange-400 text-black"
-        }`}
-        onClick={() => handleCategoryChange("all")}
-      >
-        Todos
-      </button>
-      <button
-        className={`px-5 py-2 rounded-full border transition-colors text-sm ${
-          currentCategory === "pollos-enteros"
-            ? "border-orange-500 bg-orange-500 text-white"
-            : "border-gray-300 hover:border-orange-400 text-black"
-        }`}
-        onClick={() => handleCategoryChange("pollos-enteros")}
-      >
-        Pollos Enteros
-      </button>
-      <button
-        className={`px-5 py-2 rounded-full border transition-colors text-sm ${
-          currentCategory === "cortes-pollo"
-            ? "border-orange-500 bg-orange-500 text-white"
-            : "border-gray-300 hover:border-orange-400 text-black"
-        }`}
-        onClick={() => handleCategoryChange("cortes-pollo")}
-      >
-        Cortes de Pollo
-      </button>
-      <button
-        className={`px-5 py-2 rounded-full border transition-colors text-sm ${
-          currentCategory === "huevos"
-            ? "border-orange-500 bg-orange-500 text-white"
-            : "border-gray-300 hover:border-orange-400 text-black"
-        }`}
-        onClick={() => handleCategoryChange("huevos")}
-      >
-        Huevos
-      </button>
-      <button
-        className={`px-5 py-2 rounded-full border transition-colors text-sm ${
-          currentCategory === "marinados"
-            ? "border-orange-500 bg-orange-500 text-white"
-            : "border-gray-300 hover:border-orange-400 text-black"
-        }`}
-        onClick={() => handleCategoryChange("marinados")}
-      >
-        Marinados
-      </button>
-      <button
-        className={`px-5 py-2 rounded-full border transition-colors text-sm ${
-          currentCategory === "embutidos"
-            ? "border-orange-500 bg-orange-500 text-white"
-            : "border-gray-300 hover:border-orange-400 text-black"
-        }`}
-        onClick={() => handleCategoryChange("embutidos")}
-      >
-        Embutidos
-      </button>
-      <button
-        className={`px-5 py-2 rounded-full border transition-colors text-sm ${
-          currentCategory === "menudencias"
-            ? "border-orange-500 bg-orange-500 text-white"
-            : "border-gray-300 hover:border-orange-400 text-black"
-        }`}
-        onClick={() => handleCategoryChange("menudencias")}
-      >
-        Menudencias
-      </button>
-      <button
-        className={`px-5 py-2 rounded-full border transition-colors text-sm ${
-          currentCategory === "productos-organicos"
-            ? "border-orange-500 bg-orange-500 text-white"
-            : "border-gray-300 hover:border-orange-400 text-black"
-        }`}
-        onClick={() => handleCategoryChange("productos-organicos")}
-      >
-        Orgánicos
-      </button>
-      <button
-        className={`px-5 py-2 rounded-full border transition-colors text-sm ${
-          currentCategory === "preparados"
-            ? "border-orange-500 bg-orange-500 text-white"
-            : "border-gray-300 hover:border-orange-400 text-black"
-        }`}
-        onClick={() => handleCategoryChange("preparados")}
-      >
-        Preparados
-      </button>
-      <button
-        className={`px-5 py-2 rounded-full border transition-colors text-sm ${
-          currentCategory === "promociones"
-            ? "border-orange-500 bg-orange-500 text-white"
-            : "border-gray-300 hover:border-orange-400 text-black"
-        }`}
-        onClick={() => handleCategoryChange("promociones")}
-      >
-        Promociones
-      </button>
-      <button
-        className={`px-5 py-2 rounded-full border transition-colors text-sm ${
-          currentCategory === "otros"
-            ? "border-orange-500 bg-orange-500 text-white"
-            : "border-gray-300 hover:border-orange-400 text-black"
-        }`}
-        onClick={() => handleCategoryChange("otros")}
-      >
-        Otros
-      </button>
+      {categories.map(({ key, label }) => {
+        const buttonStyles = getButtonStyles(key);
+        return (
+          <button
+            key={key}
+            className={buttonStyles.className}
+            style={buttonStyles.style}
+            onMouseEnter={buttonStyles.onMouseEnter}
+            onMouseLeave={buttonStyles.onMouseLeave}
+            onClick={() => handleCategoryChange(key)}
+          >
+            {label}
+          </button>
+        );
+      })}
     </div>
   );
 }

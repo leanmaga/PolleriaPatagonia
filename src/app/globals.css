@@ -66,8 +66,9 @@ body {
   background: #555;
 }
 
-/* Añade esto a tu archivo CSS global */
+/* Botones con animación drop personalizada */
 @layer components {
+  /* Botón original con amarillo */
   .btn-drop {
     background-color: #444;
     @apply relative text-white py-3 font-medium overflow-hidden transition-all duration-300 inline-block;
@@ -91,11 +92,45 @@ body {
   .btn-drop:hover span {
     @apply text-black;
   }
+
   .btn-drop svg {
     @apply relative z-10 transition-colors duration-300;
   }
 
   .btn-drop:hover svg {
+    @apply text-black;
+  }
+
+  /* Nuevo botón con color personalizado #F6C343 */
+  .btn-drop-yellow {
+    background-color: #444;
+    @apply relative text-white py-3 font-medium overflow-hidden transition-all duration-300 inline-block;
+  }
+
+  .btn-drop-yellow:before {
+    content: "";
+    background-color: #f6c343;
+    @apply absolute bottom-0 right-0 w-2 h-2 transition-all duration-500 ease-out;
+    z-index: 1;
+  }
+
+  .btn-drop-yellow:hover:before {
+    @apply w-full h-full transform origin-bottom-right;
+  }
+
+  .btn-drop-yellow span {
+    @apply relative z-10 transition-colors duration-300;
+  }
+
+  .btn-drop-yellow:hover span {
+    @apply text-black;
+  }
+
+  .btn-drop-yellow svg {
+    @apply relative z-10 transition-colors duration-300;
+  }
+
+  .btn-drop-yellow:hover svg {
     @apply text-black;
   }
 }

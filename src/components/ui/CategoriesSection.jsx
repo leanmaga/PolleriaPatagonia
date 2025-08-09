@@ -9,20 +9,21 @@ export default function CategoriesSection() {
   const categories = [
     {
       id: 1,
-      title: "PREMIUM CUTS",
-      subtitle: "CARNES SELECTAS",
-      description: "Cortes excepcionales para paladares exigentes",
+      title: "MILANESAS PREMIUM",
+      subtitle: "ELABORACIÓN DIARIA",
+      description:
+        "Suprema, nalga y cerdo. Preparadas todos los días con carne premium",
       price: "4.999",
       originalPrice: "6.500",
       image: { src: imagenPollo, width: 300, height: 200 },
       accent: "from-amber-400 to-yellow-500",
-      href: "/productos/premium",
+      href: "/productos/milanesas",
     },
     {
       id: 2,
-      title: "POLLO ORGÁNICO",
-      subtitle: "CRIANZA NATURAL",
-      description: "Sabor auténtico, calidad garantizada",
+      title: "POLLO SIN AGUA",
+      subtitle: "NO SE ACHICA",
+      description: "Pollos frescos que mantienen su tamaño al cocinar",
       price: "2.899",
       originalPrice: "3.400",
       image: { src: imagenPollo, width: 300, height: 200 },
@@ -31,14 +32,14 @@ export default function CategoriesSection() {
     },
     {
       id: 3,
-      title: "DELICATESSEN",
-      subtitle: "ESPECIALIDADES",
-      description: "Productos artesanales de autor",
+      title: "CARNE VACUNA",
+      subtitle: "FRESCA PREMIUM",
+      description: "Cortes frescos seleccionados, listos para tu freezer",
       price: "3.499",
       originalPrice: "4.200",
       image: { src: imagenPollo, width: 300, height: 200 },
       accent: "from-rose-400 to-pink-500",
-      href: "/productos/especialidades",
+      href: "/productos/carnes",
     },
   ];
 
@@ -103,7 +104,7 @@ export default function CategoriesSection() {
 
         .premium-card:hover .accent-line {
           height: 6px;
-          box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+          box-shadow: 0 0 20px rgba(246, 195, 67, 0.4);
         }
 
         .price-container {
@@ -114,7 +115,7 @@ export default function CategoriesSection() {
           font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont,
             sans-serif;
           font-weight: 800;
-          background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+          background: linear-gradient(135deg, #f6c343 0%, #e6b339 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -134,7 +135,7 @@ export default function CategoriesSection() {
           position: absolute;
           top: -8px;
           right: -8px;
-          background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+          background: linear-gradient(135deg, #f6c343 0%, #e6b339 100%);
           color: white;
           padding: 8px 16px;
           border-radius: 20px;
@@ -142,7 +143,7 @@ export default function CategoriesSection() {
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 1px;
-          box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3);
+          box-shadow: 0 8px 25px rgba(246, 195, 67, 0.3);
           animation: gentle-pulse 2s infinite;
         }
 
@@ -157,7 +158,7 @@ export default function CategoriesSection() {
         }
 
         .cta-button {
-          background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+          background: linear-gradient(135deg, #f6c343 0%, #e6b339 100%);
           color: white;
           border: none;
           padding: 14px 28px;
@@ -193,7 +194,7 @@ export default function CategoriesSection() {
 
         .cta-button:hover {
           transform: translateY(-2px);
-          box-shadow: 0 12px 25px rgba(31, 41, 55, 0.4);
+          box-shadow: 0 12px 25px rgba(246, 195, 67, 0.4);
         }
 
         .quality-indicator {
@@ -225,17 +226,21 @@ export default function CategoriesSection() {
         <div className="container mx-auto px-4">
           {/* Header minimalista */}
           <div className="text-center mb-16">
-            <div className="inline-block px-4 py-2 bg-gray-900 text-white text-xs font-medium rounded-full mb-6 tracking-widest uppercase">
-              Selección Premium
+            <div
+              className="inline-block px-4 py-2 text-white text-xs font-medium rounded-full mb-6 tracking-widest uppercase"
+              style={{ backgroundColor: "#F6C343" }}
+            >
+              Elaboración Diaria
             </div>
             <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-4 tracking-tight">
-              Excelencia
+              Productos
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-gray-600 to-gray-800">
-                Culinaria
+                Premium
               </span>
             </h2>
             <p className="text-gray-600 text-lg max-w-2xl mx-auto leading-relaxed">
-              Descubre la diferencia que hace la calidad excepcional
+              Listos para tu freezer, elaborados todos los días con la mejor
+              calidad
             </p>
           </div>
 
@@ -247,7 +252,7 @@ export default function CategoriesSection() {
                 className="premium-card rounded-3xl p-0 shadow-lg"
               >
                 {/* Badge flotante */}
-                <div className="floating-badge">Premium</div>
+                <div className="floating-badge">Fresco</div>
 
                 {/* Indicador de calidad */}
                 <div className="quality-indicator"></div>
@@ -316,7 +321,7 @@ export default function CategoriesSection() {
                   {/* CTA */}
                   <Link href={category.href}>
                     <button className="cta-button w-full">
-                      Agregar al Carrito
+                      Pedir por WhatsApp
                     </button>
                   </Link>
                 </div>

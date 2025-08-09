@@ -11,19 +11,18 @@ import RelatedProducts from "@/components/product/RelatedProducts";
 import ProductImageSlider from "@/components/product/ProductImageSlider";
 
 export async function generateMetadata({ params }) {
-  // AWAIT params before accessing its properties
   const resolvedParams = await params;
   const product = await getProductById(resolvedParams.id);
 
   if (!product) {
     return {
-      title: "Producto no encontrado | PolleríaPatagonia",
+      title: "Producto no encontrado | Sol Campestre",
       description: "El producto que buscas no está disponible",
     };
   }
 
   return {
-    title: `${product.title} | PolleríaPatagonia`,
+    title: `${product.title} | Sol Campestre`,
     description: product.description,
   };
 }
@@ -67,17 +66,17 @@ async function ProductContent({ id }) {
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       {/* Breadcrumb */}
       <div className="mb-6 text-sm text-gray-500 flex items-center space-x-2">
-        <Link href="/" className="hover:text-indigo-600">
+        <Link href="/" className="hover:text-[#F6C343]">
           Inicio
         </Link>
         <span>/</span>
-        <Link href="/products" className="hover:text-indigo-600">
+        <Link href="/products" className="hover:text-[#F6C343]">
           Productos
         </Link>
         <span>/</span>
         <Link
           href={`/products?category=${product.category}`}
-          className="hover:text-indigo-600"
+          className="hover:text-[#F6C343]"
         >
           {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
         </Link>
@@ -96,7 +95,8 @@ async function ProductContent({ id }) {
             <div className="mb-2">
               <Link
                 href={`/products?category=${product.category}`}
-                className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                className="text-sm font-medium hover:text-[#E6B339]"
+                style={{ color: "#F6C343" }}
               >
                 {product.category.charAt(0).toUpperCase() +
                   product.category.slice(1)}
@@ -127,7 +127,10 @@ async function ProductContent({ id }) {
                   <p className="ml-3 text-lg text-gray-500 line-through">
                     ${regularPrice.toFixed(2)}
                   </p>
-                  <span className="ml-3 px-2 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-md">
+                  <span
+                    className="ml-3 px-2 py-1 text-white text-xs font-semibold rounded-md"
+                    style={{ backgroundColor: "#F6C343" }}
+                  >
                     {Math.round((1 - product.promoPrice / regularPrice) * 100)}%
                     OFF
                   </span>
@@ -149,10 +152,13 @@ async function ProductContent({ id }) {
               Stock disponible: {product.stock} unidades
               {product.stock > 5 ? (
                 <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
-                  En stock
+                  Disponible
                 </span>
               ) : product.stock > 0 ? (
-                <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                <span
+                  className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium text-white"
+                  style={{ backgroundColor: "#F6C343" }}
+                >
                   Quedan pocas unidades
                 </span>
               ) : (
@@ -168,13 +174,13 @@ async function ProductContent({ id }) {
                 {product.sizes && product.sizes.length > 0 && (
                   <div className="mb-4">
                     <h3 className="text-sm font-medium text-gray-700 mb-2">
-                      Talle
+                      Peso/Tamaño
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {product.sizes.map((size) => (
                         <button
                           key={size}
-                          className="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-indigo-500 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          className="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-[#F6C343] hover:text-[#F6C343] focus:outline-none focus:ring-2 focus:ring-[#F6C343]"
                         >
                           {size}
                         </button>
@@ -186,13 +192,13 @@ async function ProductContent({ id }) {
                 {product.colors && product.colors.length > 0 && (
                   <div>
                     <h3 className="text-sm font-medium text-gray-700 mb-2">
-                      Color
+                      Tipo
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {product.colors.map((color) => (
                         <button
                           key={color}
-                          className="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-indigo-500 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          className="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-[#F6C343] hover:text-[#F6C343] focus:outline-none focus:ring-2 focus:ring-[#F6C343]"
                         >
                           {color}
                         </button>
@@ -203,7 +209,7 @@ async function ProductContent({ id }) {
               </div>
             )}
 
-            {/* Botón de agregar al carrito */}
+            {/* Botón de pedir por WhatsApp */}
             <div className="mb-8">
               <AddToCartButton product={product} />
             </div>
@@ -238,34 +244,30 @@ async function ProductContent({ id }) {
                       product.category.slice(1)}
                   </li>
                   <li>
-                    Disponibilidad: {product.stock > 0 ? "En stock" : "Agotado"}
+                    Disponibilidad:{" "}
+                    {product.stock > 0 ? "Disponible" : "Agotado"}
                   </li>
-                  {product.material && <li>Material: {product.material}</li>}
+                  {product.material && <li>Tipo: {product.material}</li>}
                   {product.gender && (
                     <li>
-                      Género:{" "}
+                      Corte:{" "}
                       {product.gender.charAt(0).toUpperCase() +
                         product.gender.slice(1)}
                     </li>
                   )}
-                  {product.style && <li>Estilo: {product.style}</li>}
-                  {product.season && (
-                    <li>
-                      Temporada:{" "}
-                      {product.season.charAt(0).toUpperCase() +
-                        product.season.slice(1)}
-                    </li>
-                  )}
+                  {product.style && <li>Preparación: {product.style}</li>}
+                  <li>Frescura: Elaborado diariamente</li>
+                  <li>Empaque: Listo para freezer</li>
                 </ul>
               </details>
             </div>
 
-            {/* Métodos de pago */}
+            {/* Información de entrega */}
             <div className="mt-2 pt-4 border-t border-gray-200">
               <details className="group">
                 <summary className="flex justify-between items-center font-medium cursor-pointer list-none">
                   <span className="text-lg font-semibold text-gray-700">
-                    Métodos de pago
+                    Entrega y Zonas
                   </span>
                   <span className="transition group-open:rotate-180">
                     <svg
@@ -283,57 +285,21 @@ async function ProductContent({ id }) {
                     </svg>
                   </span>
                 </summary>
-                <div className="text-gray-600 mt-3 group-open:animate-fadeIn">
-                  <div className="flex space-x-4">
-                    <div className="bg-gray-100 rounded p-2">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6 text-gray-600"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                        />
-                      </svg>
-                    </div>
-                    <div className="bg-gray-100 rounded p-2">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6 text-gray-600"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z"
-                        />
-                      </svg>
-                    </div>
-                    <div className="bg-gray-100 rounded p-2">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6 text-gray-600"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                        />
-                      </svg>
-                    </div>
-                  </div>
+                <div className="text-gray-600 mt-3 group-open:animate-fadeIn space-y-2">
+                  <p>
+                    <strong>Tiempo de entrega:</strong> Máximo 24 horas
+                  </p>
+                  <p>
+                    <strong>Zonas de cobertura:</strong> Belgrano, Palermo, Las
+                    Cañitas, Colegiales y Núñez
+                  </p>
+                  <p>
+                    <strong>Pedidos:</strong> Por WhatsApp (+54 9 11 2552-8131)
+                  </p>
+                  <p>
+                    <strong>Horarios:</strong> Lunes a Viernes 10:00-20:00,
+                    Sábados 10:00-14:00
+                  </p>
                 </div>
               </details>
             </div>

@@ -35,45 +35,54 @@ export default function Home() {
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="font-sora-bold uppercase text-3xl font-bold text-center mb-12 text-gray-800">
-            ¿Por qué comprar con nosotros?
+            ¿Por qué elegir Sol Campestre?
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="flex flex-col items-center text-center">
-              <div className="bg-indigo-500 p-4 rounded-full mb-4">
+              <div
+                className="p-4 rounded-full mb-4"
+                style={{ backgroundColor: "#F6C343" }}
+              >
                 <ShoppingBagIcon className="h-8 w-8 text-white" />
               </div>
               <h3 className="font-sora-regular uppercase text-xl font-semibold mb-2">
-                Gran variedad de productos
+                Elaboración Diaria
               </h3>
               <p className="text-gray-600">
-                Encuentra todo lo que necesitas en un solo lugar, con la mejor
-                calidad.
+                Milanesas preparadas todos los días para garantizar máxima
+                frescura y calidad premium.
               </p>
             </div>
 
             <div className="flex flex-col items-center text-center">
-              <div className="bg-indigo-500 p-4 rounded-full mb-4">
+              <div
+                className="p-4 rounded-full mb-4"
+                style={{ backgroundColor: "#F6C343" }}
+              >
                 <TruckIcon className="h-8 w-8 text-white" />
               </div>
               <h3 className="font-sora-regular uppercase text-xl font-semibold mb-2">
-                Coordinación de envíos
+                Entrega en 24hs
               </h3>
               <p className="text-gray-600">
-                Enviamos tu pedido a donde estés. Coordinamos contigo el mejor
-                método.
+                Pedí por WhatsApp y recibí en tu zona en menos de 24 horas.
+                Cobertura en Belgrano, Palermo, Cañitas, Colegiales y Núñez.
               </p>
             </div>
 
             <div className="flex flex-col items-center text-center">
-              <div className="bg-indigo-500 p-4 rounded-full mb-4">
+              <div
+                className="p-4 rounded-full mb-4"
+                style={{ backgroundColor: "#F6C343" }}
+              >
                 <CreditCardIcon className="h-8 w-8 text-white" />
               </div>
               <h3 className="font-sora-regular uppercase text-xl font-semibold mb-2">
-                Pagos seguros
+                Listo para tu Freezer
               </h3>
               <p className="text-gray-600">
-                Utiliza nuestra pasarela de pago con MercadoPago para una compra
-                segura.
+                Mercadería separada y empaquetada. Llegás a casa y solo guardás
+                en el freezer. Pollos sin agua que no se achican.
               </p>
             </div>
           </div>
@@ -81,11 +90,17 @@ export default function Home() {
       </section>
 
       {/* Contact CTA */}
-      <section className="py-16 bg-black text-white">
+      <section
+        className="py-16 text-white"
+        style={{ backgroundColor: "#F6C343" }}
+      >
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">¿Tienes preguntas?</h2>
+          <h2 className="text-3xl font-bold mb-4">
+            ¿Tenés preguntas sobre nuestros productos?
+          </h2>
           <p className="text-xl mb-8">
-            Estamos aquí para ayudarte con cualquier duda o sugerencia.
+            Contactanos por WhatsApp y te respondemos al toque. Atención cordial
+            garantizada.
           </p>
           <ButtonContact />
         </div>

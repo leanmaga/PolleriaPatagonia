@@ -12,7 +12,7 @@ export default function HeroSection() {
       <div className="absolute inset-0 lg:hidden">
         <Image
           src={heroImageUrl}
-          alt="Hero background - Productos de calidad para tu freezer"
+          alt="Milanesas premium y productos frescos listos para tu freezer"
           fill
           style={{ objectFit: "cover" }}
           className="transition-opacity duration-500"
@@ -31,18 +31,18 @@ export default function HeroSection() {
           <div className="max-w-2xl">
             <h1 className="font-drop font-black uppercase leading-none mb-8">
               <span className="block text-[8vw] xl:text-[6vw] 2xl:text-[5vw] tracking-tighter text-white">
-                CALIDAD
+                MILANESAS
               </span>
               <span className="block text-[8vw] xl:text-[6vw] 2xl:text-[5vw] tracking-tighter text-white">
-                LISTA PARA
+                PREMIUM
               </span>
               <span className="block text-[8vw] xl:text-[6vw] 2xl:text-[5vw] tracking-tighter text-white">
-                TU FREEZER
+                TODOS LOS DÍAS
               </span>
             </h1>
 
             <p className="text-lg xl:text-xl font-medium mb-8 tracking-wider uppercase text-white/90">
-              Todo lo que buscas en un solo lugar.
+              Elaboración diaria • Listo para tu freezer • Sin agua agregada
             </p>
 
             <CTAButton />
@@ -53,7 +53,7 @@ export default function HeroSection() {
         <div className="relative">
           <Image
             src={heroImageUrl}
-            alt="Hero background - Productos de calidad para tu freezer"
+            alt="Milanesas premium y productos frescos listos para tu freezer"
             fill
             style={{ objectFit: "cover" }}
             className="transition-opacity duration-500"
@@ -69,15 +69,15 @@ export default function HeroSection() {
         <div className="max-w-5xl">
           <h1 className="font-drop font-black uppercase leading-none mb-8">
             <span className="block text-[12vw] tracking-tighter text-white drop-shadow-lg">
-              CALIDAD
+              MILANESAS
             </span>
             <span className="block text-[12vw] tracking-tighter text-white drop-shadow-lg">
-              LISTA PARA TU FREEZER
+              PREMIUM TODOS LOS DÍAS
             </span>
           </h1>
 
           <p className="text-xl md:text-2xl font-medium mb-8 tracking-wider uppercase text-white/90 drop-shadow-md max-w-2xl">
-            Todo lo que buscas en un solo lugar.
+            Elaboración diaria • Listo para tu freezer
           </p>
 
           <CTAButton />
