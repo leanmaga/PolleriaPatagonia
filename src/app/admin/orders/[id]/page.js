@@ -1,4 +1,4 @@
-// app/admin/orders/[id]/page.js
+// app/admin/orders/[id]/page.js (Con color #F6C343)
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -54,7 +54,14 @@ export default async function OrderDetailPage({ params }) {
     <div>
       <Link
         href="/admin/orders"
-        className="inline-flex items-center text-indigo-600 hover:text-indigo-800 mb-6"
+        className="inline-flex items-center mb-6 transition-colors"
+        style={{ color: "#F6C343" }}
+        onMouseEnter={(e) => {
+          e.target.style.color = "#E5B63C";
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.color = "#F6C343";
+        }}
       >
         <ArrowLeftIcon className="h-5 w-5 mr-1" />
         Volver a todos los pedidos
@@ -100,7 +107,14 @@ export default async function OrderDetailPage({ params }) {
                       <h3 className="text-base font-medium text-gray-900">
                         <Link
                           href={`/products/${item.product}`}
-                          className="hover:text-indigo-600"
+                          className="transition-colors"
+                          style={{ color: "inherit" }}
+                          onMouseEnter={(e) => {
+                            e.target.style.color = "#F6C343";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.color = "inherit";
+                          }}
                         >
                           {item.title}
                         </Link>
@@ -218,17 +232,22 @@ export default async function OrderDetailPage({ params }) {
               <div>
                 <h3 className="text-sm font-medium text-gray-500">Estado</h3>
                 <p
-                  className={`${
+                  className={`font-medium ${
                     order.status === "pagado"
                       ? "text-green-600"
                       : order.status === "pendiente"
-                      ? "text-yellow-600"
+                      ? ""
                       : order.status === "enviado"
                       ? "text-blue-600"
                       : order.status === "entregado"
-                      ? "text-indigo-600"
+                      ? ""
                       : "text-red-600"
-                  } font-medium`}
+                  }`}
+                  style={
+                    order.status === "pendiente" || order.status === "entregado"
+                      ? { color: "#F6C343" }
+                      : {}
+                  }
                 >
                   {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                 </p>

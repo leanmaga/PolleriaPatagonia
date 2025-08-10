@@ -1,4 +1,4 @@
-// src/app/admin/questions/page.js - VERSIÓN OPTIMIZADA
+// src/app/admin/questions/page.js - VERSIÓN OPTIMIZADA (Con color #F6C343)
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
@@ -242,7 +242,15 @@ const AdminQuestionsPage = () => {
               placeholder="Buscar preguntas, usuarios o productos..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:border-transparent"
+              onFocus={(e) => {
+                e.target.style.borderColor = "#F6C343";
+                e.target.style.boxShadow = `0 0 0 3px rgba(246, 195, 67, 0.1)`;
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "#d1d5db";
+                e.target.style.boxShadow = "none";
+              }}
             />
           </div>
 
@@ -252,7 +260,15 @@ const AdminQuestionsPage = () => {
               setFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500"
+            className="px-4 py-2 border border-gray-300 rounded-md focus:ring-2"
+            onFocus={(e) => {
+              e.target.style.borderColor = "#F6C343";
+              e.target.style.boxShadow = `0 0 0 3px rgba(246, 195, 67, 0.1)`;
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = "#d1d5db";
+              e.target.style.boxShadow = "none";
+            }}
           >
             <option value="all">Todas las preguntas</option>
             <option value="pending">Pendientes respuesta</option>
@@ -270,7 +286,13 @@ const AdminQuestionsPage = () => {
 
           {loading ? (
             <div className="text-center py-8">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 border-t-transparent"></div>
+              <div
+                className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-t-transparent"
+                style={{
+                  borderColor: "#F6C343",
+                  borderTopColor: "transparent",
+                }}
+              ></div>
               <p className="mt-2 text-gray-600">Cargando preguntas...</p>
             </div>
           ) : filteredQuestions.length === 0 ? (
@@ -381,8 +403,16 @@ const AdminQuestionsPage = () => {
                               value={responseText}
                               onChange={(e) => setResponseText(e.target.value)}
                               rows="3"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:border-transparent"
                               placeholder="Escribe tu respuesta aquí..."
+                              onFocus={(e) => {
+                                e.target.style.borderColor = "#F6C343";
+                                e.target.style.boxShadow = `0 0 0 3px rgba(246, 195, 67, 0.1)`;
+                              }}
+                              onBlur={(e) => {
+                                e.target.style.borderColor = "#d1d5db";
+                                e.target.style.boxShadow = "none";
+                              }}
                             />
                             <p className="text-xs text-gray-500 mt-1">
                               Mínimo 10 caracteres ({responseText.length}/10)
@@ -394,7 +424,29 @@ const AdminQuestionsPage = () => {
                               disabled={
                                 submitting || responseText.trim().length < 10
                               }
-                              className="inline-flex items-center px-3 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                              className="inline-flex items-center px-3 py-2 text-white text-sm font-medium rounded-md disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                              style={{
+                                backgroundColor:
+                                  submitting || responseText.trim().length < 10
+                                    ? "#9ca3af"
+                                    : "#F6C343",
+                              }}
+                              onMouseEnter={(e) => {
+                                if (
+                                  !submitting &&
+                                  responseText.trim().length >= 10
+                                ) {
+                                  e.target.style.backgroundColor = "#E5B63C";
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                if (
+                                  !submitting &&
+                                  responseText.trim().length >= 10
+                                ) {
+                                  e.target.style.backgroundColor = "#F6C343";
+                                }
+                              }}
                             >
                               {submitting ? (
                                 <>
@@ -422,7 +474,14 @@ const AdminQuestionsPage = () => {
                       ) : (
                         <button
                           onClick={() => setRespondingTo(question._id)}
-                          className="inline-flex items-center px-3 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700"
+                          className="inline-flex items-center px-3 py-2 text-white text-sm font-medium rounded-md transition-colors"
+                          style={{ backgroundColor: "#F6C343" }}
+                          onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = "#E5B63C";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = "#F6C343";
+                          }}
                         >
                           <ChatBubbleLeftRightIcon className="h-4 w-4 mr-2" />
                           Responder
@@ -462,9 +521,12 @@ const AdminQuestionsPage = () => {
                     onClick={() => setCurrentPage(page)}
                     className={`px-3 py-1 border rounded ${
                       currentPage === page
-                        ? "bg-indigo-600 text-white"
+                        ? "text-white"
                         : "bg-white text-gray-700 hover:bg-gray-50"
                     }`}
+                    style={
+                      currentPage === page ? { backgroundColor: "#F6C343" } : {}
+                    }
                   >
                     {page}
                   </button>

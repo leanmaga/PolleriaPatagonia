@@ -22,7 +22,7 @@ const LegalModal = ({ isOpen, onClose, title, content }) => {
       <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-lg shadow-xl">
         {/* Header del modal */}
         <div className="sticky top-0 z-10 flex items-center justify-between p-4 border-b bg-white">
-          <h2 className="text-xl font-bold font-drop">{title}</h2>
+          <h2 className="text-xl font-bold font-drop text-gray-800">{title}</h2>
         </div>
 
         {/* Contenido del modal */}
@@ -34,7 +34,8 @@ const LegalModal = ({ isOpen, onClose, title, content }) => {
         <div className="sticky bottom-0 flex justify-end p-4 border-t bg-white">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-white bg-indigo-500 rounded-md hover:bg-indigo-600 focus:outline-none font-drop"
+            className="px-4 py-2 text-sm font-medium text-white rounded-md hover:opacity-90 focus:outline-none font-drop transition-opacity"
+            style={{ backgroundColor: "#FAC348" }}
           >
             Cerrar
           </button>

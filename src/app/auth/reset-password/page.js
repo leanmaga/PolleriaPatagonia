@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -6,7 +6,11 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import { sendPasswordResetEmail } from "@/lib/email-actions"; // Importar directamente la server action
 
-export default function ResetPasswordPage({ isInModal = false, onBackToLogin, afterSubmit }) {
+export default function ResetPasswordPage({
+  isInModal = false,
+  onBackToLogin,
+  afterSubmit,
+}) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -21,13 +25,13 @@ export default function ResetPasswordPage({ isInModal = false, onBackToLogin, af
     try {
       // Usar directamente la server action en lugar de hacer una solicitud fetch
       const result = await sendPasswordResetEmail(email);
-      
+
       if (!result.success) {
         // Si hay un error específico que debemos mostrar al usuario
         if (result.error && result.error.includes("Google")) {
           throw new Error(result.error);
         }
-        
+
         // Para otros errores, lanza un error genérico
         throw new Error("Error al procesar la solicitud");
       }
@@ -36,9 +40,9 @@ export default function ResetPasswordPage({ isInModal = false, onBackToLogin, af
         "Te hemos enviado un correo con instrucciones para restablecer tu contraseña"
       );
       setSubmitted(true);
-      
+
       // Si estamos en el modal y hay una función afterSubmit, la llamamos
-      if (isInModal && typeof afterSubmit === 'function') {
+      if (isInModal && typeof afterSubmit === "function") {
         setTimeout(() => {
           afterSubmit();
         }, 1500); // Esperar un poco para que el usuario vea el mensaje de éxito
@@ -54,7 +58,13 @@ export default function ResetPasswordPage({ isInModal = false, onBackToLogin, af
 
   if (submitted) {
     return (
-      <div className={isInModal ? "" : "min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8"}>
+      <div
+        className={
+          isInModal
+            ? ""
+            : "min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
+        }
+      >
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <div className="flex justify-center">
             <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center">
@@ -79,7 +89,7 @@ export default function ResetPasswordPage({ isInModal = false, onBackToLogin, af
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Hemos enviado instrucciones para restablecer tu contraseña a{" "}
-            <span className="font-medium text-indigo-600">{email}</span>. Revisa
+            <span className="font-medium text-yellow-600">{email}</span>. Revisa
             tu bandeja de entrada y sigue el enlace.
           </p>
         </div>
@@ -89,12 +99,12 @@ export default function ResetPasswordPage({ isInModal = false, onBackToLogin, af
             <div className="flex flex-col space-y-4">
               <button
                 onClick={() => setSubmitted(false)}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-400 hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400"
               >
                 Intentar con otro correo
               </button>
-              
-              {isInModal && typeof onBackToLogin === 'function' ? (
+
+              {isInModal && typeof onBackToLogin === "function" ? (
                 <button
                   onClick={onBackToLogin}
                   className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
@@ -117,7 +127,13 @@ export default function ResetPasswordPage({ isInModal = false, onBackToLogin, af
   }
 
   return (
-    <div className={isInModal ? "" : "min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8"}>
+    <div
+      className={
+        isInModal
+          ? ""
+          : "min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
+      }
+    >
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           Recupera tu contraseña
@@ -153,7 +169,7 @@ export default function ResetPasswordPage({ isInModal = false, onBackToLogin, af
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-yellow-400 focus:border-yellow-400 sm:text-sm"
                 />
               </div>
             </div>
@@ -162,7 +178,7 @@ export default function ResetPasswordPage({ isInModal = false, onBackToLogin, af
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-400"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-400 hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 disabled:bg-yellow-300"
               >
                 {loading ? "Enviando..." : "Enviar instrucciones"}
               </button>
@@ -180,7 +196,7 @@ export default function ResetPasswordPage({ isInModal = false, onBackToLogin, af
             </div>
 
             <div className="mt-6">
-              {isInModal && typeof onBackToLogin === 'function' ? (
+              {isInModal && typeof onBackToLogin === "function" ? (
                 <button
                   onClick={onBackToLogin}
                   className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"

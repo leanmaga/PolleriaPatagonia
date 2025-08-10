@@ -47,7 +47,7 @@ const CookieBanner = ({ onOpenCookiesSettings, onAccept }) => {
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex-1">
-            <h3 className="text-lg font-bold mb-2 font-sora-regular">
+            <h3 className="text-lg font-bold mb-2 font-sora-regular text-gray-800">
               Cookies y Privacidad
             </h3>
             <p className="text-sm text-gray-600 font-sora-regular">
@@ -56,7 +56,7 @@ const CookieBanner = ({ onOpenCookiesSettings, onAccept }) => {
               las esenciales o configurar tus preferencias.
               <button
                 onClick={onOpenCookiesSettings}
-                className="text-indigo-500 underline ml-1 font-semibold"
+                className="text-yellow-600 underline ml-1 font-semibold hover:text-yellow-700 transition-colors"
               >
                 Más información
               </button>
@@ -65,13 +65,14 @@ const CookieBanner = ({ onOpenCookiesSettings, onAccept }) => {
           <div className="flex flex-wrap gap-2">
             <button
               onClick={handleAcceptEssential}
-              className="px-4 py-2 text-sm bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none font-sora-regular"
+              className="px-4 py-2 text-sm bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none font-sora-regular transition-colors"
             >
               Solo esenciales
             </button>
             <button
               onClick={handleAcceptAll}
-              className="px-4 py-2 text-sm bg-indigo-500 text-white rounded-md hover:bg-indigo-600 focus:outline-none font-sora-regular"
+              className="px-4 py-2 text-sm text-white rounded-md hover:opacity-90 focus:outline-none font-sora-regular transition-colors"
+              style={{ backgroundColor: "#FAC348" }}
             >
               Aceptar todas
             </button>

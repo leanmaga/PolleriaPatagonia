@@ -143,7 +143,10 @@ export default function AdminDashboard() {
   ) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+        <div
+          className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2"
+          style={{ borderTopColor: "#F6C343", borderBottomColor: "#F6C343" }}
+        ></div>
       </div>
     );
   }
@@ -152,7 +155,10 @@ export default function AdminDashboard() {
   if (isDataLoading) {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+        <div
+          className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2"
+          style={{ borderTopColor: "#F6C343", borderBottomColor: "#F6C343" }}
+        ></div>
       </div>
     );
   }
@@ -166,7 +172,14 @@ export default function AdminDashboard() {
         <h1 className="text-2xl font-semibold">Dashboard</h1>
         <button
           onClick={handleLogout}
-          className="px-4 py-2 bg-indigo-500 text-white hover:bg-indigo-600 transition"
+          className="px-4 py-2 text-white transition rounded-md"
+          style={{ backgroundColor: "#F6C343" }}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = "#E5B63C"; // Versión más oscura
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = "#F6C343";
+          }}
         >
           Cerrar Sesión
         </button>
@@ -195,7 +208,14 @@ export default function AdminDashboard() {
           <h2 className="text-xl font-semibold">Pedidos Recientes</h2>
           <Link
             href="/admin/orders"
-            className="text-black hover:underline text-sm font-medium"
+            className="text-sm font-medium transition-colors hover:underline"
+            style={{ color: "#F6C343" }}
+            onMouseEnter={(e) => {
+              e.target.style.color = "#E5B63C";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.color = "#F6C343";
+            }}
           >
             Ver todos
           </Link>
@@ -264,13 +284,18 @@ export default function AdminDashboard() {
                           order.status === "pagado"
                             ? "bg-green-100 text-green-800"
                             : order.status === "pendiente"
-                            ? "bg-yellow-100 text-yellow-800"
+                            ? "text-yellow-800"
                             : order.status === "enviado"
                             ? "bg-blue-100 text-blue-800"
                             : order.status === "entregado"
-                            ? "bg-black bg-opacity-10 text-white"
+                            ? "bg-gray-800 text-white"
                             : "bg-red-100 text-red-800"
                         }`}
+                        style={
+                          order.status === "pendiente"
+                            ? { backgroundColor: "rgba(246, 195, 67, 0.1)" }
+                            : {}
+                        }
                       >
                         {order.status
                           ? order.status.charAt(0).toUpperCase() +

@@ -72,7 +72,10 @@ export default function ProductsAdminPage() {
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+        <div
+          className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2"
+          style={{ borderTopColor: "#F6C343", borderBottomColor: "#F6C343" }}
+        ></div>
       </div>
     );
   }
@@ -143,7 +146,14 @@ export default function ProductsAdminPage() {
 
         <Link
           href="/admin/products/add"
-          className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+          className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white transition-colors"
+          style={{ backgroundColor: "#F6C343" }}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = "#E5B63C";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = "#F6C343";
+          }}
         >
           <PlusIcon className="h-5 w-5 mr-2" />
           Agregar Producto
@@ -158,7 +168,15 @@ export default function ProductsAdminPage() {
             placeholder="Buscar productos..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 pl-10"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none pl-10"
+            onFocus={(e) => {
+              e.target.style.borderColor = "#F6C343";
+              e.target.style.boxShadow = `0 0 0 3px rgba(246, 195, 67, 0.1)`;
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = "#d1d5db";
+              e.target.style.boxShadow = "none";
+            }}
           />
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
@@ -168,7 +186,15 @@ export default function ProductsAdminPage() {
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="cursor-pointer px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          className="cursor-pointer px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
+          onFocus={(e) => {
+            e.target.style.borderColor = "#F6C343";
+            e.target.style.boxShadow = `0 0 0 3px rgba(246, 195, 67, 0.1)`;
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = "#d1d5db";
+            e.target.style.boxShadow = "none";
+          }}
         >
           <option value="all">Todas las categorías</option>
           <option value="pollos-enteros">Pollos Enteros</option>
@@ -187,7 +213,10 @@ export default function ProductsAdminPage() {
       {/* Tabla de productos */}
       {loading ? (
         <div className="flex justify-center py-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+          <div
+            className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2"
+            style={{ borderTopColor: "#F6C343", borderBottomColor: "#F6C343" }}
+          ></div>
         </div>
       ) : (
         <>
@@ -291,7 +320,14 @@ export default function ProductsAdminPage() {
                         <div className="flex space-x-2">
                           <Link
                             href={`/admin/products/edit/${product._id}`}
-                            className="text-indigo-600 hover:text-indigo-900"
+                            className="transition-colors"
+                            style={{ color: "#F6C343" }}
+                            onMouseEnter={(e) => {
+                              e.target.style.color = "#E5B63C";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.color = "#F6C343";
+                            }}
                           >
                             <PencilSquareIcon className="h-5 w-5" />
                           </Link>
@@ -398,9 +434,14 @@ export default function ProductsAdminPage() {
                         onClick={() => handlePageChange(i + 1)}
                         className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
                           currentPage === i + 1
-                            ? "bg-indigo-600 text-white"
+                            ? "text-white"
                             : "text-gray-900 hover:bg-gray-50"
                         }`}
+                        style={
+                          currentPage === i + 1
+                            ? { backgroundColor: "#F6C343" }
+                            : {}
+                        }
                       >
                         {i + 1}
                       </button>

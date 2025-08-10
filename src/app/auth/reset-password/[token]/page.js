@@ -15,27 +15,27 @@ export default function NewPasswordPage({ params }) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const router = useRouter();
-  
+
   // Obtener el token de los parámetros de la ruta
   const token = params.token;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    
+
     // Validar contraseñas
     if (password.length < 6) {
       setError("La contraseña debe tener al menos 6 caracteres");
       return;
     }
-    
+
     if (password !== confirmPassword) {
       setError("Las contraseñas no coinciden");
       return;
     }
-    
+
     setLoading(true);
-    
+
     try {
       // Usar la API para actualizar la contraseña
       const response = await fetch("/api/auth/reset-password", {
@@ -51,11 +51,11 @@ export default function NewPasswordPage({ params }) {
         const data = await response.json().catch(() => ({}));
         throw new Error(data.message || "Error al actualizar la contraseña");
       }
-      
+
       // Si la respuesta es exitosa
       toast.success("Contraseña actualizada con éxito");
       setSuccess(true);
-      
+
       // Redireccionar después de 3 segundos
       setTimeout(() => {
         router.push("/auth/login");
@@ -68,7 +68,7 @@ export default function NewPasswordPage({ params }) {
       setLoading(false);
     }
   };
-  
+
   if (success) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -95,15 +95,16 @@ export default function NewPasswordPage({ params }) {
             ¡Contraseña actualizada!
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Tu contraseña ha sido actualizada con éxito. Serás redirigido a la página de inicio de sesión.
+            Tu contraseña ha sido actualizada con éxito. Serás redirigido a la
+            página de inicio de sesión.
           </p>
         </div>
-        
+
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
             <Link
               href="/auth/login"
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-400 hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400"
             >
               Ir a iniciar sesión
             </Link>
@@ -148,14 +149,18 @@ export default function NewPasswordPage({ params }) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-yellow-400 focus:border-yellow-400 sm:text-sm"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
-                  {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+                  {showPassword ? (
+                    <FaEyeSlash size={18} />
+                  ) : (
+                    <FaEye size={18} />
+                  )}
                 </button>
               </div>
             </div>
@@ -175,14 +180,18 @@ export default function NewPasswordPage({ params }) {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-yellow-400 focus:border-yellow-400 sm:text-sm"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
-                  {showConfirmPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+                  {showConfirmPassword ? (
+                    <FaEyeSlash size={18} />
+                  ) : (
+                    <FaEye size={18} />
+                  )}
                 </button>
               </div>
             </div>
@@ -191,7 +200,7 @@ export default function NewPasswordPage({ params }) {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-400"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-400 hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 disabled:bg-yellow-300"
               >
                 {loading ? "Actualizando..." : "Actualizar contraseña"}
               </button>

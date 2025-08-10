@@ -310,7 +310,7 @@ const ProductReviews = ({ productId }) => {
     if (isLoading) {
       return (
         <div className="text-center py-2">
-          <div className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-indigo-600 border-t-transparent"></div>
+          <div className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-yellow-400 border-t-transparent"></div>
         </div>
       );
     }
@@ -323,7 +323,8 @@ const ProductReviews = ({ productId }) => {
           </p>
           <Link
             href="/auth/login"
-            className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-colors"
+            className="inline-flex items-center px-4 py-2 text-white text-sm font-medium rounded-md transition-colors hover:opacity-90"
+            style={{ backgroundColor: "#FAC348" }}
           >
             Iniciar Sesión
           </Link>
@@ -333,8 +334,11 @@ const ProductReviews = ({ productId }) => {
 
     if (permissions.question === "already_asked") {
       return (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
-          <p className="text-blue-800 text-sm">
+        <div
+          className="border rounded-lg p-3 text-center"
+          style={{ backgroundColor: "#FEF3E2", borderColor: "#FAC348" }}
+        >
+          <p className="text-gray-700 text-sm">
             Ya has hecho una pregunta sobre este producto
           </p>
         </div>
@@ -345,7 +349,8 @@ const ProductReviews = ({ productId }) => {
       return (
         <button
           onClick={() => setShowQuestionForm(true)}
-          className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors text-sm font-medium"
+          className="w-full text-white py-2 px-4 rounded-md transition-colors hover:opacity-90 text-sm font-medium"
+          style={{ backgroundColor: "#FAC348" }}
         >
           Hacer una pregunta
         </button>
@@ -359,7 +364,7 @@ const ProductReviews = ({ productId }) => {
     if (isLoading) {
       return (
         <div className="text-center py-2">
-          <div className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-indigo-600 border-t-transparent"></div>
+          <div className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-yellow-400 border-t-transparent"></div>
         </div>
       );
     }
@@ -372,7 +377,8 @@ const ProductReviews = ({ productId }) => {
           </p>
           <Link
             href="/auth/login"
-            className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-colors"
+            className="inline-flex items-center px-4 py-2 text-white text-sm font-medium rounded-md transition-colors hover:opacity-90"
+            style={{ backgroundColor: "#FAC348" }}
           >
             Iniciar Sesión
           </Link>
@@ -382,8 +388,11 @@ const ProductReviews = ({ productId }) => {
 
     if (permissions.rating === "already_rated") {
       return (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
-          <p className="text-green-800 text-sm">
+        <div
+          className="border rounded-lg p-3 text-center"
+          style={{ backgroundColor: "#F9F7F4", borderColor: "#F1ECE8" }}
+        >
+          <p className="text-gray-700 text-sm">
             Ya has calificado este producto
           </p>
         </div>
@@ -405,7 +414,8 @@ const ProductReviews = ({ productId }) => {
       return (
         <button
           onClick={() => setShowRatingForm(true)}
-          className="w-full bg-yellow-500 text-white py-2 px-4 rounded-md hover:bg-yellow-600 transition-colors text-sm font-medium"
+          className="w-full text-white py-2 px-4 rounded-md transition-colors hover:opacity-90 text-sm font-medium"
+          style={{ backgroundColor: "#FAC348" }}
         >
           ⭐ Calificar producto
         </button>
@@ -418,7 +428,7 @@ const ProductReviews = ({ productId }) => {
   if (loading) {
     return (
       <div className="text-center py-8">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 border-t-transparent"></div>
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-yellow-400 border-t-transparent"></div>
         <p className="mt-2 text-gray-600">Cargando contenido...</p>
       </div>
     );
@@ -429,10 +439,12 @@ const ProductReviews = ({ productId }) => {
       {/* Resumen de calificaciones */}
       {ratingStats.total > 0 && (
         <div className="bg-gray-50 p-6 rounded-lg">
-          <h2 className="text-xl font-bold mb-4">Calificaciones de Clientes</h2>
+          <h2 className="text-xl font-bold mb-4 text-gray-800">
+            Calificaciones de Clientes
+          </h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="flex items-center gap-4">
-              <div className="text-3xl font-bold">
+              <div className="text-3xl font-bold text-gray-800">
                 {ratingStats.average.toFixed(1)}
               </div>
               <div>
@@ -447,7 +459,7 @@ const ProductReviews = ({ productId }) => {
             <div className="space-y-2">
               {[5, 4, 3, 2, 1].map((stars) => (
                 <div key={stars} className="flex items-center gap-2">
-                  <span className="text-sm w-3">{stars}</span>
+                  <span className="text-sm w-3 text-gray-600">{stars}</span>
                   <StarIcon className="h-3 w-3 text-yellow-400 fill-current" />
                   <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div
@@ -479,22 +491,28 @@ const ProductReviews = ({ productId }) => {
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveTab("questions")}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+            className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === "questions"
-                ? "border-indigo-500 text-indigo-600"
+                ? "text-yellow-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             }`}
+            style={
+              activeTab === "questions" ? { borderBottomColor: "#FAC348" } : {}
+            }
           >
             <ChatBubbleLeftRightIcon className="h-4 w-4 inline mr-1" />
             Preguntas ({counts.questions})
           </button>
           <button
             onClick={() => setActiveTab("ratings")}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+            className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === "ratings"
-                ? "border-indigo-500 text-indigo-600"
+                ? "text-yellow-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             }`}
+            style={
+              activeTab === "ratings" ? { borderBottomColor: "#FAC348" } : {}
+            }
           >
             <StarIcon className="h-4 w-4 inline mr-1" />
             Calificaciones ({counts.ratings})
@@ -509,7 +527,8 @@ const ProductReviews = ({ productId }) => {
           placeholder="Buscar en reviews..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-yellow-500"
+          style={{ "--tw-ring-color": "#FAC348" }}
         />
       </div>
 
@@ -518,14 +537,17 @@ const ProductReviews = ({ productId }) => {
         <div className="space-y-6">
           {/* Formulario de pregunta */}
           <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-medium mb-3">Pregunta sobre este producto</h3>
+            <h3 className="font-medium mb-3 text-gray-800">
+              Pregunta sobre este producto
+            </h3>
 
             {showQuestionForm ? (
               <div className="space-y-3">
                 <textarea
                   value={questionForm.comment}
                   onChange={(e) => setQuestionForm({ comment: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-yellow-500"
+                  style={{ "--tw-ring-color": "#FAC348" }}
                   rows="3"
                   placeholder="¿Qué quieres saber sobre este producto?"
                   minLength="10"
@@ -539,7 +561,13 @@ const ProductReviews = ({ productId }) => {
                     disabled={
                       submitting || questionForm.comment.trim().length < 10
                     }
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
+                    className="text-white px-4 py-2 rounded-md transition-colors hover:opacity-90 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
+                    style={{
+                      backgroundColor:
+                        submitting || questionForm.comment.trim().length < 10
+                          ? "#9CA3AF"
+                          : "#FAC348",
+                    }}
                   >
                     {submitting ? "Enviando..." : "Enviar pregunta"}
                   </button>
@@ -578,7 +606,7 @@ const ProductReviews = ({ productId }) => {
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-gray-800">
                           {question.user?.name || "Usuario"}
                         </p>
                         <p className="text-sm text-gray-500">
@@ -593,7 +621,13 @@ const ProductReviews = ({ productId }) => {
                         </p>
                       </div>
                       {question.verified && (
-                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                        <span
+                          className="text-xs px-2 py-1 rounded"
+                          style={{
+                            backgroundColor: "#F1ECE8",
+                            color: "#5A5A5A",
+                          }}
+                        >
                           ✓ Cliente verificado
                         </span>
                       )}
@@ -604,7 +638,7 @@ const ProductReviews = ({ productId }) => {
                     {shouldTruncate && (
                       <button
                         onClick={() => toggleExpanded(question._id)}
-                        className="text-indigo-600 hover:text-indigo-800 text-sm font-medium flex items-center gap-1 mb-3"
+                        className="text-yellow-600 hover:text-yellow-700 text-sm font-medium flex items-center gap-1 mb-3 transition-colors"
                       >
                         {isExpanded ? (
                           <>
@@ -619,18 +653,24 @@ const ProductReviews = ({ productId }) => {
                     )}
 
                     {question.response && (
-                      <div className="bg-blue-50 border-l-4 border-blue-400 p-3 mt-3">
+                      <div
+                        className="border-l-4 p-3 mt-3"
+                        style={{
+                          backgroundColor: "#FEF3E2",
+                          borderLeftColor: "#FAC348",
+                        }}
+                      >
                         <div className="flex items-center mb-1">
-                          <CheckCircleIcon className="h-4 w-4 text-blue-600 mr-2" />
-                          <p className="text-sm font-medium text-blue-900">
+                          <CheckCircleIcon className="h-4 w-4 text-yellow-600 mr-2" />
+                          <p className="text-sm font-medium text-gray-700">
                             Respuesta del vendedor:
                           </p>
                         </div>
-                        <p className="text-blue-800 mt-1">
+                        <p className="text-gray-700 mt-1">
                           {question.response}
                         </p>
                         {question.responseDate && (
-                          <p className="text-xs text-blue-600 mt-1">
+                          <p className="text-xs text-gray-500 mt-1">
                             Respondido el{" "}
                             {new Date(question.responseDate).toLocaleDateString(
                               "es-ES"
@@ -642,7 +682,7 @@ const ProductReviews = ({ productId }) => {
 
                     <button
                       onClick={() => markHelpful(question._id)}
-                      className="text-sm text-gray-600 hover:text-indigo-600 transition-colors mt-2 flex items-center gap-1"
+                      className="text-sm text-gray-600 hover:text-yellow-600 transition-colors mt-2 flex items-center gap-1"
                       disabled={!isAuthenticated}
                     >
                       👍 ¿Te resultó útil? ({question.helpful || 0})
@@ -671,12 +711,14 @@ const ProductReviews = ({ productId }) => {
         <div className="space-y-6">
           {/* Formulario de calificación */}
           <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-medium mb-3">Califica este producto</h3>
+            <h3 className="font-medium mb-3 text-gray-800">
+              Califica este producto
+            </h3>
 
             {showRatingForm ? (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2 text-gray-700">
                     Tu calificación
                   </label>
                   <StarRating
@@ -690,7 +732,7 @@ const ProductReviews = ({ productId }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2 text-gray-700">
                     Tu comentario
                   </label>
                   <textarea
@@ -698,7 +740,8 @@ const ProductReviews = ({ productId }) => {
                     onChange={(e) =>
                       setRatingForm({ ...ratingForm, comment: e.target.value })
                     }
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-yellow-500"
+                    style={{ "--tw-ring-color": "#FAC348" }}
                     rows="4"
                     placeholder="Cuéntanos qué te pareció este producto..."
                     minLength="10"
@@ -716,7 +759,15 @@ const ProductReviews = ({ productId }) => {
                       ratingForm.rating === 0 ||
                       ratingForm.comment.trim().length < 10
                     }
-                    className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
+                    className="text-white px-4 py-2 rounded-md transition-colors hover:opacity-90 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
+                    style={{
+                      backgroundColor:
+                        submitting ||
+                        ratingForm.rating === 0 ||
+                        ratingForm.comment.trim().length < 10
+                          ? "#9CA3AF"
+                          : "#FAC348",
+                    }}
                   >
                     {submitting ? "Enviando..." : "Enviar calificación"}
                   </button>
@@ -742,7 +793,8 @@ const ProductReviews = ({ productId }) => {
               <select
                 value={ratingFilter}
                 onChange={(e) => setRatingFilter(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-yellow-500"
+                style={{ "--tw-ring-color": "#FAC348" }}
               >
                 <option value="all">Todas las calificaciones</option>
                 <option value="5">
@@ -786,12 +838,18 @@ const ProductReviews = ({ productId }) => {
                         <div className="flex items-center gap-2 mb-1">
                           <StarRating rating={rating.rating} size="sm" />
                           {rating.verified && (
-                            <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                            <span
+                              className="text-xs px-2 py-1 rounded"
+                              style={{
+                                backgroundColor: "#F1ECE8",
+                                color: "#5A5A5A",
+                              }}
+                            >
                               ✓ Compra verificada
                             </span>
                           )}
                         </div>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-gray-800">
                           {rating.user?.name || "Usuario"}
                         </p>
                         <p className="text-sm text-gray-500">
@@ -812,7 +870,7 @@ const ProductReviews = ({ productId }) => {
                     {shouldTruncate && (
                       <button
                         onClick={() => toggleExpanded(rating._id)}
-                        className="text-indigo-600 hover:text-indigo-800 text-sm font-medium flex items-center gap-1 mb-3"
+                        className="text-yellow-600 hover:text-yellow-700 text-sm font-medium flex items-center gap-1 mb-3 transition-colors"
                       >
                         {isExpanded ? (
                           <>
@@ -828,7 +886,7 @@ const ProductReviews = ({ productId }) => {
 
                     <button
                       onClick={() => markHelpful(rating._id)}
-                      className="text-sm text-gray-600 hover:text-indigo-600 transition-colors flex items-center gap-1"
+                      className="text-sm text-gray-600 hover:text-yellow-600 transition-colors flex items-center gap-1"
                       disabled={!isAuthenticated}
                     >
                       👍 ¿Te resultó útil? ({rating.helpful || 0})

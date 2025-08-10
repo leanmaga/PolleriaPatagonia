@@ -97,7 +97,7 @@ const MessagesPage = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-yellow-400 border-t-transparent mx-auto mb-4"></div>
           <p className="text-gray-600">Cargando tus mensajes...</p>
         </div>
       </div>
@@ -112,13 +112,13 @@ const MessagesPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <Link
                 href="/"
-                className="flex items-center space-x-2 text-gray-600 hover:text-indigo-600 transition-colors"
+                className="flex items-center space-x-2 text-gray-600 hover:text-yellow-600 transition-colors"
               >
                 <ArrowLeftIcon className="h-5 w-5" />
                 <span>Volver a la tienda</span>
@@ -126,8 +126,8 @@ const MessagesPage = () => {
             </div>
 
             <div className="flex items-center space-x-3">
-              <ChatBubbleLeftRightIcon className="h-6 w-6 text-indigo-600" />
-              <h1 className="text-xl font-semibold text-gray-900">
+              <ChatBubbleLeftRightIcon className="h-6 w-6 text-yellow-500" />
+              <h1 className="text-xl font-semibold text-gray-800">
                 Mis Mensajes
               </h1>
             </div>
@@ -142,12 +142,12 @@ const MessagesPage = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total</p>
-                <p className="text-3xl font-bold text-gray-900">
+                <p className="text-3xl font-bold text-gray-800">
                   {stats.total}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <ChatBubbleLeftRightIcon className="h-6 w-6 text-blue-600" />
+              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <ChatBubbleLeftRightIcon className="h-6 w-6 text-yellow-600" />
               </div>
             </div>
             <p className="text-sm text-gray-500 mt-2">Preguntas realizadas</p>
@@ -172,12 +172,18 @@ const MessagesPage = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Respondidas</p>
-                <p className="text-3xl font-bold text-green-600">
+                <p className="text-3xl font-bold" style={{ color: "#F1ECE8" }}>
                   {stats.answered}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <CheckCircleIcon className="h-6 w-6 text-green-600" />
+              <div
+                className="w-12 h-12 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: "#F1ECE8" }}
+              >
+                <CheckCircleIcon
+                  className="h-6 w-6"
+                  style={{ color: "#5A5A5A" }}
+                />
               </div>
             </div>
             <p className="text-sm text-gray-500 mt-2">Ya respondidas</p>
@@ -211,9 +217,14 @@ const MessagesPage = () => {
                     }}
                     className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                       filter === filterOption.key
-                        ? "bg-indigo-100 text-indigo-700 border border-indigo-300"
+                        ? "text-gray-800 border border-yellow-400"
                         : "bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300"
                     }`}
+                    style={
+                      filter === filterOption.key
+                        ? { backgroundColor: "#FAC348" }
+                        : {}
+                    }
                   >
                     {filterOption.label} ({filterOption.count})
                   </button>
@@ -267,7 +278,7 @@ const MessagesPage = () => {
 
                         {/* Info del producto */}
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-lg font-medium text-gray-900 mb-1">
+                          <h3 className="text-lg font-medium text-gray-800 mb-1">
                             {message.product?.title || "Producto eliminado"}
                           </h3>
                           <p className="text-sm text-gray-500">
@@ -279,7 +290,10 @@ const MessagesPage = () => {
                       {/* Estado */}
                       <div className="flex-shrink-0">
                         {message.response ? (
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          <span
+                            className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-gray-700"
+                            style={{ backgroundColor: "#F1ECE8" }}
+                          >
                             <CheckCircleIcon className="h-3 w-3 mr-1" />
                             Respondida
                           </span>
@@ -300,7 +314,13 @@ const MessagesPage = () => {
                       <h4 className="text-sm font-medium text-gray-700 mb-2">
                         Tu pregunta:
                       </h4>
-                      <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r-lg">
+                      <div
+                        className="border-l-4 p-3 rounded-r-lg"
+                        style={{
+                          backgroundColor: "#FEF3E2",
+                          borderLeftColor: "#FAC348",
+                        }}
+                      >
                         <p className="text-gray-800">{message.comment}</p>
                       </div>
                     </div>
@@ -311,7 +331,13 @@ const MessagesPage = () => {
                         <h4 className="text-sm font-medium text-gray-700 mb-2">
                           Respuesta del vendedor:
                         </h4>
-                        <div className="bg-green-50 border-l-4 border-green-400 p-3 rounded-r-lg">
+                        <div
+                          className="border-l-4 p-3 rounded-r-lg"
+                          style={{
+                            backgroundColor: "#F9F7F4",
+                            borderLeftColor: "#F1ECE8",
+                          }}
+                        >
                           <p className="text-gray-800 mb-2">
                             {message.response}
                           </p>
@@ -343,7 +369,7 @@ const MessagesPage = () => {
 
                       <Link
                         href={`/products/${message.product?._id}#reviews-section`}
-                        className="text-indigo-600 hover:text-indigo-800 text-sm font-medium transition-colors"
+                        className="text-yellow-600 hover:text-yellow-700 text-sm font-medium transition-colors"
                       >
                         Ver producto →
                       </Link>
@@ -369,11 +395,16 @@ const MessagesPage = () => {
                       <button
                         key={i + 1}
                         onClick={() => setCurrentPage(i + 1)}
-                        className={`px-3 py-2 text-sm font-medium rounded-md ${
+                        className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                           currentPage === i + 1
-                            ? "bg-indigo-600 text-white"
+                            ? "text-gray-800"
                             : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
                         }`}
+                        style={
+                          currentPage === i + 1
+                            ? { backgroundColor: "#FAC348" }
+                            : {}
+                        }
                       >
                         {i + 1}
                       </button>
@@ -397,7 +428,7 @@ const MessagesPage = () => {
             /* Empty State */
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
               <InboxIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-gray-800 mb-2">
                 {filter === "pending"
                   ? "No tienes preguntas pendientes"
                   : filter === "answered"
@@ -413,7 +444,8 @@ const MessagesPage = () => {
               {filter === "all" && (
                 <Link
                   href="/products"
-                  className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-colors"
+                  className="inline-flex items-center px-4 py-2 text-white text-sm font-medium rounded-md transition-colors hover:opacity-90"
+                  style={{ backgroundColor: "#FAC348" }}
                 >
                   Explorar productos
                 </Link>
@@ -423,10 +455,13 @@ const MessagesPage = () => {
         </div>
 
         {/* Info adicional */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div
+          className="mt-8 border rounded-lg p-4"
+          style={{ backgroundColor: "#FEF3E2", borderColor: "#FAC348" }}
+        >
           <div className="flex items-start space-x-3">
-            <ChatBubbleLeftRightIcon className="h-5 w-5 text-blue-600 mt-0.5" />
-            <div className="text-sm text-blue-800">
+            <ChatBubbleLeftRightIcon className="h-5 w-5 text-yellow-600 mt-0.5" />
+            <div className="text-sm text-gray-700">
               <p className="font-medium mb-1">💡 ¿Cómo funciona?</p>
               <ul className="list-disc list-inside space-y-1 text-xs">
                 <li>Haz preguntas sobre cualquier producto en su página</li>

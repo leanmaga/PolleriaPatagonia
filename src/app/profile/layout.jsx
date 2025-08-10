@@ -68,7 +68,7 @@ export default function ProfileLayout({ children }) {
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-400"></div>
       </div>
     );
   }
@@ -111,7 +111,7 @@ export default function ProfileLayout({ children }) {
                     href="/profile"
                     className={`font-sora-regular block px-4 py-2 rounded-md text-sm font-medium ${
                       pathname === "/profile"
-                        ? "bg-indigo-50 text-indigo-600"
+                        ? "bg-yellow-50 text-yellow-600"
                         : "text-gray-700 hover:bg-gray-100"
                     }`}
                   >
@@ -125,7 +125,7 @@ export default function ProfileLayout({ children }) {
                       className={`font-sora-regular block px-4 py-2 rounded-md text-sm font-medium ${
                         pathname === "/profile/orders" ||
                         pathname.startsWith("/profile/orders/")
-                          ? "bg-indigo-50 text-indigo-600"
+                          ? "bg-yellow-50 text-yellow-600"
                           : "text-gray-700 hover:bg-gray-100"
                       }`}
                     >
@@ -141,7 +141,7 @@ export default function ProfileLayout({ children }) {
                       pathname === "/profile/questions" ||
                       pathname.startsWith("/profile/messages/") ||
                       pathname.startsWith("/profile/questions/")
-                        ? "bg-indigo-50 text-indigo-600"
+                        ? "bg-yellow-50 text-yellow-600"
                         : "text-gray-700 hover:bg-gray-100"
                     }`}
                   >
@@ -175,7 +175,7 @@ export default function ProfileLayout({ children }) {
                     href="/profile/settings"
                     className={`font-sora-regular block px-4 py-2 rounded-md text-sm font-medium ${
                       pathname === "/profile/settings"
-                        ? "bg-indigo-50 text-indigo-600"
+                        ? "bg-yellow-50 text-yellow-600"
                         : "text-gray-700 hover:bg-gray-100"
                     }`}
                   >

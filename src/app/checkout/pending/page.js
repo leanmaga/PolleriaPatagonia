@@ -64,7 +64,7 @@ function CheckoutPendingContent() {
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center">
             <Link
               href="/products"
-              className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition"
+              className="bg-yellow-400 text-white px-6 py-3 rounded-lg hover:bg-yellow-500 transition"
             >
               Volver a la Tienda
             </Link>
@@ -88,7 +88,7 @@ export default function CheckoutPendingPage() {
     <Suspense
       fallback={
         <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-400"></div>
         </div>
       }
     >

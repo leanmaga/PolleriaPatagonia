@@ -33,7 +33,7 @@ export default function CheckoutFailurePage() {
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center">
             <Link
               href="/checkout"
-              className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition"
+              className="bg-yellow-400 text-white px-6 py-3 rounded-lg hover:bg-yellow-500 transition"
             >
               Intentar Nuevamente
             </Link>

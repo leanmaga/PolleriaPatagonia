@@ -160,7 +160,7 @@ const AdminQuestionsPage = () => {
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-gray-800">
               Gestión de Preguntas
             </h1>
             <p className="text-gray-600 mt-1">
@@ -170,9 +170,12 @@ const AdminQuestionsPage = () => {
 
           {/* Notificación de preguntas pendientes */}
           {stats.pending > 0 && (
-            <div className="bg-orange-100 border border-orange-300 rounded-lg p-3 flex items-center space-x-2">
-              <BellIcon className="h-5 w-5 text-orange-600" />
-              <span className="text-orange-800 font-medium">
+            <div
+              className="border rounded-lg p-3 flex items-center space-x-2"
+              style={{ backgroundColor: "#FEF3E2", borderColor: "#FAC348" }}
+            >
+              <BellIcon className="h-5 w-5 text-yellow-600" />
+              <span className="text-gray-700 font-medium">
                 {stats.pending} pregunta{stats.pending !== 1 ? "s" : ""}{" "}
                 pendiente{stats.pending !== 1 ? "s" : ""}
               </span>
@@ -182,11 +185,14 @@ const AdminQuestionsPage = () => {
 
         {/* Estadísticas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-blue-50 p-4 rounded-lg text-center">
-            <div className="text-2xl font-bold text-blue-600">
+          <div
+            className="p-4 rounded-lg text-center"
+            style={{ backgroundColor: "#FEF3E2" }}
+          >
+            <div className="text-2xl font-bold text-yellow-600">
               {stats.total}
             </div>
-            <div className="text-sm text-blue-800">Total Preguntas</div>
+            <div className="text-sm text-gray-700">Total Preguntas</div>
           </div>
           <div className="bg-orange-50 p-4 rounded-lg text-center">
             <div className="text-2xl font-bold text-orange-600">
@@ -194,11 +200,14 @@ const AdminQuestionsPage = () => {
             </div>
             <div className="text-sm text-orange-800">Pendientes Respuesta</div>
           </div>
-          <div className="bg-green-50 p-4 rounded-lg text-center">
-            <div className="text-2xl font-bold text-green-600">
+          <div
+            className="p-4 rounded-lg text-center"
+            style={{ backgroundColor: "#F9F7F4" }}
+          >
+            <div className="text-2xl font-bold" style={{ color: "#5A5A5A" }}>
               {stats.answered}
             </div>
-            <div className="text-sm text-green-800">Respondidas</div>
+            <div className="text-sm text-gray-700">Respondidas</div>
           </div>
         </div>
 
@@ -211,7 +220,8 @@ const AdminQuestionsPage = () => {
               placeholder="Buscar preguntas, usuarios o productos..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:border-yellow-500"
+              style={{ "--tw-ring-color": "#FAC348" }}
             />
           </div>
 
@@ -221,7 +231,8 @@ const AdminQuestionsPage = () => {
               setFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500"
+            className="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:border-yellow-500"
+            style={{ "--tw-ring-color": "#FAC348" }}
           >
             <option value="all">Todas las preguntas</option>
             <option value="pending">
@@ -236,13 +247,13 @@ const AdminQuestionsPage = () => {
       <div className="bg-white rounded-lg shadow">
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-gray-800">
               Preguntas ({filteredQuestions.length})
             </h2>
 
             <button
               onClick={fetchQuestions}
-              className="flex items-center space-x-2 px-3 py-1 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-md hover:bg-gray-50"
+              className="flex items-center space-x-2 px-3 py-1 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-md hover:bg-gray-50"
             >
               <svg
                 className="h-4 w-4"
@@ -263,7 +274,7 @@ const AdminQuestionsPage = () => {
 
           {loading ? (
             <div className="text-center py-8">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 border-t-transparent"></div>
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-yellow-400 border-t-transparent"></div>
               <p className="mt-2 text-gray-600">Cargando preguntas...</p>
             </div>
           ) : filteredQuestions.length === 0 ? (
@@ -289,7 +300,7 @@ const AdminQuestionsPage = () => {
                         <UserIcon className="h-5 w-5 text-gray-600" />
                       </div>
                       <div>
-                        <div className="font-medium text-gray-900">
+                        <div className="font-medium text-gray-800">
                           {question.user?.name || "Usuario eliminado"}
                         </div>
                         <div className="text-sm text-gray-500">
@@ -303,13 +314,22 @@ const AdminQuestionsPage = () => {
 
                     <div className="flex items-center space-x-2">
                       {question.verified && (
-                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                        <span
+                          className="text-xs px-2 py-1 rounded"
+                          style={{
+                            backgroundColor: "#FEF3E2",
+                            color: "#5A5A5A",
+                          }}
+                        >
                           Cliente verificado
                         </span>
                       )}
 
                       {question.response ? (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <span
+                          className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-gray-700"
+                          style={{ backgroundColor: "#F1ECE8" }}
+                        >
                           <CheckCircleIcon className="h-3 w-3 mr-1" />
                           Respondida
                         </span>
@@ -337,14 +357,14 @@ const AdminQuestionsPage = () => {
                       />
                     </div>
                     <div>
-                      <div className="font-medium text-gray-900">
+                      <div className="font-medium text-gray-800">
                         {question.product?.title || "Producto eliminado"}
                       </div>
                       <div className="text-sm text-gray-500">
                         Pregunta sobre este producto
                       </div>
                     </div>
-                    <button className="ml-auto text-indigo-600 hover:text-indigo-800 text-sm">
+                    <button className="ml-auto text-yellow-600 hover:text-yellow-700 text-sm">
                       <EyeIcon className="h-4 w-4" />
                     </button>
                   </div>
@@ -354,23 +374,41 @@ const AdminQuestionsPage = () => {
                     <h4 className="text-sm font-medium text-gray-700 mb-2">
                       Pregunta:
                     </h4>
-                    <p className="text-gray-900 bg-blue-50 p-3 rounded-lg border-l-4 border-blue-400">
+                    <p
+                      className="text-gray-800 p-3 rounded-lg border-l-4"
+                      style={{
+                        backgroundColor: "#FEF3E2",
+                        borderLeftColor: "#FAC348",
+                      }}
+                    >
                       {question.comment}
                     </p>
                   </div>
 
                   {/* Respuesta existente o formulario */}
                   {question.response ? (
-                    <div className="bg-green-50 border-l-4 border-green-400 p-3">
+                    <div
+                      className="border-l-4 p-3"
+                      style={{
+                        backgroundColor: "#F9F7F4",
+                        borderLeftColor: "#F1ECE8",
+                      }}
+                    >
                       <div className="flex items-center mb-1">
-                        <CheckCircleIcon className="h-4 w-4 text-green-600 mr-2" />
-                        <span className="text-sm font-medium text-green-900">
+                        <CheckCircleIcon
+                          className="h-4 w-4 mr-2"
+                          style={{ color: "#5A5A5A" }}
+                        />
+                        <span
+                          className="text-sm font-medium"
+                          style={{ color: "#5A5A5A" }}
+                        >
                           Tu respuesta:
                         </span>
                       </div>
-                      <p className="text-green-800">{question.response}</p>
+                      <p className="text-gray-700">{question.response}</p>
                       {question.responseDate && (
-                        <p className="text-xs text-green-600 mt-1">
+                        <p className="text-xs text-gray-500 mt-1">
                           Respondido el {formatDate(question.responseDate)}
                         </p>
                       )}
@@ -387,7 +425,8 @@ const AdminQuestionsPage = () => {
                               value={responseText}
                               onChange={(e) => setResponseText(e.target.value)}
                               rows="3"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:border-yellow-500"
+                              style={{ "--tw-ring-color": "#FAC348" }}
                               placeholder="Escribe tu respuesta aquí..."
                             />
                             <p className="text-xs text-gray-500 mt-1">
@@ -395,10 +434,16 @@ const AdminQuestionsPage = () => {
                             </p>
                           </div>
 
-                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <div
+                            className="border rounded-lg p-3"
+                            style={{
+                              backgroundColor: "#FEF3E2",
+                              borderColor: "#FAC348",
+                            }}
+                          >
                             <div className="flex items-start space-x-2">
-                              <ExclamationTriangleIcon className="h-4 w-4 text-blue-600 mt-0.5" />
-                              <div className="text-xs text-blue-800">
+                              <ExclamationTriangleIcon className="h-4 w-4 text-yellow-600 mt-0.5" />
+                              <div className="text-xs text-gray-700">
                                 <p className="font-medium">Recordatorio:</p>
                                 <p>
                                   El cliente recibirá un email automático con tu
@@ -414,7 +459,13 @@ const AdminQuestionsPage = () => {
                               disabled={
                                 submitting || responseText.trim().length < 10
                               }
-                              className="inline-flex items-center px-3 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                              className="inline-flex items-center px-3 py-2 text-white text-sm font-medium rounded-md transition-colors hover:opacity-90 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                              style={{
+                                backgroundColor:
+                                  submitting || responseText.trim().length < 10
+                                    ? "#9CA3AF"
+                                    : "#FAC348",
+                              }}
                             >
                               {submitting ? (
                                 <>
@@ -433,7 +484,7 @@ const AdminQuestionsPage = () => {
                                 setRespondingTo(null);
                                 setResponseText("");
                               }}
-                              className="px-3 py-2 bg-gray-200 text-gray-800 text-sm font-medium rounded-md hover:bg-gray-300"
+                              className="px-3 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-300"
                             >
                               Cancelar
                             </button>
@@ -442,7 +493,8 @@ const AdminQuestionsPage = () => {
                       ) : (
                         <button
                           onClick={() => setRespondingTo(question._id)}
-                          className="inline-flex items-center px-3 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700"
+                          className="inline-flex items-center px-3 py-2 text-white text-sm font-medium rounded-md transition-colors hover:opacity-90"
+                          style={{ backgroundColor: "#FAC348" }}
                         >
                           <ChatBubbleLeftRightIcon className="h-4 w-4 mr-2" />
                           Responder
@@ -472,7 +524,7 @@ const AdminQuestionsPage = () => {
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 hover:bg-gray-50"
               >
                 Anterior
               </button>
@@ -481,11 +533,14 @@ const AdminQuestionsPage = () => {
                 <button
                   key={i + 1}
                   onClick={() => setCurrentPage(i + 1)}
-                  className={`px-3 py-1 border rounded ${
+                  className={`px-3 py-1 border rounded transition-colors ${
                     currentPage === i + 1
-                      ? "bg-indigo-600 text-white"
+                      ? "text-white"
                       : "bg-white text-gray-700 hover:bg-gray-50"
                   }`}
+                  style={
+                    currentPage === i + 1 ? { backgroundColor: "#FAC348" } : {}
+                  }
                 >
                   {i + 1}
                 </button>
@@ -496,7 +551,7 @@ const AdminQuestionsPage = () => {
                   setCurrentPage(Math.min(totalPages, currentPage + 1))
                 }
                 disabled={currentPage === totalPages}
-                className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 hover:bg-gray-50"
               >
                 Siguiente
               </button>

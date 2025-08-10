@@ -27,9 +27,7 @@ export default function SettingsPage() {
     }));
   };
 
-  const handlePasswordSubmit = async (e) => {
-    e.preventDefault();
-
+  const handlePasswordSubmit = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       toast.error("Las contraseñas no coinciden");
       return;
@@ -103,13 +101,13 @@ export default function SettingsPage() {
 
   return (
     <div>
-      <h2 className="font-sora-extralight text-xl font-semibold mb-6">
+      <h2 className="font-sora-extralight text-xl font-semibold mb-6 text-gray-800">
         Configuración de la cuenta
       </h2>
 
       {/* Cambiar contraseña */}
       <div className="mb-8">
-        <h3 className="font-sora-extralight text-lg font-medium mb-4">
+        <h3 className="font-sora-extralight text-lg font-medium mb-4 text-gray-800">
           Cambiar contraseña
         </h3>
 
@@ -119,7 +117,7 @@ export default function SettingsPage() {
             contraseña.
           </p>
         ) : (
-          <form onSubmit={handlePasswordSubmit} className="space-y-4 max-w-md">
+          <div className="space-y-4 max-w-md">
             <div>
               <label
                 htmlFor="currentPassword"
@@ -134,7 +132,8 @@ export default function SettingsPage() {
                 value={passwordData.currentPassword}
                 onChange={handlePasswordChange}
                 required
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-yellow-500"
+                style={{ "--tw-ring-color": "#FAC348" }}
               />
             </div>
 
@@ -152,7 +151,8 @@ export default function SettingsPage() {
                 value={passwordData.newPassword}
                 onChange={handlePasswordChange}
                 required
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-yellow-500"
+                style={{ "--tw-ring-color": "#FAC348" }}
               />
             </div>
 
@@ -170,24 +170,28 @@ export default function SettingsPage() {
                 value={passwordData.confirmPassword}
                 onChange={handlePasswordChange}
                 required
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-yellow-500"
+                style={{ "--tw-ring-color": "#FAC348" }}
               />
             </div>
 
             <button
-              type="submit"
+              onClick={handlePasswordSubmit}
               disabled={changingPassword}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition disabled:opacity-50"
+              className="px-4 py-2 text-white rounded-md transition hover:opacity-90 disabled:opacity-50"
+              style={{
+                backgroundColor: changingPassword ? "#9CA3AF" : "#FAC348",
+              }}
             >
               {changingPassword ? "Actualizando..." : "Cambiar contraseña"}
             </button>
-          </form>
+          </div>
         )}
       </div>
 
       {/* Opciones de notificaciones */}
       <div className="mb-8">
-        <h3 className="font-sora-extralight text-lg font-medium mb-4">
+        <h3 className="font-sora-extralight text-lg font-medium mb-4 text-gray-800">
           Notificaciones
         </h3>
 
@@ -197,7 +201,8 @@ export default function SettingsPage() {
               id="emailNotifications"
               name="emailNotifications"
               type="checkbox"
-              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              className="h-4 w-4 border-gray-300 rounded focus:ring-2"
+              style={{ color: "#FAC348", "--tw-ring-color": "#FAC348" }}
             />
             <label
               htmlFor="emailNotifications"
@@ -212,7 +217,8 @@ export default function SettingsPage() {
               id="promotions"
               name="promotions"
               type="checkbox"
-              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              className="h-4 w-4 border-gray-300 rounded focus:ring-2"
+              style={{ color: "#FAC348", "--tw-ring-color": "#FAC348" }}
             />
             <label
               htmlFor="promotions"

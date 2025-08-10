@@ -25,7 +25,7 @@ export default function AdminSettingsPage() {
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-400"></div>
       </div>
     );
   }
@@ -53,8 +53,8 @@ export default function AdminSettingsPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
                 activeTab === tab.id
-                  ? "border-indigo-500 text-indigo-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  ? "border-yellow-400 text-yellow-600"
+                  : "border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300"
               }`}
             >
               <span>{tab.icon}</span>

@@ -1,4 +1,4 @@
-// components/admin/OrderStatusUpdate.jsx
+// components/admin/OrderStatusUpdate.jsx (Con color #F6C343)
 "use client";
 
 import { useState } from "react";
@@ -55,7 +55,19 @@ const OrderStatusUpdate = ({ order }) => {
           id="status"
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none sm:text-sm rounded-md"
+          style={{
+            "--focus-ring-color": "#F6C343",
+            "--focus-border-color": "#F6C343",
+          }}
+          onFocus={(e) => {
+            e.target.style.borderColor = "#F6C343";
+            e.target.style.boxShadow = `0 0 0 3px rgba(246, 195, 67, 0.1)`;
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = "#d1d5db";
+            e.target.style.boxShadow = "none";
+          }}
         >
           <option value="whatsapp_pendiente">WhatsApp - Pendiente</option>
           <option value="pendiente">Pendiente</option>
@@ -69,7 +81,21 @@ const OrderStatusUpdate = ({ order }) => {
       <button
         onClick={handleUpdateStatus}
         disabled={loading || status === order.status}
-        className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition flex items-center justify-center whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed mt-5"
+        className="text-white px-4 py-2 rounded-md transition flex items-center justify-center whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed mt-5"
+        style={{
+          backgroundColor:
+            status === order.status || loading ? "#9ca3af" : "#F6C343",
+        }}
+        onMouseEnter={(e) => {
+          if (!loading && status !== order.status) {
+            e.target.style.backgroundColor = "#E5B63C"; // Versión más oscura del amarillo
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!loading && status !== order.status) {
+            e.target.style.backgroundColor = "#F6C343";
+          }
+        }}
       >
         {loading ? (
           <>

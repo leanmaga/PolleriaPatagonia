@@ -1,4 +1,4 @@
-// app/admin/reviews/page
+// app/admin/reviews/page (Con color #F6C343)
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
@@ -275,11 +275,16 @@ const AdminReviewsPage = () => {
             <div className="text-sm text-blue-800">Total Reviews</div>
           </div>
 
-          <div className="bg-yellow-50 p-4 rounded-lg text-center">
-            <div className="text-2xl font-bold text-yellow-600">
+          <div
+            className="p-4 rounded-lg text-center"
+            style={{ backgroundColor: "rgba(246, 195, 67, 0.1)" }}
+          >
+            <div className="text-2xl font-bold" style={{ color: "#F6C343" }}>
               {stats.totalRatings || 0}
             </div>
-            <div className="text-sm text-yellow-800">Calificaciones</div>
+            <div className="text-sm" style={{ color: "#E5B63C" }}>
+              Calificaciones
+            </div>
           </div>
 
           <div className="bg-green-50 p-4 rounded-lg text-center">
@@ -324,8 +329,9 @@ const AdminReviewsPage = () => {
                     <span className="text-sm w-8">{stars} ★</span>
                     <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-yellow-400"
+                        className="h-full"
                         style={{
+                          backgroundColor: "#F6C343",
                           width:
                             stats.totalRatings > 0
                               ? `${
@@ -359,9 +365,14 @@ const AdminReviewsPage = () => {
               }}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === "ratings"
-                  ? "border-yellow-500 text-yellow-600"
+                  ? "text-yellow-600"
                   : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
+              style={
+                activeTab === "ratings"
+                  ? { borderBottomColor: "#F6C343", color: "#F6C343" }
+                  : {}
+              }
             >
               <StarIcon className="h-4 w-4 inline mr-1" />
               Calificaciones ({stats.totalRatings || 0})
@@ -387,9 +398,14 @@ const AdminReviewsPage = () => {
               }}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === "all"
-                  ? "border-indigo-500 text-indigo-600"
+                  ? ""
                   : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
+              style={
+                activeTab === "all"
+                  ? { borderBottomColor: "#F6C343", color: "#F6C343" }
+                  : {}
+              }
             >
               Todas ({stats.totalReviews || 0})
             </button>
@@ -406,7 +422,15 @@ const AdminReviewsPage = () => {
               placeholder="Buscar por contenido, usuario o producto..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:border-transparent"
+              onFocus={(e) => {
+                e.target.style.borderColor = "#F6C343";
+                e.target.style.boxShadow = `0 0 0 3px rgba(246, 195, 67, 0.1)`;
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "#d1d5db";
+                e.target.style.boxShadow = "none";
+              }}
             />
           </div>
 
@@ -419,7 +443,15 @@ const AdminReviewsPage = () => {
                   setRatingFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500"
+                className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2"
+                onFocus={(e) => {
+                  e.target.style.borderColor = "#F6C343";
+                  e.target.style.boxShadow = `0 0 0 3px rgba(246, 195, 67, 0.1)`;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = "#d1d5db";
+                  e.target.style.boxShadow = "none";
+                }}
               >
                 <option value="all">Todas las estrellas</option>
                 <option value="5">5 estrellas</option>
@@ -436,7 +468,15 @@ const AdminReviewsPage = () => {
                 setStatusFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2"
+              onFocus={(e) => {
+                e.target.style.borderColor = "#F6C343";
+                e.target.style.boxShadow = `0 0 0 3px rgba(246, 195, 67, 0.1)`;
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "#d1d5db";
+                e.target.style.boxShadow = "none";
+              }}
             >
               <option value="all">Todos los estados</option>
               <option value="verified">Solo verificadas</option>
@@ -447,7 +487,15 @@ const AdminReviewsPage = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2"
+              onFocus={(e) => {
+                e.target.style.borderColor = "#F6C343";
+                e.target.style.boxShadow = `0 0 0 3px rgba(246, 195, 67, 0.1)`;
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "#d1d5db";
+                e.target.style.boxShadow = "none";
+              }}
             >
               <option value="newest">Más recientes</option>
               <option value="oldest">Más antiguas</option>
@@ -464,16 +512,24 @@ const AdminReviewsPage = () => {
 
         {/* Acciones Masivas */}
         {selectedReviews.size > 0 && (
-          <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-6">
+          <div
+            className="rounded-lg p-4 mb-6"
+            style={{
+              backgroundColor: "rgba(246, 195, 67, 0.1)",
+              borderColor: "rgba(246, 195, 67, 0.3)",
+              borderWidth: "1px",
+            }}
+          >
             <div className="flex items-center justify-between">
-              <span className="text-sm text-indigo-800">
+              <span className="text-sm" style={{ color: "#E5B63C" }}>
                 {selectedReviews.size} reviews seleccionadas
               </span>
               <div className="flex items-center space-x-3">
                 <select
                   value={bulkAction}
                   onChange={(e) => setBulkAction(e.target.value)}
-                  className="px-3 py-1 border border-indigo-300 rounded text-sm"
+                  className="px-3 py-1 border rounded text-sm"
+                  style={{ borderColor: "rgba(246, 195, 67, 0.5)" }}
                 >
                   <option value="">Seleccionar acción...</option>
                   <option value="delete">Eliminar</option>
@@ -484,7 +540,20 @@ const AdminReviewsPage = () => {
                 <button
                   onClick={handleBulkAction}
                   disabled={!bulkAction}
-                  className="px-3 py-1 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 disabled:bg-gray-400"
+                  className="px-3 py-1 text-white text-sm rounded transition-colors disabled:bg-gray-400"
+                  style={{
+                    backgroundColor: !bulkAction ? "#9ca3af" : "#F6C343",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (bulkAction) {
+                      e.target.style.backgroundColor = "#E5B63C";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (bulkAction) {
+                      e.target.style.backgroundColor = "#F6C343";
+                    }
+                  }}
                 >
                   Aplicar
                 </button>
@@ -514,7 +583,16 @@ const AdminReviewsPage = () => {
                   type="checkbox"
                   checked={selectedReviews.size === filteredReviews.length}
                   onChange={toggleSelectAll}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  className="h-4 w-4 border-gray-300 rounded focus:ring-2"
+                  style={{
+                    accentColor: "#F6C343",
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.boxShadow = `0 0 0 3px rgba(246, 195, 67, 0.1)`;
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.boxShadow = "none";
+                  }}
                 />
                 <label className="text-sm text-gray-700">
                   Seleccionar todas
@@ -525,7 +603,13 @@ const AdminReviewsPage = () => {
 
           {loading ? (
             <div className="text-center py-8">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 border-t-transparent"></div>
+              <div
+                className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-t-transparent"
+                style={{
+                  borderColor: "#F6C343",
+                  borderTopColor: "transparent",
+                }}
+              ></div>
               <p className="mt-2 text-gray-600">Cargando reviews...</p>
             </div>
           ) : filteredReviews.length === 0 ? (
@@ -544,10 +628,16 @@ const AdminReviewsPage = () => {
                   <div
                     key={review._id}
                     className={`border rounded-lg p-4 hover:border-gray-300 transition-colors ${
-                      selectedReviews.has(review._id)
-                        ? "border-indigo-500 bg-indigo-50"
-                        : "border-gray-200"
+                      selectedReviews.has(review._id) ? "" : "border-gray-200"
                     }`}
+                    style={
+                      selectedReviews.has(review._id)
+                        ? {
+                            borderColor: "#F6C343",
+                            backgroundColor: "rgba(246, 195, 67, 0.05)",
+                          }
+                        : {}
+                    }
                   >
                     {/* Header de la review */}
                     <div className="flex items-start justify-between mb-3">
@@ -556,7 +646,16 @@ const AdminReviewsPage = () => {
                           type="checkbox"
                           checked={selectedReviews.has(review._id)}
                           onChange={() => toggleSelectReview(review._id)}
-                          className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                          className="mt-1 h-4 w-4 border-gray-300 rounded focus:ring-2"
+                          style={{
+                            accentColor: "#F6C343",
+                          }}
+                          onFocus={(e) => {
+                            e.target.style.boxShadow = `0 0 0 3px rgba(246, 195, 67, 0.1)`;
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.boxShadow = "none";
+                          }}
                         />
 
                         <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
@@ -699,9 +798,14 @@ const AdminReviewsPage = () => {
                     onClick={() => setCurrentPage(i + 1)}
                     className={`px-3 py-1 border rounded ${
                       currentPage === i + 1
-                        ? "bg-indigo-600 text-white"
+                        ? "text-white"
                         : "bg-white text-gray-700 hover:bg-gray-50"
                     }`}
+                    style={
+                      currentPage === i + 1
+                        ? { backgroundColor: "#F6C343" }
+                        : {}
+                    }
                   >
                     {i + 1}
                   </button>

@@ -44,13 +44,22 @@ export default function OrdersPage() {
   const getStatusText = (status) => {
     const statusMap = {
       pendiente: { text: "Pendiente", color: "bg-yellow-100 text-yellow-800" },
-      pagado: { text: "Pagado", color: "bg-green-100 text-green-800" },
+      pagado: {
+        text: "Pagado",
+        color: "text-gray-700",
+        style: { backgroundColor: "#F1ECE8" },
+      },
       enviado: { text: "Enviado", color: "bg-blue-100 text-blue-800" },
-      entregado: { text: "Entregado", color: "bg-indigo-100 text-indigo-800" },
+      entregado: {
+        text: "Entregado",
+        color: "text-gray-700",
+        style: { backgroundColor: "#F1ECE8" },
+      },
       cancelado: { text: "Cancelado", color: "bg-red-100 text-red-800" },
       whatsapp_pendiente: {
         text: "WhatsApp - Pendiente",
-        color: "bg-green-100 text-green-800",
+        color: "text-gray-700",
+        style: { backgroundColor: "#FEF3E2" },
       },
     };
 
@@ -72,7 +81,7 @@ export default function OrdersPage() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-400"></div>
       </div>
     );
   }
@@ -83,7 +92,8 @@ export default function OrdersPage() {
         <p className="text-red-500 mb-4">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+          className="px-4 py-2 text-white rounded-md transition-colors hover:opacity-90"
+          style={{ backgroundColor: "#FAC348" }}
         >
           Reintentar
         </button>
@@ -93,7 +103,7 @@ export default function OrdersPage() {
 
   return (
     <div>
-      <h2 className="font-sora-extralight text-xl font-semibold mb-6">
+      <h2 className="font-sora-extralight text-xl font-semibold mb-6 text-gray-800">
         Mis Pedidos
       </h2>
 
@@ -109,19 +119,22 @@ export default function OrdersPage() {
                   <p className="text-sm text-gray-500">
                     Pedido #{order._id.substring(0, 8)}
                   </p>
-                  <p className="text-sm">{formatDate(order.createdAt)}</p>
+                  <p className="text-sm text-gray-600">
+                    {formatDate(order.createdAt)}
+                  </p>
                 </div>
                 <div className="flex space-x-4 items-center">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium ${
                       getStatusText(order.status).color
                     }`}
+                    style={getStatusText(order.status).style}
                   >
                     {getStatusText(order.status).text}
                   </span>
                   <Link
                     href={`/profile/orders/${order._id}`}
-                    className="text-indigo-600 hover:text-indigo-800 text-sm underline"
+                    className="text-yellow-600 hover:text-yellow-700 text-sm underline transition-colors"
                   >
                     Ver detalles
                   </Link>
@@ -143,7 +156,7 @@ export default function OrdersPage() {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
+                        <p className="text-sm font-medium text-gray-800 truncate">
                           {item.title}
                         </p>
                         <p className="text-sm text-gray-500">
@@ -165,14 +178,14 @@ export default function OrdersPage() {
 
                 <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between items-center">
                   <div>
-                    <p className="text-sm text-gray-700">Total:</p>
-                    <p className="text-lg font-medium">
+                    <p className="text-sm text-gray-600">Total:</p>
+                    <p className="text-lg font-medium text-gray-800">
                       ${order.totalAmount.toFixed(2)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-700">Método de pago:</p>
-                    <p className="text-sm font-medium">
+                    <p className="text-sm text-gray-600">Método de pago:</p>
+                    <p className="text-sm font-medium text-gray-700">
                       {order.paymentMethod === "mercadopago"
                         ? "MercadoPago"
                         : order.paymentMethod === "credit_card"
@@ -196,7 +209,8 @@ export default function OrdersPage() {
           </p>
           <Link
             href="/products"
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition inline-block"
+            className="px-4 py-2 text-white rounded-md transition-colors hover:opacity-90 inline-block"
+            style={{ backgroundColor: "#FAC348" }}
           >
             Explorar Productos
           </Link>

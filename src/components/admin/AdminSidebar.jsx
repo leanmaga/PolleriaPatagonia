@@ -1,4 +1,4 @@
-// src/components/admin/AdminSidebar.jsx (Actualizado)
+// src/components/admin/AdminSidebar.jsx (Con color #F6C343)
 "use client";
 
 import { usePathname } from "next/navigation";
@@ -76,11 +76,26 @@ const AdminSidebar = () => {
             <li key={item.href} className="space-y-2">
               <Link
                 href={item.href}
-                className={`flex items-center px-4 py-2 ${
+                className={`flex items-center px-4 py-2 transition-all ${
                   isActive(item.href) && !item.submenu
-                    ? "bg-indigo-500 text-white"
-                    : "text-gray-800 hover:border-indigo-500 hover:border-l-2 pl-3"
-                } transition-all`}
+                    ? "text-white"
+                    : "text-gray-800 hover:border-l-2 pl-3"
+                }`}
+                style={
+                  isActive(item.href) && !item.submenu
+                    ? { backgroundColor: "#F6C343" }
+                    : {}
+                }
+                onMouseEnter={(e) => {
+                  if (!isActive(item.href) || item.submenu) {
+                    e.target.style.borderLeftColor = "#F6C343";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive(item.href) || item.submenu) {
+                    e.target.style.borderLeftColor = "transparent";
+                  }
+                }}
               >
                 <span className="mr-3">{item.icon}</span>
                 <span>{item.title}</span>
@@ -93,11 +108,16 @@ const AdminSidebar = () => {
                     <li key={subItem.href}>
                       <Link
                         href={subItem.href}
-                        className={`flex items-center px-4 py-2 ${
+                        className={`flex items-center px-4 py-2 transition-all ${
                           pathname === subItem.href
-                            ? "bg-gray-100 text-black"
+                            ? "text-gray-900 font-medium"
                             : "text-gray-600 hover:bg-gray-50"
-                        } transition-all`}
+                        }`}
+                        style={
+                          pathname === subItem.href
+                            ? { backgroundColor: "#F6C343", opacity: 0.3 }
+                            : {}
+                        }
                       >
                         <span className="mr-3">{subItem.icon}</span>
                         <span>{subItem.title}</span>
