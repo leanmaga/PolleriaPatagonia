@@ -120,7 +120,7 @@ const ProductCard = ({ product }) => {
 
       <div className="p-4 flex flex-col flex-grow">
         {/* Título del producto */}
-        <h3 className="font-medium text-sm mb-2">
+        <h3 className="text-2xl font-black text-gray-900 mb-3 tracking-tight">
           <Link
             href={`/products/${product._id}`}
             className="hover:text-gray-600 transition"
@@ -129,21 +129,33 @@ const ProductCard = ({ product }) => {
           </Link>
         </h3>
 
+        <p className="text-gray-600 mb-6 leading-relaxed">
+          {product.description}
+        </p>
+
         {/* Precio y descuento */}
-        <div className="flex items-center gap-2 mb-2">
-          {hasPromotion ? (
-            <>
-              <span className="font-medium">${displayPrice.toFixed(2)}</span>
-              <span className="text-gray-400 line-through text-sm">
-                ${regularPrice.toFixed(2)}
-              </span>
-              <span className="text-red-600 text-sm">
-                | {discountPercentage}% OFF
-              </span>
-            </>
-          ) : (
-            <span className="font-medium">${displayPrice.toFixed(2)}</span>
-          )}
+        <div className="flex items-end justify-between mb-8">
+          <div className="price-container">
+            <div className="flex items-baseline space-x-2">
+              {hasPromotion ? (
+                <>
+                  <span className="price-main text-4xl">
+                    ${displayPrice.toFixed(2)}
+                  </span>
+                  <span className="text-gray-400 line-through text-sm">
+                    ${regularPrice.toFixed(2)}
+                  </span>
+                  <span className="text-red-600 text-sm">
+                    | {discountPercentage}% OFF
+                  </span>
+                </>
+              ) : (
+                <span className="price-main text-4xl">
+                  ${displayPrice.toFixed(2)}
+                </span>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Rating con StarRating component */}

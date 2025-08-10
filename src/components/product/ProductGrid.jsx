@@ -60,14 +60,6 @@ const ProductGrid = ({ products }) => {
 
   return (
     <>
-      {/* Contador de productos */}
-      <div className="mb-6 text-center">
-        <p className="text-sm text-gray-600">
-          Mostrando <span className="font-semibold">{products.length}</span>{" "}
-          producto{products.length !== 1 ? "s" : ""}
-        </p>
-      </div>
-
       {/* Grid responsivo de productos */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.map((product) => (

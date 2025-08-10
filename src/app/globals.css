@@ -134,3 +134,25 @@ body {
     @apply text-black;
   }
 }
+.price-container {
+  position: relative;
+}
+
+.price-main {
+  font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 800;
+  background: linear-gradient(135deg, #f6c343 0%, #e6b339 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+}
+
+.price-main::after {
+  content: "$";
+  position: absolute;
+  left: -16px;
+  top: 0;
+  font-size: 0.7em;
+  opacity: 0.6;
+}

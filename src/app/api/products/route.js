@@ -1,4 +1,4 @@
-// app/api/products/route.js - API ESPECÍFICA PARA POLLERÍA (CORREGIDA)
+// app/api/products/route.js - API ESPECÍFICA PARA POLLERÍA (SIN isNearExpiration)
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import { authOptions } from "@/lib/auth";
@@ -179,7 +179,7 @@ function getProductModel() {
           "rabadilla",
           "menudencias",
 
-          // Cortes vacunos (basado en las imágenes)
+          // Cortes vacunos
           "tortuguita",
           "bola-de-lomo",
           "peceto",
@@ -226,13 +226,6 @@ function getProductModel() {
           type: Number,
           default: 0,
         },
-      },
-
-      // Fecha de vencimiento (importante para productos frescos)
-      expirationDays: {
-        type: Number,
-        min: [0, "Los días de vencimiento no pueden ser negativos"],
-        default: 3, // Por defecto 3 días para productos frescos
       },
 
       // Información nutricional
@@ -409,7 +402,7 @@ function getProductModel() {
 
   // Crear índices para mejorar el rendimiento de las consultas
   productSchema.index({ category: 1 });
-  productSchema.index({ productType: 1 }); // Cambio de poultryType a productType
+  productSchema.index({ productType: 1 });
   productSchema.index({ farmingType: 1 });
   productSchema.index({ productState: 1 });
   productSchema.index({ featured: 1 });
@@ -462,22 +455,6 @@ function getProductModel() {
     }
     return this.effectivePrice;
   });
-
-  // Método para verificar si el producto está próximo a vencer
-  productSchema.methods.isNearExpiration = function () {
-    if (!this.createdAt || this.expirationDays === 0) return false;
-
-    const creationDate = new Date(this.createdAt);
-    const expirationDate = new Date(creationDate);
-    expirationDate.setDate(expirationDate.getDate() + this.expirationDays);
-
-    const today = new Date();
-    const daysUntilExpiration = Math.ceil(
-      (expirationDate - today) / (1000 * 60 * 60 * 24)
-    );
-
-    return daysUntilExpiration <= 1; // Próximo a vencer si queda 1 día o menos
-  };
 
   // Middleware pre-save para cálculos automáticos
   productSchema.pre("save", function (next) {
@@ -610,7 +587,8 @@ export async function GET(request) {
       productObj.effectivePrice = product.effectivePrice;
       productObj.availableToday = product.availableToday;
       productObj.pricePerKg = product.pricePerKg;
-      productObj.isNearExpiration = product.isNearExpiration();
+      // ❌ REMOVIDA LA LÍNEA PROBLEMÁTICA:
+      // productObj.isNearExpiration = product.isNearExpiration();
 
       return productObj;
     });
@@ -770,7 +748,6 @@ export async function POST(request) {
       farmingType: data.farmingType || "convencional",
       productState: data.productState || "fresco",
       cut: data.cut || "entero",
-      expirationDays: parseInt(data.expirationDays) || 3,
 
       // Nuevos campos para carnicería
       meatGrade: data.meatGrade || "",
@@ -885,7 +862,8 @@ export async function POST(request) {
     productResponse.effectivePrice = newProduct.effectivePrice;
     productResponse.availableToday = newProduct.availableToday;
     productResponse.pricePerKg = newProduct.pricePerKg;
-    productResponse.isNearExpiration = newProduct.isNearExpiration();
+    // ❌ REMOVIDA LA LÍNEA PROBLEMÁTICA:
+    // productResponse.isNearExpiration = newProduct.isNearExpiration();
 
     return NextResponse.json(
       {
