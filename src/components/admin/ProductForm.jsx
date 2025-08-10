@@ -53,14 +53,9 @@ const ProductForm = ({ product = null }) => {
       category: product?.category || "",
       featured: product?.featured || false,
 
-      // Campos específicos de pollería
+      // Campos de peso
       weight: product?.weight?.toString() || "",
       weightUnit: product?.weightUnit || "kg",
-      poultryType: product?.poultryType || "pollo",
-      farmingType: product?.farmingType || "convencional",
-      productState: product?.productState || "fresco",
-      cut: product?.cut || "entero",
-      expirationDays: product?.expirationDays?.toString() || "3",
 
       // Rango de peso
       weightRangeMin: product?.weightRange?.min?.toString() || "",
@@ -76,9 +71,6 @@ const ProductForm = ({ product = null }) => {
       ingredients: product?.ingredients?.join(", ") || "",
       allergens: product?.allergens?.join(", ") || "",
 
-      // Certificaciones
-      certifications: product?.certifications || [],
-
       // Disponibilidad por días
       availabilityMonday: product?.availability?.monday !== false,
       availabilityTuesday: product?.availability?.tuesday !== false,
@@ -92,12 +84,9 @@ const ProductForm = ({ product = null }) => {
     },
   });
 
-  // Observar los cambios en el formulario
+  // Observar solo los cambios necesarios
   const watchSalePrice = watch("salePrice");
   const watchCost = watch("cost");
-  const watchCategory = watch("category");
-  const watchPoultryType = watch("poultryType");
-  const watchWeightUnit = watch("weightUnit");
 
   // Calcular margen automáticamente
   useEffect(() => {
@@ -126,7 +115,7 @@ const ProductForm = ({ product = null }) => {
     }
   };
 
-  const handleAddImage = (info, imageUrl, description) => {
+  const handleAddImage = (info, imageUrl, color, description) => {
     const newImage = {
       imageUrl,
       description: description || "",
@@ -139,7 +128,7 @@ const ProductForm = ({ product = null }) => {
     setAdditionalImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Función de validación
+  // Función de validación simplificada
   const validateForm = (data) => {
     const errors = {};
 
@@ -162,13 +151,9 @@ const ProductForm = ({ product = null }) => {
       errors.image = "Debes subir una imagen principal del producto";
     }
 
-    // Validaciones específicas de pollería
+    // Validaciones básicas opcionales
     if (data.weight && parseFloat(data.weight) < 0) {
       errors.weight = "El peso no puede ser negativo";
-    }
-
-    if (data.expirationDays && parseInt(data.expirationDays) < 0) {
-      errors.expirationDays = "Los días de vencimiento no pueden ser negativos";
     }
 
     // Validar rango de peso
@@ -180,7 +165,7 @@ const ProductForm = ({ product = null }) => {
       }
     }
 
-    // Validaciones opcionales
+    // Validaciones financieras
     if (data.cost && parseFloat(data.cost) < 0) {
       errors.cost = "El costo no puede ser negativo";
     }
@@ -204,7 +189,7 @@ const ProductForm = ({ product = null }) => {
     return Object.keys(errors).length === 0;
   };
 
-  // Función onSubmit
+  // Función onSubmit simplificada
   const onSubmit = async (data) => {
     if (!validateForm(data)) {
       toast.error("Por favor completa todos los campos obligatorios");
@@ -219,7 +204,7 @@ const ProductForm = ({ product = null }) => {
     setLoading(true);
 
     try {
-      // Preparar datos del producto con estructura que coincida con el modelo
+      // Preparar datos básicos del producto
       const productData = {
         title: data.title.trim(),
         description: data.description.trim(),
@@ -227,22 +212,17 @@ const ProductForm = ({ product = null }) => {
         category: data.category,
         featured: data.featured,
 
-        // Campos específicos de pollería
+        // Campos de peso
         weight: data.weight ? parseFloat(data.weight) : 0,
         weightUnit: data.weightUnit,
-        poultryType: data.poultryType,
-        farmingType: data.farmingType,
-        productState: data.productState,
-        cut: data.cut,
-        expirationDays: data.expirationDays ? parseInt(data.expirationDays) : 3,
 
-        // Rango de peso - corregido para coincidir con el modelo
+        // Rango de peso
         weightRange: {
           min: data.weightRangeMin ? parseFloat(data.weightRangeMin) : 0,
           max: data.weightRangeMax ? parseFloat(data.weightRangeMax) : 0,
         },
 
-        // Información nutricional - corregido para coincidir con el modelo
+        // Información nutricional
         nutritionalInfo: {
           calories: data.calories ? parseFloat(data.calories) : 0,
           protein: data.protein ? parseFloat(data.protein) : 0,
@@ -250,7 +230,7 @@ const ProductForm = ({ product = null }) => {
           per100g: data.per100g !== false,
         },
 
-        // Ingredientes y alérgenos - procesado correctamente como arrays
+        // Ingredientes y alérgenos
         ingredients: data.ingredients
           ? data.ingredients
               .split(",")
@@ -264,12 +244,7 @@ const ProductForm = ({ product = null }) => {
               .filter((item) => item)
           : [],
 
-        // Certificaciones - array de strings
-        certifications: Array.isArray(data.certifications)
-          ? data.certifications
-          : [],
-
-        // Disponibilidad por días - corregido para coincidir con el modelo
+        // Disponibilidad por días
         availability: {
           monday: data.availabilityMonday !== false,
           tuesday: data.availabilityTuesday !== false,
@@ -419,7 +394,7 @@ const ProductForm = ({ product = null }) => {
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
                   validationErrors.title ? "border-red-500" : "border-gray-300"
                 }`}
-                placeholder="Ej: Pollo entero fresco, Pechuga sin hueso..."
+                placeholder="Ej: Bife Ancho Premium, Milanesa de Nalga con Panko..."
                 {...register("title")}
               />
               {validationErrors.title && (
@@ -463,16 +438,35 @@ const ProductForm = ({ product = null }) => {
                 {...register("category")}
               >
                 <option value="">Selecciona una categoría</option>
-                <option value="pollos-enteros">Pollos Enteros</option>
-                <option value="cortes-pollo">Cortes de Pollo</option>
-                <option value="huevos">Huevos</option>
-                <option value="marinados">Marinados</option>
-                <option value="embutidos">Embutidos</option>
-                <option value="menudencias">Menudencias</option>
-                <option value="productos-organicos">Productos Orgánicos</option>
-                <option value="preparados">Preparados</option>
-                <option value="promociones">Promociones</option>
-                <option value="otros">Otros</option>
+
+                {/* Productos Avícolas */}
+                <option value="pollos-enteros">🐔 Pollos Enteros</option>
+                <option value="cortes-pollo">🐔 Cortes de Pollo</option>
+                <option value="huevos">🥚 Huevos</option>
+                <option value="marinados-pollo">🐔 Marinados de Pollo</option>
+                <option value="embutidos-pollo">🐔 Embutidos de Pollo</option>
+                <option value="menudencias-pollo">
+                  🐔 Menudencias de Pollo
+                </option>
+
+                {/* Productos de Carnicería */}
+                <option value="cortes-vacunos">🥩 Cortes Vacunos</option>
+                <option value="cortes-cerdo">🐷 Cortes de Cerdo</option>
+                <option value="cortes-cordero">🐑 Cortes de Cordero</option>
+                <option value="milanesas">🍖 Milanesas</option>
+                <option value="carne-picada">🍖 Carne Picada</option>
+                <option value="embutidos-vacunos">
+                  🌭 Embutidos y Chorizos
+                </option>
+                <option value="vísceras">🫀 Vísceras y Achuras</option>
+
+                {/* Otros Productos */}
+                <option value="productos-organicos">
+                  🌿 Productos Orgánicos
+                </option>
+                <option value="preparados">👨‍🍳 Preparados y Listos</option>
+                <option value="promociones">🏷️ Promociones</option>
+                <option value="otros">📦 Otros</option>
               </select>
               {validationErrors.category && (
                 <p className="mt-1 text-sm text-red-600">
@@ -587,129 +581,6 @@ const ProductForm = ({ product = null }) => {
 
           {/* Columna derecha */}
           <div className="space-y-6">
-            {/* Campos específicos de pollería */}
-            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-              <h3 className="text-lg font-medium text-gray-800 mb-3">
-                Detalles del Producto
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <label
-                    htmlFor="poultryType"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Tipo de Producto
-                  </label>
-                  <select
-                    id="poultryType"
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 border-gray-300"
-                    {...register("poultryType")}
-                  >
-                    <option value="pollo">Pollo</option>
-                    <option value="gallina">Gallina</option>
-                    <option value="gallo">Gallo</option>
-                    <option value="pollito">Pollito</option>
-                    <option value="huevos">Huevos</option>
-                    <option value="embutido">Embutido</option>
-                    <option value="otro">Otro</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="farmingType"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Tipo de Crianza
-                  </label>
-                  <select
-                    id="farmingType"
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 border-gray-300"
-                    {...register("farmingType")}
-                  >
-                    <option value="convencional">Convencional</option>
-                    <option value="organico">Orgánico</option>
-                    <option value="libre-pastoreo">Libre Pastoreo</option>
-                    <option value="sin-antibioticos">Sin Antibióticos</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="productState"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Estado del Producto
-                  </label>
-                  <select
-                    id="productState"
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 border-gray-300"
-                    {...register("productState")}
-                  >
-                    <option value="fresco">Fresco</option>
-                    <option value="congelado">Congelado</option>
-                    <option value="marinado">Marinado</option>
-                    <option value="cocido">Cocido</option>
-                    <option value="ahumado">Ahumado</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="cut"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Tipo de Corte
-                  </label>
-                  <select
-                    id="cut"
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 border-gray-300"
-                    {...register("cut")}
-                  >
-                    <option value="entero">Entero</option>
-                    <option value="trozado">Trozado</option>
-                    <option value="pechuga">Pechuga</option>
-                    <option value="muslo">Muslo</option>
-                    <option value="contramuslo">Contramuslo</option>
-                    <option value="ala">Ala</option>
-                    <option value="cuadril">Cuadril</option>
-                    <option value="rabadilla">Rabadilla</option>
-                    <option value="menudencias">Menudencias</option>
-                    <option value="otro">Otro</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="expirationDays"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Días de Vencimiento
-                  </label>
-                  <input
-                    type="number"
-                    id="expirationDays"
-                    min="0"
-                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                      validationErrors.expirationDays
-                        ? "border-red-500"
-                        : "border-gray-300"
-                    }`}
-                    {...register("expirationDays")}
-                  />
-                  <p className="mt-1 text-xs text-gray-500">
-                    Número de días desde la fecha de elaboración hasta el
-                    vencimiento
-                  </p>
-                  {validationErrors.expirationDays && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {validationErrors.expirationDays}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-
             {/* Rango de peso (para productos variables) */}
             <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
               <h3 className="text-lg font-medium text-gray-800 mb-3">
@@ -755,8 +626,7 @@ const ProductForm = ({ product = null }) => {
                 </p>
               )}
               <p className="mt-1 text-xs text-gray-500">
-                Para productos que varían en peso (ej: pollos enteros entre
-                1.5kg y 2.2kg)
+                Para productos que varían en peso (ej: bifes entre 350g y 500g)
               </p>
             </div>
 
@@ -777,7 +647,7 @@ const ProductForm = ({ product = null }) => {
                   onMainImageChange={handleMainImageChange}
                   onAddImage={handleAddImage}
                   onRemoveImage={handleRemoveImage}
-                  descriptions={true} // Para permitir descripciones en imágenes adicionales
+                  descriptions={true}
                 />
               </div>
               {validationErrors.image && (
@@ -971,143 +841,115 @@ const ProductForm = ({ product = null }) => {
           </button>
 
           {showNutritionalInfo && (
-            <div className="p-4 border-t border-gray-200 bg-green-50 space-y-4">
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label
-                    htmlFor="calories"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Calorías
-                  </label>
-                  <input
-                    type="number"
-                    id="calories"
-                    min="0"
-                    step="0.1"
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 border-gray-300"
-                    {...register("calories")}
-                  />
+            <>
+              <div className="p-4 border-t border-gray-200 bg-green-50 space-y-4">
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label
+                      htmlFor="calories"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Calorías
+                    </label>
+                    <input
+                      type="number"
+                      id="calories"
+                      min="0"
+                      step="0.1"
+                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 border-gray-300"
+                      {...register("calories")}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="protein"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Proteínas (g)
+                    </label>
+                    <input
+                      type="number"
+                      id="protein"
+                      min="0"
+                      step="0.1"
+                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 border-gray-300"
+                      {...register("protein")}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="fat"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Grasas (g)
+                    </label>
+                    <input
+                      type="number"
+                      id="fat"
+                      min="0"
+                      step="0.1"
+                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 border-gray-300"
+                      {...register("fat")}
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label
-                    htmlFor="protein"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Proteínas (g)
-                  </label>
+                <div className="flex items-center">
                   <input
-                    type="number"
-                    id="protein"
-                    min="0"
-                    step="0.1"
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 border-gray-300"
-                    {...register("protein")}
+                    id="per100g"
+                    type="checkbox"
+                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                    {...register("per100g")}
                   />
-                </div>
-                <div>
                   <label
-                    htmlFor="fat"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    htmlFor="per100g"
+                    className="ml-2 text-sm text-gray-700"
                   >
-                    Grasas (g)
+                    Valores por cada 100g
                   </label>
-                  <input
-                    type="number"
-                    id="fat"
-                    min="0"
-                    step="0.1"
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 border-gray-300"
-                    {...register("fat")}
-                  />
                 </div>
               </div>
-              <div className="flex items-center">
-                <input
-                  id="per100g"
-                  type="checkbox"
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                  {...register("per100g")}
-                />
-                <label htmlFor="per100g" className="ml-2 text-sm text-gray-700">
-                  Valores por cada 100g
-                </label>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 border-t border-gray-200">
+                <div>
+                  <label
+                    htmlFor="ingredients"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Ingredientes
+                  </label>
+                  <textarea
+                    id="ingredients"
+                    rows="3"
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 border-gray-300"
+                    placeholder="Separar con comas: carne vacuna, sal marina, especias..."
+                    {...register("ingredients")}
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    Lista de ingredientes separados por comas
+                  </p>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="allergens"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Alérgenos
+                  </label>
+                  <textarea
+                    id="allergens"
+                    rows="3"
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 border-gray-300"
+                    placeholder="Separar con comas: soja, gluten..."
+                    {...register("allergens")}
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    Alérgenos presentes separados por comas
+                  </p>
+                </div>
               </div>
-            </div>
+            </>
           )}
-        </div>
-
-        {/* Ingredientes y certificaciones */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label
-              htmlFor="ingredients"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Ingredientes
-            </label>
-            <textarea
-              id="ingredients"
-              rows="3"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 border-gray-300"
-              placeholder="Separar con comas: pollo, sal marina, especias..."
-              {...register("ingredients")}
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              Lista de ingredientes separados por comas
-            </p>
-          </div>
-
-          <div>
-            <label
-              htmlFor="allergens"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Alérgenos
-            </label>
-            <textarea
-              id="allergens"
-              rows="3"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 border-gray-300"
-              placeholder="Separar con comas: soja, gluten..."
-              {...register("allergens")}
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              Alérgenos presentes separados por comas
-            </p>
-          </div>
-        </div>
-
-        {/* Certificaciones */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Certificaciones
-          </label>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            {[
-              "organico",
-              "halal",
-              "kosher",
-              "sin-antibioticos",
-              "bienestar-animal",
-            ].map((cert) => (
-              <div key={cert} className="flex items-center">
-                <input
-                  id={`cert-${cert}`}
-                  type="checkbox"
-                  value={cert}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                  {...register("certifications")}
-                />
-                <label
-                  htmlFor={`cert-${cert}`}
-                  className="ml-2 text-sm text-gray-700 capitalize"
-                >
-                  {cert.replace("-", " ")}
-                </label>
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Disponibilidad por días */}

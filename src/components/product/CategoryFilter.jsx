@@ -1,5 +1,4 @@
 "use client";
-
 import { Suspense } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -54,12 +53,25 @@ function CategoryFilterContent() {
 
   const categories = [
     { key: "all", label: "Todos" },
+
+    // Categorías de pollería
     { key: "pollos-enteros", label: "Pollos Enteros" },
     { key: "cortes-pollo", label: "Cortes de Pollo" },
     { key: "huevos", label: "Huevos" },
-    { key: "marinados", label: "Marinados" },
-    { key: "embutidos", label: "Embutidos" },
-    { key: "menudencias", label: "Menudencias" },
+    { key: "marinados-pollo", label: "Marinados de Pollo" },
+    { key: "embutidos-pollo", label: "Embutidos de Pollo" },
+    { key: "menudencias-pollo", label: "Menudencias de Pollo" },
+
+    // Categorías de carnicería
+    { key: "cortes-vacunos", label: "Cortes Vacunos" },
+    { key: "cortes-cerdo", label: "Cortes de Cerdo" },
+    { key: "cortes-cordero", label: "Cortes de Cordero" },
+    { key: "milanesas", label: "Milanesas" },
+    { key: "carne-picada", label: "Carne Picada" },
+    { key: "embutidos-vacunos", label: "Embutidos Vacunos" },
+    { key: "vísceras", label: "Vísceras" },
+
+    // Categorías generales
     { key: "productos-organicos", label: "Orgánicos" },
     { key: "preparados", label: "Preparados" },
     { key: "promociones", label: "Promociones" },
