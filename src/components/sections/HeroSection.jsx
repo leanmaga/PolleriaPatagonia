@@ -3,15 +3,16 @@
 
 import Image from "next/image";
 import { CTAButton } from "@/components/ui";
-import heroImageUrl from "/public/images/portada2.jpg";
+import heroImageDesktop from "/public/images/portada2.jpg";
+import heroImageMobile from "/public/images/6.jpg";
 
 export default function HeroSection() {
   return (
-    <section className="relative h-screen w-full overflow-hidden">
-      {/* Mobile: Imagen de fondo completa */}
-      <div className="absolute inset-0 lg:hidden">
+    <section className="relative w-full overflow-hidden">
+      {/* Mobile: Imagen de fondo vertical */}
+      <div className="absolute inset-0 lg:hidden h-full min-h-screen">
         <Image
-          src={heroImageUrl}
+          src={heroImageMobile}
           alt="Milanesas premium y productos frescos listos para tu freezer"
           fill
           style={{ objectFit: "cover" }}
@@ -20,23 +21,22 @@ export default function HeroSection() {
           quality={85}
           sizes="100vw"
         />
-        {/* Overlay para mobile */}
         <div className="absolute inset-0 bg-black/50" />
       </div>
 
-      {/* Desktop: Grid de 2 columnas */}
-      <div className="hidden lg:grid lg:grid-cols-2 h-full">
+      {/* Desktop: Grid de 2 columnas con imagen horizontal */}
+      <div className="hidden lg:grid lg:grid-cols-2 h-screen">
         {/* Columna izquierda - Fondo negro con contenido */}
         <div className="bg-black text-white flex items-center justify-center px-8 xl:px-16">
           <div className="max-w-2xl">
             <h1 className="font-drop font-black uppercase leading-none mb-8">
-              <span className="block text-[8vw] xl:text-[6vw] 2xl:text-[5vw] tracking-tighter text-white">
+              <span className="block text-[8vw] xl:text-[6vw] 2xl:text-[5vw] tracking-tighter">
                 CALIDAD
               </span>
-              <span className="block text-[8vw] xl:text-[6vw] 2xl:text-[5vw] tracking-tighter text-white">
+              <span className="block text-[8vw] xl:text-[6vw] 2xl:text-[5vw] tracking-tighter">
                 ARGENTINA
               </span>
-              <span className="block text-[8vw] xl:text-[6vw] 2xl:text-[5vw] tracking-tighter text-white">
+              <span className="block text-[8vw] xl:text-[6vw] 2xl:text-[5vw] tracking-tighter">
                 QUE ALIMENTA TU DÍA
               </span>
             </h1>
@@ -49,10 +49,10 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* Columna derecha - Imagen */}
+        {/* Columna derecha - Imagen horizontal */}
         <div className="relative">
           <Image
-            src={heroImageUrl}
+            src={heroImageDesktop}
             alt="Milanesas premium y productos frescos listos para tu freezer"
             fill
             style={{ objectFit: "cover" }}
@@ -65,14 +65,17 @@ export default function HeroSection() {
       </div>
 
       {/* Mobile: Contenido sobre la imagen */}
-      <div className="lg:hidden relative z-10 container mx-auto px-4 h-full flex items-center">
+      <div className="lg:hidden relative z-10 container mx-auto px-4 min-h-screen flex items-center">
         <div className="max-w-5xl">
           <h1 className="font-drop font-black uppercase leading-none mb-8">
             <span className="block text-[12vw] tracking-tighter text-white drop-shadow-lg">
-              MILANESAS
+              CALIDAD
             </span>
             <span className="block text-[12vw] tracking-tighter text-white drop-shadow-lg">
-              PREMIUM TODOS LOS DÍAS
+              ARGENTINA
+            </span>
+            <span className="block text-[12vw] tracking-tighter text-white drop-shadow-lg">
+              QUE ALIMENTA TU DÍA
             </span>
           </h1>
 
