@@ -132,13 +132,13 @@ const EmailTestPanel = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <div className="border-b border-gray-200 pb-4 mb-6">
-        <h2 className="text-xl font-semibold text-gray-900 flex items-center">
-          <EnvelopeIcon className="h-6 w-6 mr-2 text-indigo-600" />
+    <div className="bg-[#FFFFFF] rounded-lg shadow p-6">
+      <div className="border-b border-[#5A5A5A] pb-4 mb-6">
+        <h2 className="text-xl font-semibold text-[#5A5A5A] flex items-center">
+          <EnvelopeIcon className="h-6 w-6 mr-2 text-[#F6C343]" />
           Test de Emails
         </h2>
-        <p className="text-gray-600 mt-1">
+        <p className="text-[#5A5A5A] mt-1">
           Prueba el sistema de emails para verificar que funciona correctamente
         </p>
       </div>
@@ -148,7 +148,7 @@ const EmailTestPanel = () => {
         <div>
           <label
             htmlFor="testEmail"
-            className="block text-sm font-medium text-gray-700 mb-2"
+            className="block text-sm font-medium text-[#5A5A5A] mb-2"
           >
             Email de Prueba
           </label>
@@ -158,9 +158,9 @@ const EmailTestPanel = () => {
             value={testEmail}
             onChange={(e) => setTestEmail(e.target.value)}
             placeholder="tu-email@gmail.com"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            className="w-full px-3 py-2 border border-[#5A5A5A] rounded-md shadow-sm focus:outline-none focus:ring-[#F6C343] focus:border-[#F6C343]"
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-[#5A5A5A] mt-1">
             Los emails de prueba se enviarán a esta dirección
           </p>
         </div>
@@ -168,7 +168,7 @@ const EmailTestPanel = () => {
         <div>
           <label
             htmlFor="testType"
-            className="block text-sm font-medium text-gray-700 mb-2"
+            className="block text-sm font-medium text-[#5A5A5A] mb-2"
           >
             Tipo de Email a Probar
           </label>
@@ -176,7 +176,7 @@ const EmailTestPanel = () => {
             id="testType"
             value={selectedTest}
             onChange={(e) => setSelectedTest(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            className="w-full px-3 py-2 border border-[#5A5A5A] rounded-md shadow-sm focus:outline-none focus:ring-[#F6C343] focus:border-[#F6C343]"
           >
             <option value="">Selecciona un tipo de email...</option>
             {emailTypes.map((type) => (
@@ -193,11 +193,11 @@ const EmailTestPanel = () => {
         <button
           onClick={() => handleTest()}
           disabled={isLoading || !testEmail || !selectedTest}
-          className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
+          className="flex-1 bg-[#F6C343] text-[#FFFFFF] px-4 py-2 rounded-md hover:bg-yellow-500 disabled:bg-[#5A5A5A] disabled:cursor-not-allowed flex items-center justify-center"
         >
           {isLoading ? (
             <>
-              <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-[#FFFFFF] mr-2"></div>
               Enviando...
             </>
           ) : (
@@ -211,11 +211,11 @@ const EmailTestPanel = () => {
         <button
           onClick={handleTestAll}
           disabled={isLoading || !testEmail}
-          className="flex-1 bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
+          className="flex-1 bg-[#5A5A5A] text-[#FFFFFF] px-4 py-2 rounded-md hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
         >
           {isLoading ? (
             <>
-              <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-[#FFFFFF] mr-2"></div>
               Enviando...
             </>
           ) : (
@@ -229,7 +229,7 @@ const EmailTestPanel = () => {
 
       {/* Lista de Tipos de Email */}
       <div className="mb-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-3">
+        <h3 className="text-lg font-medium text-[#5A5A5A] mb-3">
           Tipos de Email Disponibles
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -238,21 +238,21 @@ const EmailTestPanel = () => {
               key={type.id}
               className={`border rounded-lg p-3 cursor-pointer transition-colors ${
                 selectedTest === type.id
-                  ? "border-indigo-500 bg-indigo-50"
-                  : "border-gray-200 hover:border-gray-300"
+                  ? "border-[#F6C343] bg-[#F1ECE8]"
+                  : "border-[#5A5A5A] hover:border-[#F6C343]"
               }`}
               onClick={() => setSelectedTest(type.id)}
             >
               <div className="flex items-start">
                 <span className="text-2xl mr-3">{type.icon}</span>
                 <div className="flex-1">
-                  <h4 className="font-medium text-gray-900">{type.name}</h4>
-                  <p className="text-sm text-gray-600">{type.description}</p>
+                  <h4 className="font-medium text-[#5A5A5A]">{type.name}</h4>
+                  <p className="text-sm text-[#5A5A5A]">{type.description}</p>
                   <span
                     className={`inline-block mt-1 px-2 py-1 text-xs rounded-full ${
                       type.recipient === "Cliente"
-                        ? "bg-blue-100 text-blue-800"
-                        : "bg-green-100 text-green-800"
+                        ? "bg-[#F6C343] text-[#FFFFFF]"
+                        : "bg-[#F1ECE8] text-[#5A5A5A]"
                     }`}
                   >
                     Para: {type.recipient}
@@ -266,8 +266,8 @@ const EmailTestPanel = () => {
 
       {/* Resultados */}
       {results && (
-        <div className="border-t border-gray-200 pt-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-3">
+        <div className="border-t border-[#5A5A5A] pt-6">
+          <h3 className="text-lg font-medium text-[#5A5A5A] mb-3">
             Resultados del Test
           </h3>
 
@@ -279,7 +279,7 @@ const EmailTestPanel = () => {
                   key={index}
                   className={`flex items-center p-3 rounded-lg ${
                     result.result.success
-                      ? "bg-green-50 text-green-800"
+                      ? "bg-[#F1ECE8] text-[#5A5A5A]"
                       : "bg-red-50 text-red-800"
                   }`}
                 >
@@ -301,7 +301,7 @@ const EmailTestPanel = () => {
                   </div>
                 </div>
               ))}
-              <div className="bg-blue-50 text-blue-800 p-3 rounded-lg mt-4">
+              <div className="bg-[#F1ECE8] text-[#5A5A5A] p-3 rounded-lg mt-4">
                 <div className="flex items-center">
                   <InformationCircleIcon className="h-5 w-5 mr-3" />
                   <span className="font-medium">
@@ -317,7 +317,7 @@ const EmailTestPanel = () => {
             <div
               className={`flex items-center p-4 rounded-lg ${
                 results.success
-                  ? "bg-green-50 text-green-800"
+                  ? "bg-[#F1ECE8] text-[#5A5A5A]"
                   : "bg-red-50 text-red-800"
               }`}
             >
@@ -345,9 +345,9 @@ const EmailTestPanel = () => {
       )}
 
       {/* Información Adicional */}
-      <div className="bg-gray-50 rounded-lg p-4 mt-6">
-        <h4 className="font-medium text-gray-900 mb-2">ℹ️ Información</h4>
-        <ul className="text-sm text-gray-600 space-y-1">
+      <div className="bg-[#F1ECE8] rounded-lg p-4 mt-6">
+        <h4 className="font-medium text-[#5A5A5A] mb-2">ℹ️ Información</h4>
+        <ul className="text-sm text-[#5A5A5A] space-y-1">
           <li>• Los emails de prueba usan datos ficticios pero realistas</li>
           <li>• Verifica tu bandeja de entrada y carpeta de spam</li>
           <li>• Los emails se envían desde la configuración de Resend</li>

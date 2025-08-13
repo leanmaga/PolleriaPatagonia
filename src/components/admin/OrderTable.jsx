@@ -12,6 +12,10 @@ const OrderTable = ({ orders: initialOrders }) => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [isUpdating, setIsUpdating] = useState(false);
 
+  // 🔹 Estados para paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
   // Filtrar órdenes
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
@@ -28,11 +32,20 @@ const OrderTable = ({ orders: initialOrders }) => {
     const matchesStatus =
       statusFilter === "all" ||
       order.status === statusFilter ||
-      // Caso especial para filtrar todos los pedidos de WhatsApp
       (statusFilter === "whatsapp" && order.paymentMethod === "whatsapp");
 
     return matchesSearch && matchesStatus;
   });
+
+  // 🔹 Calcular índices para paginación
+  const indexOfLastOrder = currentPage * rowsPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - rowsPerPage;
+  const currentOrders = filteredOrders.slice(
+    indexOfFirstOrder,
+    indexOfLastOrder
+  );
+
+  const totalPages = Math.ceil(filteredOrders.length / rowsPerPage);
 
   // Actualizar estado de la orden
   const handleStatusUpdate = async (orderId, newStatus) => {
@@ -51,7 +64,6 @@ const OrderTable = ({ orders: initialOrders }) => {
         throw new Error("Error al actualizar el estado del pedido");
       }
 
-      // Actualizar estado local
       setOrders(
         orders.map((order) =>
           order._id === orderId ? { ...order, status: newStatus } : order
@@ -67,17 +79,14 @@ const OrderTable = ({ orders: initialOrders }) => {
     }
   };
 
-  // Formatear fecha
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  // Abrir chat de WhatsApp
   const openWhatsAppChat = (order) => {
-    // Extraer el número de teléfono del pedido (si existe) o usar un número predeterminado
-    const phone = order.shippingInfo?.phone || "5491126907696"; // Reemplaza con tu número
-    const whatsappUrl = `https://wa.me/${phone.replace(/\D/g, "")}`; // Eliminar caracteres no numéricos
+    const phone = order.shippingInfo?.phone || "5491126907696";
+    const whatsappUrl = `https://wa.me/${phone.replace(/\D/g, "")}`;
     window.open(whatsappUrl, "_blank");
   };
 
@@ -94,14 +103,20 @@ const OrderTable = ({ orders: initialOrders }) => {
             placeholder="Buscar pedidos..."
             className="pl-10 py-2 pr-4 block w-full border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
           />
         </div>
 
         <div className="flex space-x-2">
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setCurrentPage(1);
+            }}
             className="py-2 px-4 border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="all">Todos los pedidos</option>
@@ -121,53 +136,32 @@ const OrderTable = ({ orders: initialOrders }) => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 ID Pedido
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Cliente
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Fecha
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Total
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Método
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Estado
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Acciones
               </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {filteredOrders.length > 0 ? (
-              filteredOrders.map((order) => (
+            {currentOrders.length > 0 ? (
+              currentOrders.map((order) => (
                 <tr
                   key={order._id}
                   className={`hover:bg-gray-50 ${
@@ -292,6 +286,51 @@ const OrderTable = ({ orders: initialOrders }) => {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* 🔹 Controles de paginación */}
+      <div className="flex justify-between items-center mt-4 px-4">
+        <div>
+          <label className="mr-2 text-sm text-gray-600">
+            Filas por página:
+          </label>
+          <select
+            value={rowsPerPage}
+            onChange={(e) => {
+              setRowsPerPage(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+            className="border rounded px-2 py-1 text-sm"
+          >
+            {[5, 10, 20, 50].map((num) => (
+              <option key={num} value={num}>
+                {num}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+          >
+            Anterior
+          </button>
+          <span className="text-sm">
+            Página {currentPage} de {totalPages}
+          </span>
+          <button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+          >
+            Siguiente
+          </button>
+        </div>
       </div>
     </div>
   );
