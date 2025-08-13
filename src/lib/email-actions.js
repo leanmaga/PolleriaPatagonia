@@ -87,15 +87,15 @@ export async function sendVerificationEmail(email) {
 
     // URL del logo
     const logoUrl =
-      "https://polleriapatagonia.vercel.app/_next/image?url=%2Fimages%2Flogo.jpeg&w=96&q=75";
+      "https://solcampestre.com/_next/image?url=%2Fimages%2Flogo.jpeg&w=96&q=75";
 
     // Enviar email con diseño mejorado
     const info = await transporter.sendMail({
-      from: `"PolleríaPatagonia" <${
+      from: `"Sol Campestre" <${
         process.env.EMAIL_USER || "sofiaballesta1424@gmail.com"
       }>`,
       to: user.email,
-      subject: "Verifica tu cuenta en PolleríaPatagonia",
+      subject: "Verifica tu cuenta en Sol Campestre",
       html: `
         <!DOCTYPE html>
         <html lang="es">
@@ -113,7 +113,7 @@ export async function sendVerificationEmail(email) {
             <!-- Header -->
             <tr>
                <td style="padding: 40px 30px; text-align: center; border-bottom: 1px solid #e5e5e5;">
-                <img src="${logoUrl}" alt="PolleríaPatagonia Logo" width="120" style="display: block; margin: 0 auto;">
+                <img src="${logoUrl}" alt="Sol Campestre Logo" width="120" style="display: block; margin: 0 auto;">
               </td>
             </tr>
             
@@ -128,7 +128,7 @@ export async function sendVerificationEmail(email) {
                   </tr>
                   <tr>
                     <td style="padding-bottom: 30px; text-align: center; color: #666666; font-size: 16px; line-height: 24px;">
-                      <p>¡Gracias por registrarte en PolleríaPatagonia! Para completar tu registro y acceder a todas las funcionalidades, por favor verifica tu dirección de correo electrónico.</p>
+                      <p>¡Gracias por registrarte en Sol Campestre! Para completar tu registro y acceder a todas las funcionalidades, por favor verifica tu dirección de correo electrónico.</p>
                     </td>
                   </tr>
                   <tr>
@@ -162,7 +162,7 @@ export async function sendVerificationEmail(email) {
                 <table border="0" cellpadding="0" cellspacing="0" width="100%">
                   <tr>
                     <td style="padding-bottom: 20px; text-align: center;">
-                      <p style="margin: 0; font-size: 14px; color: #999999;">© ${new Date().getFullYear()} PolleríaPatagonia. Todos los derechos reservados.</p>
+                      <p style="margin: 0; font-size: 14px; color: #999999;">© ${new Date().getFullYear()} Sol Campestre. Todos los derechos reservados.</p>
                     </td>
                   </tr>
                   <tr>
@@ -250,12 +250,12 @@ export async function sendPasswordResetEmail(email) {
 
     // URL del logo
     const logoUrl =
-      "https://polleriapatagonia.vercel.app/_next/image?url=%2Fimages%2Flogo.jpeg&w=96&q=75";
+      "https://solcampestre.com/_next/image?url=%2Fimages%2Flogo.jpeg&w=96&q=75";
 
     // Enviar email
     const info = await transporter.sendMail({
-      from: `"PolleríaPatagonia" <${
-        process.env.EMAIL_USER || "PolleríaPatagonia@gmail.com"
+      from: `"Sol Campestre" <${
+        process.env.EMAIL_USER || "Sol Campestre@gmail.com"
       }>`,
       to: user.email,
       subject: "Restablece tu contraseña",
@@ -276,7 +276,7 @@ export async function sendPasswordResetEmail(email) {
             <!-- Header -->
             <tr>
                <td style="padding: 40px 30px; text-align: center; border-bottom: 1px solid #e5e5e5;">
-                <img src="${logoUrl}" alt="PolleríaPatagonia Logo" width="120" style="display: block; margin: 0 auto;">
+                <img src="${logoUrl}" alt="Sol Campestre Logo" width="120" style="display: block; margin: 0 auto;">
               </td>
             </tr>
             
@@ -325,7 +325,7 @@ export async function sendPasswordResetEmail(email) {
                 <table border="0" cellpadding="0" cellspacing="0" width="100%">
                   <tr>
                     <td style="padding-bottom: 20px; text-align: center;">
-                      <p style="margin: 0; font-size: 14px; color: #999999;">© ${new Date().getFullYear()} PolleríaPatagonia. Todos los derechos reservados.</p>
+                      <p style="margin: 0; font-size: 14px; color: #999999;">© ${new Date().getFullYear()} Sol Campestre. Todos los derechos reservados.</p>
                     </td>
                   </tr>
                   <tr>

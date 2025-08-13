@@ -33,7 +33,7 @@ export async function sendOrderConfirmationToCustomer(order, user) {
   try {
     const baseUrl = getBaseUrl();
     const logoUrl =
-      "https://polleriapatagonia.vercel.app/_next/image?url=%2Fimages%2Flogo.jpeg&w=96&q=75";
+      "https://solcampestre.com/_next/image?url=%2Fimages%2Flogo.jpeg&w=96&q=75";
     const orderUrl = `${baseUrl}/profile/orders/${order._id}`;
 
     // Generar HTML de productos
@@ -95,7 +95,7 @@ export async function sendOrderConfirmationToCustomer(order, user) {
             <!-- Header -->
             <tr>
               <td style="padding: 40px 30px; text-align: center; border-bottom: 1px solid #e5e5e5;">
-                <img src="${logoUrl}" alt="PolleriaPatagonia Logo" width="120">
+                <img src="${logoUrl}" alt="Sol Campestre Logo" width="120">
               </td>
             </tr>
             
@@ -205,7 +205,7 @@ export async function sendOrderConfirmationToCustomer(order, user) {
             <tr>
               <td style="padding: 30px; text-align: center; background-color: #f7f7f7; border-top: 1px solid #e5e5e5;">
                 <p style="margin: 0 0 20px 0; font-size: 14px; color: #999;">
-                  © ${new Date().getFullYear()} PolleriaPatagonia. Todos los derechos reservados.
+                  © ${new Date().getFullYear()} Sol Campestre. Todos los derechos reservados.
                 </p>
                 <a href="https://www.instagram.com/patagonia_script" style="margin: 0 10px;">
                   <img src="https://i.ibb.co/NNwdYSF/instagram-icon.png" alt="Instagram" width="20" height="20">
@@ -365,7 +365,7 @@ export async function sendPaymentConfirmationToCustomer(
   try {
     const baseUrl = getBaseUrl();
     const logoUrl =
-      "https://polleriapatagonia.vercel.app/_next/image?url=%2Fimages%2Flogo.jpeg&w=96&q=75";
+      "https://Sol Campestre.vercel.app/_next/image?url=%2Fimages%2Flogo.jpeg&w=96&q=75";
     const orderUrl = `${baseUrl}/profile/orders/${order._id}`;
 
     const itemsHtml = order.items
@@ -410,7 +410,7 @@ export async function sendPaymentConfirmationToCustomer(
             
             <tr>
               <td style="padding: 40px 30px; text-align: center; border-bottom: 1px solid #e5e5e5;">
-                <img src="${logoUrl}" alt="PolleriaPatagonia Logo" width="120">
+                <img src="${logoUrl}" alt="Sol Campestre Logo" width="120">
               </td>
             </tr>
             
@@ -523,9 +523,9 @@ export async function sendPaymentConfirmationToCustomer(
             <!-- Footer -->
             <tr>
               <td style="padding: 30px; text-align: center; background-color: #f7f7f7; border-top: 1px solid #e5e5e5;">
-                <p style="margin: 0 0 15px 0; color: #10b981; font-weight: 600;">¡Gracias por confiar en PolleriaPatagonia!</p>
+                <p style="margin: 0 0 15px 0; color: #10b981; font-weight: 600;">¡Gracias por confiar en Sol Campestre!</p>
                 <p style="margin: 0 0 20px 0; font-size: 14px; color: #999;">
-                  © ${new Date().getFullYear()} PolleriaPatagonia. Todos los derechos reservados.
+                  © ${new Date().getFullYear()} Sol Campestre. Todos los derechos reservados.
                 </p>
                 <a href="https://www.instagram.com/patagonia_script" style="margin: 0 10px;">
                   <img src="https://i.ibb.co/NNwdYSF/instagram-icon.png" alt="Instagram" width="20" height="20">

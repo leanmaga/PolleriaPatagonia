@@ -33,7 +33,7 @@ export default function MultipleImageUploader({
       if (!mainWidgetRef.current) {
         const config = {
           cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-          uploadPreset: "PolleríaPatagonia",
+          uploadPreset: "Sol Campestre",
           sources: ["local", "camera"],
           multiple: false,
           maxFiles: 1,
@@ -97,7 +97,7 @@ export default function MultipleImageUploader({
 
               if (error.status === "Upload preset not found") {
                 alert(
-                  "Error: El upload preset 'PolleríaPatagonia' no existe. Verifica en tu dashboard de Cloudinary."
+                  "Error: El upload preset 'Sol Campestre' no existe. Verifica en tu dashboard de Cloudinary."
                 );
               } else if (error.status === "Invalid cloud name") {
                 alert(
@@ -153,7 +153,7 @@ export default function MultipleImageUploader({
         addWidgetRef.current = window.cloudinary.createUploadWidget(
           {
             cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-            uploadPreset: "PolleríaPatagonia",
+            uploadPreset: "Sol Campestre",
             sources: ["local", "camera"],
             multiple: false,
             maxFiles: 1,

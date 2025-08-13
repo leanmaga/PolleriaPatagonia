@@ -87,7 +87,7 @@ async function testEmail() {
     );
 
     const mailOptions = {
-      from: `"Test PolleriaPatagonia" <${config.EMAIL_USER}>`,
+      from: `"Test Sol Campestre" <${config.EMAIL_USER}>`,
       to: config.ADMIN_EMAIL,
       subject: "🧪 Test de Email - Sistema Funcionando ✅",
       html: `
@@ -142,7 +142,7 @@ async function testEmail() {
             </div>
             
             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center; color: #9ca3af;">
-              <p style="margin: 0;">Este es un email de prueba del sistema PolleriaPatagonia</p>
+              <p style="margin: 0;">Este es un email de prueba del sistema Sol Campestre</p>
               <p style="margin: 5px 0 0 0; font-size: 12px;">SSL Certificate issue fixed ✅</p>
             </div>
           </div>
@@ -199,9 +199,7 @@ Próximos pasos:
         "2. Asegúrate de usar una 'App Password' de Google (no tu contraseña normal)"
       );
       console.log("3. Ve a: https://myaccount.google.com/apppasswords");
-      console.log(
-        "4. Genera una nueva para 'Mail' - 'Other (PolleriaPatagonia)'"
-      );
+      console.log("4. Genera una nueva para 'Mail' - 'Other (Sol Campestre)'");
     } else if (error.message.includes("certificate")) {
       console.log(
         `\n${colors.yellow}🔒 PROBLEMA DE CERTIFICADOS:${colors.reset}`
@@ -261,7 +259,7 @@ async function testOrderEmail() {
     };
 
     await transporter.sendMail({
-      from: `"PolleriaPatagonia" <${config.EMAIL_USER}>`,
+      from: `"Sol Campestre" <${config.EMAIL_USER}>`,
       to: config.ADMIN_EMAIL,
       subject: `🛒 Nueva Orden #${orderData.orderId.substring(0, 8)} - $${
         orderData.total
@@ -312,7 +310,7 @@ async function testQuestionEmail() {
     const transporter = createTransport(); // Usar la función corregida
 
     await transporter.sendMail({
-      from: `"PolleriaPatagonia" <${config.EMAIL_USER}>`,
+      from: `"Sol Campestre" <${config.EMAIL_USER}>`,
       to: config.ADMIN_EMAIL,
       subject: "❓ Nueva pregunta sobre Camiseta Azul",
       html: `

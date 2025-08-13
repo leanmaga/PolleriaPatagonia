@@ -182,7 +182,7 @@ export const createPaymentPreference = async (orderData) => {
         environment: mpConfig.environment,
       },
 
-      statement_descriptor: "PolleríaPatagonia",
+      statement_descriptor: "Sol Campestre",
       expires: true,
       expiration_date_to: new Date(
         Date.now() + 24 * 60 * 60 * 1000

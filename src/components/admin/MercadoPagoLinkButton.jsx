@@ -212,7 +212,7 @@ export default function MercadoPagoLinkButton() {
                 MercadoPago"
               </li>
               <li>Inicia sesión en tu cuenta de MercadoPago</li>
-              <li>Autoriza a PolleríaPatagonia para procesar pagos</li>
+              <li>Autoriza a Sol Campestre para procesar pagos</li>
               <li>¡Listo! Tu tienda estará configurada</li>
             </ol>
           </div>
@@ -238,7 +238,7 @@ export default function MercadoPagoLinkButton() {
           </button>
 
           <div className="text-xs text-gray-500 text-center">
-            <p>Al conectar, autorizas a PolleríaPatagonia a:</p>
+            <p>Al conectar, autorizas a Sol Campestre a:</p>
             <ul className="mt-1 space-y-1">
               <li>• Crear preferencias de pago en tu nombre</li>
               <li>• Consultar el estado de los pagos</li>

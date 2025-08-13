@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth/next";
 
 export const metadata = {
-  title: "Panel de Administración | PolleríaPatagonia",
+  title: "Panel de Administración | Sol Campestre",
   description: "Gestiona tu tienda en línea de manera eficiente.",
 };
 

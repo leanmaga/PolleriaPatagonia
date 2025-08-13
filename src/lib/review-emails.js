@@ -66,14 +66,14 @@ export async function sendNewQuestionNotificationToAdmin(
     const transporter = await createEmailTransport();
     const baseUrl = getBaseUrl();
     const logoUrl =
-      "https://polleriapatagonia.vercel.app/_next/image?url=%2Fimages%2Flogo.jpeg&w=96&q=75";
+      "https://solcampestre.com/_next/image?url=%2Fimages%2Flogo.jpeg&w=96&q=75";
 
     // URL directa para responder en el panel de admin
     const adminResponseUrl = `${baseUrl}/admin/questions`;
     const productUrl = `${baseUrl}/products/${product._id}`;
 
     const info = await transporter.sendMail({
-      from: `"PolleríaPatagonia Sistema" <${
+      from: `"Sol Campestre Sistema" <${
         process.env.EMAIL_USER || "sofiaballesta1424@gmail.com"
       }>`,
       to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
@@ -195,7 +195,7 @@ export async function sendNewQuestionNotificationToAdmin(
             <tr>
               <td style="padding: 30px; text-align: center; background-color: #f7f7f7; border-top: 1px solid #e5e5e5;">
                 <p style="margin: 0 0 10px 0; font-size: 14px; color: #6b7280;">
-                  Panel de administración: <a href="${baseUrl}/admin" style="color: #3b82f6;">PolleríaPatagonia Admin</a>
+                  Panel de administración: <a href="${baseUrl}/admin" style="color: #3b82f6;">Sol Campestre Admin</a>
                 </p>
                 <p style="margin: 0; font-size: 12px; color: #9ca3af;">
                   Email automático del sistema de preguntas y respuestas
@@ -224,11 +224,11 @@ export async function sendQuestionAnsweredEmail(question, product, user) {
     const transporter = await createEmailTransport();
     const baseUrl = getBaseUrl();
     const logoUrl =
-      "https://polleriapatagonia.vercel.app/_next/image?url=%2Fimages%2Flogo.jpeg&w=96&q=75";
+      "https://solcampestre.com/_next/image?url=%2Fimages%2Flogo.jpeg&w=96&q=75";
     const productUrl = `${baseUrl}/products/${product._id}#reviews-section`;
 
     const info = await transporter.sendMail({
-      from: `"PolleríaPatagonia" <${
+      from: `"Sol Campestre" <${
         process.env.EMAIL_USER || "sofiaballesta1424@gmail.com"
       }>`,
       to: user.email,
@@ -247,7 +247,7 @@ export async function sendQuestionAnsweredEmail(question, product, user) {
             <!-- Header -->
             <tr>
               <td style="padding: 40px 30px; text-align: center; border-bottom: 1px solid #e5e5e5;">
-                <img src="${logoUrl}" alt="PolleríaPatagonia Logo" width="120">
+                <img src="${logoUrl}" alt="Sol Campestre Logo" width="120">
               </td>
             </tr>
             
@@ -349,7 +349,7 @@ export async function sendQuestionAnsweredEmail(question, product, user) {
             <tr>
               <td style="padding: 30px; text-align: center; background-color: #f7f7f7; border-top: 1px solid #e5e5e5;">
                 <p style="margin: 0 0 20px 0; font-size: 14px; color: #999;">
-                  © ${new Date().getFullYear()} PolleríaPatagonia. Todos los derechos reservados.
+                  © ${new Date().getFullYear()} Sol Campestre. Todos los derechos reservados.
                 </p>
                 <a href="https://www.instagram.com/patagonia_script" style="margin: 0 10px;">
                   <img src="https://i.ibb.co/NNwdYSF/instagram-icon.png" alt="Instagram" width="20" height="20">

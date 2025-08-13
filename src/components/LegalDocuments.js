@@ -10,12 +10,12 @@ const legalDocuments = {
       <h1 class="text-2xl font-bold mb-6 text-gray-800">TÉRMINOS Y CONDICIONES DE USO</h1>
       
       <h2 class="text-xl font-bold mb-4 text-gray-800">1. INTRODUCCIÓN</h2>
-      <p class="mb-4 text-gray-700">Bienvenido a PolleríaPatagonia. Los siguientes términos y condiciones rigen el uso de nuestro sitio web y la compra de productos a través de nuestra plataforma. Al acceder a nuestro sitio web y utilizar nuestros servicios, usted acepta estar sujeto a estos términos y condiciones. Si no está de acuerdo con alguno de estos términos, le rogamos que no utilice nuestro sitio web.</p>
+      <p class="mb-4 text-gray-700">Bienvenido a Sol Campestre. Los siguientes términos y condiciones rigen el uso de nuestro sitio web y la compra de productos a través de nuestra plataforma. Al acceder a nuestro sitio web y utilizar nuestros servicios, usted acepta estar sujeto a estos términos y condiciones. Si no está de acuerdo con alguno de estos términos, le rogamos que no utilice nuestro sitio web.</p>
       
       <h2 class="text-xl font-bold mb-4 text-gray-800">2. DEFINICIONES</h2>
       <ul class="mb-4 list-disc pl-5 text-gray-700">
-        <li class="mb-2">"Nosotros", "nuestro", "Patagonia", "PolleríaPatagonia" se refiere a nuestra empresa.</li>
-        <li class="mb-2">"Sitio web" se refiere a la plataforma en línea de PolleríaPatagonia.</li>
+        <li class="mb-2">"Nosotros", "nuestro", "Campestre", "Sol Campestre" se refiere a nuestra empresa.</li>
+        <li class="mb-2">"Sitio web" se refiere a la plataforma en línea de Sol Campestre.</li>
         <li class="mb-2">"Usuario", "usted", "cliente" se refiere a cualquier persona que acceda o utilice nuestro sitio web.</li>
         <li class="mb-2">"Productos" se refiere a los artículos ofrecidos a la venta en nuestro sitio web.</li>
         <li class="mb-2">"Términos" se refiere a estos términos y condiciones.</li>
@@ -29,7 +29,7 @@ const legalDocuments = {
       <p class="mb-4 text-gray-700">Algunos servicios pueden requerir que se registre y cree una cuenta. Usted es responsable de mantener la confidencialidad de su información de cuenta y contraseña, así como de restringir el acceso a su computadora. Usted acepta la responsabilidad de todas las actividades que ocurran bajo su cuenta.</p>
       
       <h3 class="text-lg font-bold mb-2 text-gray-700">3.3. Restricción de Venta</h3>
-      <p class="mb-4 text-gray-700">PolleríaPatagonia es una plataforma exclusivamente para la compra de productos. Los usuarios no están autorizados a vender, revender, distribuir, o comercializar productos a través de nuestro sitio web. Cualquier intento de utilizar nuestra plataforma para tales fines está estrictamente prohibido.</p>
+      <p class="mb-4 text-gray-700">Sol Campestre es una plataforma exclusivamente para la compra de productos. Los usuarios no están autorizados a vender, revender, distribuir, o comercializar productos a través de nuestro sitio web. Cualquier intento de utilizar nuestra plataforma para tales fines está estrictamente prohibido.</p>
       
       <h3 class="text-lg font-bold mb-2 text-gray-700">3.4. Conducta del Usuario</h3>
       <p class="mb-2 text-gray-700">Al utilizar nuestro sitio web, usted acepta no:</p>
@@ -79,10 +79,10 @@ const legalDocuments = {
       <p class="mb-4 text-gray-700">El producto debe ser devuelto en su embalaje original, junto con todos los accesorios y documentación. El cliente es responsable de los costos de envío para la devolución del producto.</p>
       
       <h2 class="text-xl font-bold mb-4 text-gray-800">8. PROPIEDAD INTELECTUAL</h2>
-      <p class="mb-4 text-gray-700">Todo el contenido del sitio web, incluyendo, pero no limitado a, textos, gráficos, logotipos, iconos, imágenes, clips de audio, descargas digitales y compilaciones de datos, es propiedad de PolleríaPatagonia o de sus proveedores de contenido y está protegido por las leyes argentinas e internacionales de propiedad intelectual.</p>
+      <p class="mb-4 text-gray-700">Todo el contenido del sitio web, incluyendo, pero no limitado a, textos, gráficos, logotipos, iconos, imágenes, clips de audio, descargas digitales y compilaciones de datos, es propiedad de Sol Campestre o de sus proveedores de contenido y está protegido por las leyes argentinas e internacionales de propiedad intelectual.</p>
       
       <h2 class="text-xl font-bold mb-4 text-gray-800">9. LIMITACIÓN DE RESPONSABILIDAD</h2>
-      <p class="mb-4 text-gray-700">En la medida permitida por la ley, PolleríaPatagonia no será responsable por daños indirectos, incidentales, especiales, consecuentes o punitivos, ni por cualquier pérdida de beneficios o ingresos, ya sea directa o indirectamente, ni por cualquier pérdida de datos, uso, fondo de comercio u otras pérdidas intangibles.</p>
+      <p class="mb-4 text-gray-700">En la medida permitida por la ley, Sol Campestre no será responsable por daños indirectos, incidentales, especiales, consecuentes o punitivos, ni por cualquier pérdida de beneficios o ingresos, ya sea directa o indirectamente, ni por cualquier pérdida de datos, uso, fondo de comercio u otras pérdidas intangibles.</p>
       
       <h2 class="text-xl font-bold mb-4 text-gray-800">10. LEGISLACIÓN APLICABLE Y JURISDICCIÓN</h2>
       <p class="mb-4 text-gray-700">Estos términos se regirán e interpretarán de acuerdo con las leyes de la República Argentina. Cualquier disputa relacionada con estos términos estará sujeta a la jurisdicción exclusiva de los tribunales competentes de la ciudad donde se encuentra nuestra sede principal.</p>
@@ -102,7 +102,7 @@ const legalDocuments = {
       <h1 class="text-2xl font-bold mb-6 text-gray-800">POLÍTICA DE PRIVACIDAD</h1>
       
       <h2 class="text-xl font-bold mb-4 text-gray-800">1. INTRODUCCIÓN</h2>
-      <p class="mb-4 text-gray-700">En PolleríaPatagonia, nos comprometemos a proteger su privacidad. Esta Política de Privacidad explica cómo recopilamos, utilizamos, divulgamos y protegemos su información personal cuando utiliza nuestro sitio web. Al acceder o utilizar nuestro sitio web, usted acepta las prácticas descritas en esta política.</p>
+      <p class="mb-4 text-gray-700">En Sol Campestre, nos comprometemos a proteger su privacidad. Esta Política de Privacidad explica cómo recopilamos, utilizamos, divulgamos y protegemos su información personal cuando utiliza nuestro sitio web. Al acceder o utilizar nuestro sitio web, usted acepta las prácticas descritas en esta política.</p>
       
       <h2 class="text-xl font-bold mb-4 text-gray-800">2. INFORMACIÓN QUE RECOPILAMOS</h2>
       <h3 class="text-lg font-bold mb-2 text-gray-700">2.1. Información Personal</h3>
@@ -154,7 +154,7 @@ const legalDocuments = {
       <p class="mb-4 text-gray-700">Podemos divulgar su información personal si estamos obligados a hacerlo por ley o en respuesta a solicitudes válidas de autoridades públicas.</p>
       
       <h3 class="text-lg font-bold mb-2 text-gray-700">4.3. Transferencias Comerciales</h3>
-      <p class="mb-4 text-gray-700">Si PolleríaPatagonia participa en una fusión, adquisición o venta de activos, su información personal puede ser transferida como parte de esa transacción.</p>
+      <p class="mb-4 text-gray-700">Si Sol Campestre participa en una fusión, adquisición o venta de activos, su información personal puede ser transferida como parte de esa transacción.</p>
       
       <h2 class="text-xl font-bold mb-4 text-gray-800">5. SEGURIDAD DE LA INFORMACIÓN</h2>
       <h3 class="text-lg font-bold mb-2 text-gray-700">5.1. Medidas de Seguridad</h3>

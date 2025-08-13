@@ -128,7 +128,7 @@ export async function sendEmailWithRetry(emailData, maxRetries = 3) {
       const transporter = await createEmailTransport();
 
       const info = await transporter.sendMail({
-        from: `"PolleríaPatagonia" <${process.env.EMAIL_USER}>`,
+        from: `"Sol Campestre" <${process.env.EMAIL_USER}>`,
         ...emailData,
       });
 

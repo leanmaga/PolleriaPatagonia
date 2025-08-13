@@ -101,13 +101,10 @@ export function getBaseUrls() {
     };
   } else {
     return {
-      base:
-        process.env.NEXT_PUBLIC_BASE_URL ||
-        "https://polleriapatagonia.vercel.app",
+      base: process.env.NEXT_PUBLIC_BASE_URL || "https://solcampestre.com",
       frontend:
-        process.env.NEXT_PUBLIC_FRONTEND_URL ||
-        "https://polleriapatagonia.vercel.app",
-      auth: process.env.NEXTAUTH_URL || "https://polleriapatagonia.vercel.app",
+        process.env.NEXT_PUBLIC_FRONTEND_URL || "https://solcampestre.com",
+      auth: process.env.NEXTAUTH_URL || "https://solcampestre.com",
     };
   }
 }

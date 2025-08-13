@@ -1,7 +1,7 @@
 // src/lib/email-templates.js
 
 // Template base para todos los emails
-const baseTemplate = (content, title = "PolleríaPatagonia") => `
+const baseTemplate = (content, title = "Sol Campestre") => `
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -137,7 +137,7 @@ const baseTemplate = (content, title = "PolleríaPatagonia") => `
 <body>
     <div class="container">
         <div class="header">
-            <h1>PolleríaPatagonia</h1>
+            <h1>Sol Campestre</h1>
         </div>
         <div class="content">
             ${content}
@@ -147,7 +147,7 @@ const baseTemplate = (content, title = "PolleríaPatagonia") => `
                 <a href="https://www.instagram.com/patagonia_script">Instagram</a>
                 <a href="https://wa.me/5491126907696">WhatsApp</a>
             </div>
-            <p>© 2024 PolleríaPatagonia. Todos los derechos reservados.</p>
+            <p>© 2024 Sol Campestre. Todos los derechos reservados.</p>
             <p>14 de julio 2698, Castelar Sur</p>
             <p>Si tienes alguna pregunta, contáctanos respondiendo a este email.</p>
         </div>
@@ -246,7 +246,7 @@ export const orderConfirmationTemplate = (order, user) => {
 
     <p>📧 <strong>¿Necesitas ayuda?</strong> Puedes responder a este email o contactarnos por WhatsApp.</p>
     
-    <p>¡Gracias por confiar en PolleríaPatagonia!</p>
+    <p>¡Gracias por confiar en Sol Campestre!</p>
   `;
 
   return baseTemplate(
@@ -356,7 +356,7 @@ export const adminOrderNotificationTemplate = (order, user) => {
 
   return baseTemplate(
     content,
-    `🚨 Nueva Orden #${order._id.substring(0, 8)} - PolleríaPatagonia`
+    `🚨 Nueva Orden #${order._id.substring(0, 8)} - Sol Campestre`
   );
 };
 

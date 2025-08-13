@@ -101,7 +101,7 @@ export async function GET() {
     });
 
     const response = {
-      storeName: settings.store_name || "PolleríaPatagonia",
+      storeName: settings.store_name || "Sol Campestre",
       contactEmail: settings.contact_email || "patagoniascript@gmail.com",
       storeDescription:
         settings.store_description ||

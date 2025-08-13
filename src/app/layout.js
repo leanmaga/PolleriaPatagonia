@@ -8,7 +8,7 @@ import Footer from "@/components/layout/Footer";
 import Script from "next/script";
 
 export const metadata = {
-  title: "PolleríaPatagonia – Tu E‑commerce de confianza",
+  title: "Sol Campestre – Tu E‑commerce de confianza",
   description: "Encuentra los mejores productos al mejor precio.",
   icons: {
     icon: [
