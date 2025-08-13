@@ -31,13 +31,13 @@ export default function HeroSection() {
           <div className="max-w-2xl">
             <h1 className="font-drop font-black uppercase leading-none mb-8">
               <span className="block text-[8vw] xl:text-[6vw] 2xl:text-[5vw] tracking-tighter text-white">
-                MILANESAS
+                CALIDAD
               </span>
               <span className="block text-[8vw] xl:text-[6vw] 2xl:text-[5vw] tracking-tighter text-white">
-                PREMIUM
+                ARGENTINA
               </span>
               <span className="block text-[8vw] xl:text-[6vw] 2xl:text-[5vw] tracking-tighter text-white">
-                TODOS LOS DÍAS
+                QUE ALIMENTA TU DÍA
               </span>
             </h1>
 
