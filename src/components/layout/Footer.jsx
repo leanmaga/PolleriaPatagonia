@@ -60,9 +60,20 @@ const Footer = () => {
               </div>
 
               {/* Copyright */}
-              <div className="text-center sm:text-left">
-                <p className="text-xs text-gray-400 font-drop mt-2">
+              <div className="text-center sm:text-left mt-2">
+                <p className="text-xs text-gray-400 font-drop">
                   © {currentYear} Sol Campestre
+                </p>
+                <p className="text-[10px] text-gray-500 mt-1">
+                  Sitio desarrollado por{" "}
+                  <a
+                    href="https://patagoniascript.vercel.app"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline hover:text-white transition"
+                  >
+                    PatagoniaScript
+                  </a>
                 </p>
               </div>
             </div>
@@ -126,7 +137,7 @@ const Footer = () => {
             </div>
 
             {/* Follow - Centrado en móvil */}
-            <div className="flex flex-col items-center sm:items-start space-y-3">
+            {/* <div className="flex flex-col items-center sm:items-start space-y-3">
               <h4 className="text-xs font-medium uppercase tracking-wider mb-4 font-drop">
                 Síguenos
               </h4>
@@ -164,7 +175,7 @@ const Footer = () => {
                   </svg>
                 </a>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </footer>
