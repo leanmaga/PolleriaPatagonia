@@ -459,7 +459,7 @@ const Navbar = () => {
               >
                 <div className="relative w-[65px] h-[65px]">
                   <Image
-                    src="/images/logo.jpeg"
+                    src="/images/solcampestrecolor.png"
                     alt="Logo"
                     fill
                     className="object-cover rounded"
