@@ -168,8 +168,8 @@ export default function CookiesContent() {
               Puede rechazar, aceptar o eliminar cookies de nuestro sitio web en
               cualquier momento modificando la configuración de su navegador.
               Para hacerlo, siga las instrucciones proporcionadas por su
-              navegador (generalmente ubicadas en las opciones de "ayuda",
-              "herramientas" o "editar").
+              navegador (generalmente ubicadas en las opciones de
+              &quot;ayuda&quot;, &quot;herramientas&quot; o &quot;editar&quot;).
             </p>
 
             <p className="mb-4 text-gray-700">

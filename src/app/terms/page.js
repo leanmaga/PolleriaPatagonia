@@ -76,23 +76,25 @@ export default function TermsPage() {
             </h2>
             <ul className="mb-4 list-disc pl-5 text-gray-700">
               <li className="mb-2">
-                "Nosotros", "nuestro", "Campestre", "Sol Campestre" se refiere a
+                &quot;Nosotros&quot;, &quot;nuestro&quot;,
+                &quot;Campestre&quot;, &quot;Sol Campestre&quot; se refiere a
                 nuestra empresa.
               </li>
               <li className="mb-2">
-                "Sitio web" se refiere a la plataforma en línea de Sol
+                &quot;Sitio web&quot; se refiere a la plataforma en línea de Sol
                 Campestre.
               </li>
               <li className="mb-2">
-                "Usuario", "usted", "cliente" se refiere a cualquier persona que
-                acceda o utilice nuestro sitio web.
+                &quot;Usuario&quot;, &quot;usted&quot;, &quot;cliente&quot; se
+                refiere a cualquier persona que acceda o utilice nuestro sitio
+                web.
               </li>
               <li className="mb-2">
-                "Productos" se refiere a los artículos ofrecidos a la venta en
-                nuestro sitio web.
+                &quot;Productos&quot; se refiere a los artículos ofrecidos a la
+                venta en nuestro sitio web.
               </li>
               <li className="mb-2">
-                "Términos" se refiere a estos términos y condiciones.
+                &quot;Términos&quot; se refiere a estos términos y condiciones.
               </li>
             </ul>
 
