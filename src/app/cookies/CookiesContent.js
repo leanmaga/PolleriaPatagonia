@@ -25,40 +25,6 @@ export default function CookiesContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => window.history.back()}
-                className="text-gray-600 hover:text-gray-800 transition-colors"
-              >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                  />
-                </svg>
-              </button>
-              <h1 className="text-2xl font-bold text-gray-800">
-                Sol Campestre
-              </h1>
-            </div>
-            <div className="text-sm text-gray-600">
-              Última actualización: 12 de mayo de 2025
-            </div>
-          </div>
-        </div>
-      </header>
-
       {/* Contenido principal */}
       <main className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-sm border p-8">
@@ -411,35 +377,6 @@ export default function CookiesContent() {
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="max-w-4xl mx-auto px-4 py-6">
-        <div className="text-center text-sm text-gray-500 border-t pt-4">
-          <p>© 2025 Sol Campestre. Todos los derechos reservados.</p>
-          <div className="mt-2 space-x-4">
-            <a
-              href="/privacy-policy"
-              className="text-yellow-600 hover:text-yellow-700 transition-colors"
-            >
-              Política de Privacidad
-            </a>
-            <span>•</span>
-            <a
-              href="/terms"
-              className="text-yellow-600 hover:text-yellow-700 transition-colors"
-            >
-              Términos y Condiciones
-            </a>
-            <span>•</span>
-            <a
-              href="/cookies"
-              className="text-yellow-600 hover:text-yellow-700 transition-colors"
-            >
-              Configuración de Cookies
-            </a>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
