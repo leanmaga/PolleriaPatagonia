@@ -1,18 +1,5 @@
 // app/terms/page.js
-export const metadata = {
-  title: "Términos y Condiciones | Sol Campestre",
-  description:
-    "Revisa los términos y condiciones de uso de Sol Campestre. Conoce nuestras políticas de compra, envío y garantía.",
-  keywords:
-    "términos, condiciones, sol campestre, política de compra, garantía",
-  robots: "index, follow",
-  openGraph: {
-    title: "Términos y Condiciones | Sol Campestre",
-    description:
-      "Revisa los términos y condiciones de uso de Sol Campestre. Conoce nuestras políticas de compra, envío y garantía.",
-    type: "website",
-  },
-};
+"use client";
 
 export default function TermsPage() {
   return (
