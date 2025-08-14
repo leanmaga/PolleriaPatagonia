@@ -137,13 +137,13 @@ const Footer = () => {
             </div>
 
             {/* Follow - Centrado en móvil */}
-            {/* <div className="flex flex-col items-center sm:items-start space-y-3">
+            <div className="flex flex-col items-center sm:items-start space-y-3">
               <h4 className="text-xs font-medium uppercase tracking-wider mb-4 font-drop">
                 Síguenos
               </h4>
               <div className="flex justify-center sm:justify-start space-x-4">
                 <a
-                  href="https://www.instagram.com/patagonia_script?igsh=ZWNqemd2aGM0cWNq"
+                  href="https://www.instagram.com/"
                   className="text-gray-300 hover:text-white transition"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -175,7 +175,7 @@ const Footer = () => {
                   </svg>
                 </a>
               </div>
-            </div> */}
+            </div>
           </div>
         </div>
       </footer>
