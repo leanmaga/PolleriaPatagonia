@@ -1,18 +1,5 @@
-// app/privacy-policy/page.js
-export const metadata = {
-  title: "Política de Privacidad | Sol Campestre",
-  description:
-    "Conoce cómo Sol Campestre protege y maneja tus datos personales. Información sobre cookies, seguridad y tus derechos.",
-  keywords:
-    "privacidad, datos personales, cookies, seguridad, protección de datos",
-  robots: "index, follow",
-  openGraph: {
-    title: "Política de Privacidad | Sol Campestre",
-    description:
-      "Conoce cómo Sol Campestre protege y maneja tus datos personales. Información sobre cookies, seguridad y tus derechos.",
-    type: "website",
-  },
-};
+// src/app/privacy-policy/page.js - SOLUCIÓN PARA EL ERROR
+"use client";
 
 export default function PrivacyPage() {
   return (
