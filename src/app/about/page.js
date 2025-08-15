@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
+import PropTypes from "prop-types";
 import {
   motion,
   useMotionValue,
@@ -9,7 +10,7 @@ import {
 } from "framer-motion";
 import { Clock, Heart, Truck, Shield } from "lucide-react";
 import Image from "next/image";
-import imagenAbout from "/public/images/2.jpg";
+import imagenAbout from "../../../public/images/2.jpg";
 
 const AnimatedCounter = ({
   from = 0,
@@ -60,24 +61,38 @@ const AnimatedCounter = ({
   );
 };
 
+// PropTypes para validación de propiedades
+AnimatedCounter.propTypes = {
+  from: PropTypes.number,
+  to: PropTypes.number.isRequired,
+  duration: PropTypes.number,
+  suffix: PropTypes.string,
+  prefix: PropTypes.string,
+  decimals: PropTypes.number,
+};
+
 const features = [
   {
+    id: "calidad-premium",
     icon: <Heart className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" />,
     title: "Calidad Premium",
     description:
       "Carne vacuna fresca y pollos sin agua que no se achican al cocinar",
   },
   {
+    id: "elaboracion-diaria",
     icon: <Clock className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" />,
     title: "Elaboración Diaria",
     description: "Milanesas preparadas todos los días para máxima frescura",
   },
   {
+    id: "entrega-rapida",
     icon: <Truck className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" />,
     title: "Entrega Rápida",
     description: "Pedís por WhatsApp, entregamos en 24hs en tu zona",
   },
   {
+    id: "listo-usar",
     icon: <Shield className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" />,
     title: "Listo para Usar",
     description: "Separado y empaquetado, directo al freezer o a la sartén",
@@ -85,10 +100,29 @@ const features = [
 ];
 
 const statsData = [
-  { number: 500, label: "Clientes satisfechos", suffix: "+", duration: 2.5 },
-  { number: 100, label: "Productos frescos", suffix: "%", duration: 2 },
-  { number: 24, label: "Máximo delivery", suffix: "h", duration: 1.5 },
   {
+    id: "clientes-satisfechos",
+    number: 500,
+    label: "Clientes satisfechos",
+    suffix: "+",
+    duration: 2.5,
+  },
+  {
+    id: "productos-frescos",
+    number: 100,
+    label: "Productos frescos",
+    suffix: "%",
+    duration: 2,
+  },
+  {
+    id: "delivery-tiempo",
+    number: 24,
+    label: "Máximo delivery",
+    suffix: "h",
+    duration: 1.5,
+  },
+  {
+    id: "calificacion-google",
     number: 4.2,
     label: "Calificación promedio en google",
     suffix: "⭐",
@@ -172,9 +206,9 @@ const AboutPage = () => {
               }}
               className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6"
             >
-              {features.map((feature, index) => (
+              {features.map((feature) => (
                 <motion.div
-                  key={index}
+                  key={feature.id}
                   variants={{
                     hidden: { opacity: 0, y: 30, scale: 0.9 },
                     visible: {
@@ -303,9 +337,9 @@ const AboutPage = () => {
             }}
             className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8"
           >
-            {statsData.map((stat, index) => (
+            {statsData.map((stat) => (
               <motion.div
-                key={index}
+                key={stat.id}
                 variants={{
                   hidden: { opacity: 0, y: 30, scale: 0.8 },
                   visible: {
@@ -340,7 +374,7 @@ const AboutPage = () => {
                 <motion.div
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
-                  transition={{ duration: 0.6, delay: 0.5 + index * 0.1 }}
+                  transition={{ duration: 0.6, delay: 0.5 }}
                   viewport={{ once: true }}
                   className="text-gray-600 text-xs sm:text-sm lg:text-base font-medium leading-tight"
                 >
