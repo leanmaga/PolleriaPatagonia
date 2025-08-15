@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth/next";
+import PropTypes from "prop-types";
 
 export const metadata = {
   title: "Panel de Administración | Sol Campestre",
@@ -27,3 +28,8 @@ export default async function AdminLayout({ children }) {
     </div>
   );
 }
+
+// Validación de props
+AdminLayout.propTypes = {
+  children: PropTypes.node.isRequired,
+};
