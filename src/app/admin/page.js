@@ -8,6 +8,59 @@ import toast from "react-hot-toast";
 import PopularProducts from "@/components/admin/PopularProducts";
 import StatsCards from "@/components/admin/StatsCards";
 
+// Helper functions para reducir complejidad cognitiva
+const fetchWithErrorHandling = async (url, errorMessage) => {
+  try {
+    const response = await fetch(url);
+    if (response.ok) {
+      const data = await response.json();
+      return Array.isArray(data) ? data : data.products || [];
+    } else {
+      console.error(`${errorMessage}:`, response.status);
+      return [];
+    }
+  } catch (error) {
+    console.error(`${errorMessage}:`, error);
+    return [];
+  }
+};
+
+const calculateStats = (orders) => {
+  if (!Array.isArray(orders)) return { totalSales: 0, pendingOrders: 0 };
+
+  const totalSales = orders.reduce(
+    (sum, order) => sum + (order.totalAmount || 0),
+    0
+  );
+  const pendingOrders = orders.filter(
+    (order) => order.status === "pendiente"
+  ).length;
+
+  return { totalSales, pendingOrders };
+};
+
+const getOrderStatusClass = (status) => {
+  const statusClasses = {
+    pagado: "bg-green-100 text-green-800",
+    pendiente: "text-yellow-800",
+    enviado: "bg-blue-100 text-blue-800",
+    entregado: "bg-gray-800 text-white",
+    default: "bg-red-100 text-red-800",
+  };
+
+  return statusClasses[status] || statusClasses.default;
+};
+
+const getOrderStatusStyle = (status) => {
+  return status === "pendiente"
+    ? { backgroundColor: "rgba(246, 195, 67, 0.1)" }
+    : {};
+};
+
+const formatOrderStatus = (status) => {
+  return status ? status.charAt(0).toUpperCase() + status.slice(1) : "N/A";
+};
+
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -33,96 +86,48 @@ export default function AdminDashboard() {
     }
   }, [status, session, router]);
 
+  // Función refactorizada para cargar datos del dashboard
+  const fetchDashboardData = async () => {
+    if (status !== "authenticated" || session?.user?.role !== "admin") {
+      return;
+    }
+
+    try {
+      setIsDataLoading(true);
+
+      // Cargar datos en paralelo para mejor rendimiento
+      const [productsData, ordersData, usersData] = await Promise.all([
+        fetchWithErrorHandling("/api/products", "Error al cargar productos"),
+        fetchWithErrorHandling("/api/orders", "Error al cargar órdenes"),
+        fetchWithErrorHandling("/api/users", "Error al cargar usuarios"),
+      ]);
+
+      // Calcular estadísticas
+      const { totalSales, pendingOrders } = calculateStats(ordersData);
+
+      // Órdenes recientes (las últimas 5)
+      const recentOrders = Array.isArray(ordersData)
+        ? ordersData.slice(0, 5)
+        : [];
+
+      setDashboardData({
+        products: productsData,
+        orders: ordersData,
+        users: usersData,
+        totalSales,
+        pendingOrders,
+        recentOrders,
+      });
+    } catch (error) {
+      console.error("Error general al cargar datos del dashboard:", error);
+      toast.error("Error al cargar datos del dashboard");
+    } finally {
+      setIsDataLoading(false);
+    }
+  };
+
   // Cargar datos del dashboard
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      if (status !== "authenticated" || session?.user?.role !== "admin") {
-        return;
-      }
-
-      try {
-        setIsDataLoading(true);
-
-        // Cargar productos con manejo de errores
-        let productsData = [];
-        try {
-          const productsRes = await fetch("/api/products");
-          if (productsRes.ok) {
-            const data = await productsRes.json();
-            productsData = data.products || [];
-          } else {
-            console.error("Error al cargar productos:", productsRes.status);
-          }
-        } catch (error) {
-          console.error("Error al cargar productos:", error);
-        }
-
-        // Cargar órdenes con manejo de errores
-        let ordersData = [];
-        try {
-          const ordersRes = await fetch("/api/orders");
-          if (ordersRes.ok) {
-            ordersData = await ordersRes.json();
-            // Si no es un array, manejar el caso
-            if (!Array.isArray(ordersData)) {
-              console.error("Respuesta de órdenes no es un array:", ordersData);
-              ordersData = [];
-            }
-          } else {
-            console.error("Error al cargar órdenes:", ordersRes.status);
-          }
-        } catch (error) {
-          console.error("Error al cargar órdenes:", error);
-        }
-
-        // Cargar usuarios con manejo de errores
-        let usersData = [];
-        try {
-          const usersRes = await fetch("/api/users");
-          if (usersRes.ok) {
-            usersData = await usersRes.json();
-            // Si no es un array, manejar el caso
-            if (!Array.isArray(usersData)) {
-              console.error("Respuesta de usuarios no es un array:", usersData);
-              usersData = [];
-            }
-          } else {
-            console.error("Error al cargar usuarios:", usersRes.status);
-          }
-        } catch (error) {
-          console.error("Error al cargar usuarios:", error);
-        }
-
-        // Calcular estadísticas
-        const totalSales = Array.isArray(ordersData)
-          ? ordersData.reduce((sum, order) => sum + (order.totalAmount || 0), 0)
-          : 0;
-
-        const pendingOrders = Array.isArray(ordersData)
-          ? ordersData.filter((order) => order.status === "pendiente").length
-          : 0;
-
-        // Órdenes recientes (las últimas 5)
-        const recentOrders = Array.isArray(ordersData)
-          ? ordersData.slice(0, 5)
-          : [];
-
-        setDashboardData({
-          products: productsData,
-          orders: ordersData,
-          users: usersData,
-          totalSales,
-          pendingOrders,
-          recentOrders,
-        });
-      } catch (error) {
-        console.error("Error general al cargar datos del dashboard:", error);
-        toast.error("Error al cargar datos del dashboard");
-      } finally {
-        setIsDataLoading(false);
-      }
-    };
-
     if (status === "authenticated" && session?.user?.role === "admin") {
       fetchDashboardData();
     }
@@ -135,20 +140,23 @@ export default function AdminDashboard() {
     router.push("/auth/login");
   };
 
+  // Componente de loading
+  const LoadingSpinner = () => (
+    <div className="min-h-screen flex items-center justify-center">
+      <div
+        className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2"
+        style={{ borderTopColor: "#F6C343", borderBottomColor: "#F6C343" }}
+      ></div>
+    </div>
+  );
+
   // Mostrar pantalla de carga mientras se verifican permisos
   if (
     status === "loading" ||
     status === "unauthenticated" ||
     (status === "authenticated" && session?.user?.role !== "admin")
   ) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div
-          className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2"
-          style={{ borderTopColor: "#F6C343", borderBottomColor: "#F6C343" }}
-        ></div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   // Mostrar pantalla de carga mientras se cargan los datos
@@ -175,7 +183,7 @@ export default function AdminDashboard() {
           className="px-4 py-2 text-white transition rounded-md"
           style={{ backgroundColor: "#F6C343" }}
           onMouseEnter={(e) => {
-            e.target.style.backgroundColor = "#E5B63C"; // Versión más oscura
+            e.target.style.backgroundColor = "#E5B63C";
           }}
           onMouseLeave={(e) => {
             e.target.style.backgroundColor = "#F6C343";
@@ -280,27 +288,12 @@ export default function AdminDashboard() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          order.status === "pagado"
-                            ? "bg-green-100 text-green-800"
-                            : order.status === "pendiente"
-                            ? "text-yellow-800"
-                            : order.status === "enviado"
-                            ? "bg-blue-100 text-blue-800"
-                            : order.status === "entregado"
-                            ? "bg-gray-800 text-white"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                        style={
-                          order.status === "pendiente"
-                            ? { backgroundColor: "rgba(246, 195, 67, 0.1)" }
-                            : {}
-                        }
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getOrderStatusClass(
+                          order.status
+                        )}`}
+                        style={getOrderStatusStyle(order.status)}
                       >
-                        {order.status
-                          ? order.status.charAt(0).toUpperCase() +
-                            order.status.slice(1)
-                          : "N/A"}
+                        {formatOrderStatus(order.status)}
                       </span>
                     </td>
                   </tr>
