@@ -1,35 +1,27 @@
-import { redirect } from "next/navigation";
-import AdminSidebar from "@/components/admin/AdminSidebar";
-import { authOptions } from "@/lib/auth";
-import { getServerSession } from "next-auth/next";
-import PropTypes from "prop-types";
+import { notFound } from "next/navigation";
+import { getProductById } from "@/lib/data";
+import ProductForm from "@/components/admin/ProductForm";
 
-export const metadata = {
-  title: "Panel de Administración | Sol Campestre",
-  description: "Gestiona tu tienda en línea de manera eficiente.",
-};
+export async function generateMetadata({ params }) {
+  const product = await getProductById(params.id);
 
-export default async function AdminLayout({ children }) {
-  const session = await getServerSession(authOptions);
-
-  // Verificar que el usuario sea admin
-  if (!session || session.user.role !== "admin") {
-    redirect("/auth/login");
+  if (!product) {
+    return {
+      title: "Producto no encontrado | TiendaOnline",
+    };
   }
 
-  return (
-    <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row gap-8">
-          <AdminSidebar />
-          <div className="flex-1">{children}</div>
-        </div>
-      </div>
-    </div>
-  );
+  return {
+    title: `Editar ${product.title} | TiendaOnline`,
+  };
 }
 
-// Validación de props para AdminLayout
-AdminLayout.propTypes = {
-  children: PropTypes.node.isRequired,
-};
+export default async function EditProductPage({ params }) {
+  const product = await getProductById(params.id);
+
+  if (!product) {
+    notFound();
+  }
+
+  return <ProductForm product={product} />;
+}
