@@ -1,13 +1,63 @@
-// app/admin/orders/[id]/page.js (Con color #F6C343)
+// app/admin/orders/[id]/page.js (Errores de Sonar corregidos)
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { getOrderById } from "@/lib/data";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import OrderStatusUpdate from "@/components/admin/OrderStatusUpdate";
+import PropTypes from "prop-types";
+
+// Función auxiliar para formatear fechas
+const formatDate = (dateString) => {
+  const options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  };
+  return new Date(dateString).toLocaleDateString(undefined, options);
+};
+
+// Función auxiliar para obtener el color del estado
+const getStatusColor = (status) => {
+  switch (status) {
+    case "pagado":
+      return "text-green-600";
+    case "enviado":
+      return "text-blue-600";
+    case "cancelado":
+      return "text-red-600";
+    case "pendiente":
+    case "entregado":
+      return { color: "#F6C343" };
+    default:
+      return "text-gray-600";
+  }
+};
+
+// Función auxiliar para obtener el estilo del estado
+const getStatusStyle = (status) => {
+  const colorClass = getStatusColor(status);
+  if (typeof colorClass === "object") {
+    return { ...colorClass, fontWeight: "medium" };
+  }
+  return { fontWeight: "medium" };
+};
+
+// Función auxiliar para obtener el nombre del método de pago
+const getPaymentMethodName = (paymentMethod) => {
+  const paymentMethods = {
+    mercadopago: "MercadoPago",
+    credit_card: "Tarjeta de Crédito",
+    debit_card: "Tarjeta de Débito",
+  };
+
+  return paymentMethods[paymentMethod] || paymentMethod;
+};
 
 export async function generateMetadata({ params }) {
-  // CORREGIDO: Asegurarse de que params.id existe
+  // Validación de params
   if (!params?.id) {
     return {
       title: "Pedido no encontrado | TiendaOnline",
@@ -28,6 +78,7 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function OrderDetailPage({ params }) {
+  // Validación inicial de parámetros
   if (!params?.id) {
     notFound();
   }
@@ -38,17 +89,9 @@ export default async function OrderDetailPage({ params }) {
     notFound();
   }
 
-  // Formatear fecha
-  const formatDate = (dateString) => {
-    const options = {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
+  const statusColor = getStatusColor(order.status);
+  const statusStyle = getStatusStyle(order.status);
+  const statusClassName = typeof statusColor === "string" ? statusColor : "";
 
   return (
     <div>
@@ -91,7 +134,7 @@ export default async function OrderDetailPage({ params }) {
             <div className="divide-y divide-gray-200">
               {order.items.map((item) => (
                 <div key={item._id} className="flex p-6">
-                  <div className=" flex-shrink-0 overflow-hidden rounded-md border border-gray-200 relative">
+                  <div className="flex-shrink-0 overflow-hidden rounded-md border border-gray-200 relative">
                     <Image
                       src={item.imageUrl}
                       alt={item.title}
@@ -160,6 +203,7 @@ export default async function OrderDetailPage({ params }) {
 
         {/* Información del cliente y envío */}
         <div className="space-y-6">
+          {/* Información del Cliente */}
           <div className="bg-white rounded-lg shadow overflow-hidden">
             <div className="px-6 py-4 border-b">
               <h2 className="text-lg font-semibold">Información del Cliente</h2>
@@ -180,6 +224,7 @@ export default async function OrderDetailPage({ params }) {
             </div>
           </div>
 
+          {/* Dirección de Envío */}
           <div className="bg-white rounded-lg shadow overflow-hidden">
             <div className="px-6 py-4 border-b">
               <h2 className="text-lg font-semibold">Dirección de Envío</h2>
@@ -202,6 +247,7 @@ export default async function OrderDetailPage({ params }) {
             </div>
           </div>
 
+          {/* Información de Pago */}
           <div className="bg-white rounded-lg shadow overflow-hidden">
             <div className="px-6 py-4 border-b">
               <h2 className="text-lg font-semibold">Información de Pago</h2>
@@ -211,15 +257,7 @@ export default async function OrderDetailPage({ params }) {
                 <h3 className="text-sm font-medium text-gray-500">
                   Método de Pago
                 </h3>
-                <p>
-                  {order.paymentMethod === "mercadopago"
-                    ? "MercadoPago"
-                    : order.paymentMethod === "credit_card"
-                    ? "Tarjeta de Crédito"
-                    : order.paymentMethod === "debit_card"
-                    ? "Tarjeta de Débito"
-                    : order.paymentMethod}
-                </p>
+                <p>{getPaymentMethodName(order.paymentMethod)}</p>
               </div>
               {order.paymentId && (
                 <div>
@@ -232,22 +270,8 @@ export default async function OrderDetailPage({ params }) {
               <div>
                 <h3 className="text-sm font-medium text-gray-500">Estado</h3>
                 <p
-                  className={`font-medium ${
-                    order.status === "pagado"
-                      ? "text-green-600"
-                      : order.status === "pendiente"
-                      ? ""
-                      : order.status === "enviado"
-                      ? "text-blue-600"
-                      : order.status === "entregado"
-                      ? ""
-                      : "text-red-600"
-                  }`}
-                  style={
-                    order.status === "pendiente" || order.status === "entregado"
-                      ? { color: "#F6C343" }
-                      : {}
-                  }
+                  className={`font-medium ${statusClassName}`}
+                  style={typeof statusColor === "object" ? statusStyle : {}}
                 >
                   {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                 </p>
@@ -259,3 +283,10 @@ export default async function OrderDetailPage({ params }) {
     </div>
   );
 }
+
+// Validación de PropTypes
+OrderDetailPage.propTypes = {
+  params: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }).isRequired,
+};
