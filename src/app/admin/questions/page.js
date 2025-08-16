@@ -1,11 +1,9 @@
-// src/app/admin/questions/page.js - VERSIÓN CON ACCESIBILIDAD MEJORADA
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
-import PropTypes from "prop-types";
 import {
   ChatBubbleLeftRightIcon,
   ClockIcon,
@@ -13,7 +11,6 @@ import {
   UserIcon,
   PaperAirplaneIcon,
   MagnifyingGlassIcon,
-  FunnelIcon,
 } from "@heroicons/react/24/outline";
 
 const AdminQuestionsPage = () => {
@@ -34,13 +31,103 @@ const AdminQuestionsPage = () => {
   const pollingIntervalRef = useRef(null);
   const isActiveRef = useRef(true);
 
+  // Función auxiliar para verificar si el usuario es admin
+  const isUserAdmin = () => {
+    return session?.user?.role === "admin";
+  };
+
+  // Función auxiliar para obtener el estado de auto-refresh
+  const getAutoRefreshStatus = () => {
+    if (!isActiveRef.current) return "Auto-refresh OFF";
+    return pollingIntervalRef.current ? "Auto-refresh ON" : "Auto-refresh OFF";
+  };
+
+  // Función auxiliar para verificar si debería mostrar loading
+  const shouldShowLoading = () => {
+    return loading;
+  };
+
+  // Función auxiliar para verificar si hay preguntas filtradas
+  const hasFilteredQuestions = (filteredQuestions) => {
+    return filteredQuestions.length > 0;
+  };
+
+  // Función auxiliar para formatear fecha
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString("es-ES", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  // Función auxiliar para validar respuesta
+  const isResponseValid = (text) => {
+    return text.trim().length >= 10;
+  };
+
+  // Función auxiliar para verificar si puede enviar respuesta
+  const canSubmitResponse = () => {
+    return !submitting && isResponseValid(responseText);
+  };
+
+  // Función auxiliar para obtener clases del botón de envío
+  const getSubmitButtonClasses = () => {
+    const baseClasses =
+      "inline-flex items-center px-3 py-2 text-white text-sm font-medium rounded-md transition-colors";
+    const disabledClasses = "disabled:bg-gray-400 disabled:cursor-not-allowed";
+    return `${baseClasses} ${disabledClasses}`;
+  };
+
+  // Función auxiliar para obtener el estilo del botón de envío
+  const getSubmitButtonStyle = () => {
+    return {
+      backgroundColor: canSubmitResponse() ? "#F6C343" : "#9ca3af",
+    };
+  };
+
+  // Función auxiliar para renderizar el contenido del botón de envío
+  const renderSubmitButtonContent = () => {
+    if (submitting) {
+      return (
+        <>
+          <div
+            className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"
+            aria-label="Enviando"
+          ></div>
+          Enviando...
+        </>
+      );
+    }
+
+    return (
+      <>
+        <PaperAirplaneIcon className="h-4 w-4 mr-2" />
+        Enviar Respuesta
+      </>
+    );
+  };
+
+  // Función separada para manejar el filtrado de preguntas
+  const getFilteredQuestions = useCallback(() => {
+    return questions.filter(
+      (question) =>
+        searchTerm === "" ||
+        question.comment.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        question.user?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        question.product?.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [questions, searchTerm]);
+
   const fetchQuestions = useCallback(
     async (showLoading = true) => {
       const now = Date.now();
       if (now - lastFetchRef.current < 2000) return;
 
       lastFetchRef.current = now;
-      if (!session?.user?.role || session.user.role !== "admin") return;
+      if (!isUserAdmin()) return;
 
       try {
         if (showLoading) setLoading(true);
@@ -73,14 +160,14 @@ const AdminQuestionsPage = () => {
   );
 
   useEffect(() => {
-    if (session?.user?.role === "admin") {
+    if (isUserAdmin()) {
       fetchQuestions(true);
     }
   }, [session, filter, currentPage, fetchQuestions]);
 
   // Effect para polling automático (MUY REDUCIDO)
   useEffect(() => {
-    if (!session?.user?.role || session.user.role !== "admin") return;
+    if (!isUserAdmin()) return;
 
     // Limpiar intervalo anterior
     if (pollingIntervalRef.current) {
@@ -88,12 +175,15 @@ const AdminQuestionsPage = () => {
     }
 
     // Solo hacer polling si hay preguntas pendientes Y la página está activa
-    if (stats.pending > 0 && isActiveRef.current) {
+    const shouldStartPolling = stats.pending > 0 && isActiveRef.current;
+
+    if (shouldStartPolling) {
       pollingIntervalRef.current = setInterval(() => {
-        if (isActiveRef.current && document.visibilityState === "visible") {
+        const isPageVisible = document.visibilityState === "visible";
+        if (isActiveRef.current && isPageVisible) {
           fetchQuestions(false); // Sin loading spinner
         }
-      }, 30000); // 30 segundos en lugar de constante
+      }, 30000); // 30 segundos
     }
 
     return () => {
@@ -120,7 +210,7 @@ const AdminQuestionsPage = () => {
 
   // Función optimizada para responder
   const handleRespond = async (questionId) => {
-    if (!responseText.trim() || responseText.trim().length < 10) {
+    if (!isResponseValid(responseText)) {
       toast.error("La respuesta debe tener al menos 10 caracteres");
       return;
     }
@@ -159,26 +249,124 @@ const AdminQuestionsPage = () => {
     }
   };
 
-  // Función de filtrado local para evitar re-fetching
-  const filteredQuestions = questions.filter(
-    (question) =>
-      searchTerm === "" ||
-      question.comment.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      question.user?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      question.product?.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString("es-ES", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  // Función para cancelar respuesta
+  const handleCancelResponse = () => {
+    setRespondingTo(null);
+    setResponseText("");
   };
 
-  if (!session?.user || session.user.role !== "admin") {
+  // Función para manejar eventos del mouse en botones
+  const handleButtonMouseEvents = (e, isEnter, bgColor, hoverColor) => {
+    if (canSubmitResponse()) {
+      e.target.style.backgroundColor = isEnter ? hoverColor : bgColor;
+    }
+  };
+
+  // Renderizar indicador de estado del sistema
+  const renderSystemStatus = () => {
+    const statusColor = isActiveRef.current ? "bg-green-500" : "bg-gray-400";
+
+    return (
+      <div className="flex items-center space-x-2 text-sm text-gray-600">
+        <div className={`w-2 h-2 rounded-full ${statusColor}`}></div>
+        <output>{getAutoRefreshStatus()}</output>
+      </div>
+    );
+  };
+
+  // Renderizar loading spinner
+  const renderLoadingSpinner = () => (
+    <div className="text-center py-8">
+      <output
+        className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-t-transparent"
+        style={{
+          borderColor: "#F6C343",
+          borderTopColor: "transparent",
+        }}
+        aria-label="Cargando preguntas"
+      ></output>
+      <p className="mt-2 text-gray-600">Cargando preguntas...</p>
+    </div>
+  );
+
+  // Renderizar mensaje vacío
+  const renderEmptyMessage = () => (
+    <div className="text-center py-8 text-gray-500">
+      <ChatBubbleLeftRightIcon className="h-12 w-12 mx-auto text-gray-300 mb-3" />
+      <p>No se encontraron preguntas con los filtros aplicados</p>
+    </div>
+  );
+
+  // Renderizar formulario de respuesta
+  const renderResponseForm = (questionId) => (
+    <div className="space-y-3">
+      <div>
+        <label
+          htmlFor={`response-${questionId}`}
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
+          Tu respuesta:
+        </label>
+        <textarea
+          id={`response-${questionId}`}
+          value={responseText}
+          onChange={(e) => setResponseText(e.target.value)}
+          rows="3"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:border-transparent"
+          placeholder="Escribe tu respuesta aquí..."
+          onFocus={(e) => {
+            e.target.style.borderColor = "#F6C343";
+            e.target.style.boxShadow = `0 0 0 3px rgba(246, 195, 67, 0.1)`;
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = "#d1d5db";
+            e.target.style.boxShadow = "none";
+          }}
+          aria-describedby={`response-help-${questionId}`}
+          aria-invalid={!isResponseValid(responseText)}
+        />
+        <div
+          id={`response-help-${questionId}`}
+          className="text-xs text-gray-500 mt-1"
+        >
+          Mínimo 10 caracteres ({responseText.length}/10)
+        </div>
+      </div>
+      <div className="flex space-x-2">
+        <button
+          onClick={() => handleRespond(questionId)}
+          disabled={!canSubmitResponse()}
+          className={getSubmitButtonClasses()}
+          style={getSubmitButtonStyle()}
+          onMouseEnter={(e) =>
+            handleButtonMouseEvents(e, true, "#F6C343", "#E5B63C")
+          }
+          onMouseLeave={(e) =>
+            handleButtonMouseEvents(e, false, "#F6C343", "#E5B63C")
+          }
+          aria-describedby={`submit-help-${questionId}`}
+        >
+          {renderSubmitButtonContent()}
+        </button>
+        <output id={`submit-help-${questionId}`} className="sr-only">
+          {submitting
+            ? "Enviando respuesta"
+            : !isResponseValid(responseText)
+            ? "Necesitas escribir al menos 10 caracteres para enviar"
+            : "Presiona para enviar tu respuesta"}
+        </output>
+        <button
+          onClick={handleCancelResponse}
+          className="px-3 py-2 bg-gray-200 text-gray-800 text-sm font-medium rounded-md hover:bg-gray-300"
+          aria-label="Cancelar respuesta"
+        >
+          Cancelar
+        </button>
+      </div>
+    </div>
+  );
+
+  if (!isUserAdmin()) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-4">
         <p className="text-red-800">
@@ -188,6 +376,8 @@ const AdminQuestionsPage = () => {
     );
   }
 
+  const filteredQuestions = getFilteredQuestions();
+
   return (
     <div className="space-y-6">
       {/* Header y Estadísticas */}
@@ -196,20 +386,7 @@ const AdminQuestionsPage = () => {
           <h1 className="text-2xl font-bold text-gray-900">
             Gestión de Preguntas
           </h1>
-
-          {/* Indicador de estado */}
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <div
-              className={`w-2 h-2 rounded-full ${
-                isActiveRef.current ? "bg-green-500" : "bg-gray-400"
-              }`}
-            ></div>
-            <span>
-              {pollingIntervalRef.current
-                ? "Auto-refresh ON"
-                : "Auto-refresh OFF"}
-            </span>
-          </div>
+          {renderSystemStatus()}
         </div>
 
         {/* Estadísticas */}
@@ -234,7 +411,7 @@ const AdminQuestionsPage = () => {
           </div>
         </div>
 
-        {/* Controles de Filtro - CON ACCESIBILIDAD MEJORADA */}
+        {/* Controles de Filtro */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
             <label htmlFor="search-questions" className="sr-only">
@@ -304,24 +481,10 @@ const AdminQuestionsPage = () => {
             Preguntas ({filteredQuestions.length})
           </h2>
 
-          {loading ? (
-            <div className="text-center py-8">
-              <div
-                className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-t-transparent"
-                style={{
-                  borderColor: "#F6C343",
-                  borderTopColor: "transparent",
-                }}
-                role="status"
-                aria-label="Cargando preguntas"
-              ></div>
-              <p className="mt-2 text-gray-600">Cargando preguntas...</p>
-            </div>
-          ) : filteredQuestions.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <ChatBubbleLeftRightIcon className="h-12 w-12 mx-auto text-gray-300 mb-3" />
-              <p>No se encontraron preguntas con los filtros aplicados</p>
-            </div>
+          {shouldShowLoading() ? (
+            renderLoadingSpinner()
+          ) : !hasFilteredQuestions(filteredQuestions) ? (
+            renderEmptyMessage()
           ) : (
             <div className="space-y-4">
               {filteredQuestions.map((question) => (
@@ -397,7 +560,7 @@ const AdminQuestionsPage = () => {
                     </p>
                   </div>
 
-                  {/* Respuesta existente o formulario - CON ACCESIBILIDAD MEJORADA */}
+                  {/* Respuesta existente o formulario */}
                   {question.response ? (
                     <div className="bg-green-50 border-l-4 border-green-400 p-3">
                       <div className="flex items-center mb-1">
@@ -416,108 +579,7 @@ const AdminQuestionsPage = () => {
                   ) : (
                     <div>
                       {respondingTo === question._id ? (
-                        <div className="space-y-3">
-                          <div>
-                            <label
-                              htmlFor={`response-${question._id}`}
-                              className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                              Tu respuesta:
-                            </label>
-                            <textarea
-                              id={`response-${question._id}`}
-                              value={responseText}
-                              onChange={(e) => setResponseText(e.target.value)}
-                              rows="3"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:border-transparent"
-                              placeholder="Escribe tu respuesta aquí..."
-                              onFocus={(e) => {
-                                e.target.style.borderColor = "#F6C343";
-                                e.target.style.boxShadow = `0 0 0 3px rgba(246, 195, 67, 0.1)`;
-                              }}
-                              onBlur={(e) => {
-                                e.target.style.borderColor = "#d1d5db";
-                                e.target.style.boxShadow = "none";
-                              }}
-                              aria-describedby={`response-help-${question._id}`}
-                              aria-invalid={responseText.trim().length < 10}
-                            />
-                            <div
-                              id={`response-help-${question._id}`}
-                              className="text-xs text-gray-500 mt-1"
-                            >
-                              Mínimo 10 caracteres ({responseText.length}/10)
-                            </div>
-                          </div>
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() => handleRespond(question._id)}
-                              disabled={
-                                submitting || responseText.trim().length < 10
-                              }
-                              className="inline-flex items-center px-3 py-2 text-white text-sm font-medium rounded-md disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-                              style={{
-                                backgroundColor:
-                                  submitting || responseText.trim().length < 10
-                                    ? "#9ca3af"
-                                    : "#F6C343",
-                              }}
-                              onMouseEnter={(e) => {
-                                if (
-                                  !submitting &&
-                                  responseText.trim().length >= 10
-                                ) {
-                                  e.target.style.backgroundColor = "#E5B63C";
-                                }
-                              }}
-                              onMouseLeave={(e) => {
-                                if (
-                                  !submitting &&
-                                  responseText.trim().length >= 10
-                                ) {
-                                  e.target.style.backgroundColor = "#F6C343";
-                                }
-                              }}
-                              aria-describedby={`submit-help-${question._id}`}
-                            >
-                              {submitting ? (
-                                <>
-                                  <div
-                                    className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"
-                                    role="status"
-                                    aria-label="Enviando"
-                                  ></div>
-                                  Enviando...
-                                </>
-                              ) : (
-                                <>
-                                  <PaperAirplaneIcon className="h-4 w-4 mr-2" />
-                                  Enviar Respuesta
-                                </>
-                              )}
-                            </button>
-                            <div
-                              id={`submit-help-${question._id}`}
-                              className="sr-only"
-                            >
-                              {submitting
-                                ? "Enviando respuesta"
-                                : responseText.trim().length < 10
-                                ? "Necesitas escribir al menos 10 caracteres para enviar"
-                                : "Presiona para enviar tu respuesta"}
-                            </div>
-                            <button
-                              onClick={() => {
-                                setRespondingTo(null);
-                                setResponseText("");
-                              }}
-                              className="px-3 py-2 bg-gray-200 text-gray-800 text-sm font-medium rounded-md hover:bg-gray-300"
-                              aria-label="Cancelar respuesta"
-                            >
-                              Cancelar
-                            </button>
-                          </div>
-                        </div>
+                        renderResponseForm(question._id)
                       ) : (
                         <button
                           onClick={() => setRespondingTo(question._id)}
@@ -552,7 +614,7 @@ const AdminQuestionsPage = () => {
             </div>
           )}
 
-          {/* Paginación - CON ACCESIBILIDAD MEJORADA */}
+          {/* Paginación */}
           {totalPages > 1 && (
             <nav
               className="flex justify-center items-center space-x-2 mt-6"
@@ -569,20 +631,20 @@ const AdminQuestionsPage = () => {
 
               {[...Array(Math.min(totalPages, 5))].map((_, i) => {
                 const page = i + 1;
+                const isCurrentPage = currentPage === page;
+
                 return (
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
                     className={`px-3 py-1 border rounded ${
-                      currentPage === page
+                      isCurrentPage
                         ? "text-white"
                         : "bg-white text-gray-700 hover:bg-gray-50"
                     }`}
-                    style={
-                      currentPage === page ? { backgroundColor: "#F6C343" } : {}
-                    }
+                    style={isCurrentPage ? { backgroundColor: "#F6C343" } : {}}
                     aria-label={`Ir a página ${page}`}
-                    aria-current={currentPage === page ? "page" : undefined}
+                    aria-current={isCurrentPage ? "page" : undefined}
                   >
                     {page}
                   </button>
@@ -605,11 +667,6 @@ const AdminQuestionsPage = () => {
       </div>
     </div>
   );
-};
-
-// Agregar PropTypes para validación
-AdminQuestionsPage.propTypes = {
-  // Este componente no recibe props, pero agregamos la definición por consistencia
 };
 
 export default AdminQuestionsPage;
