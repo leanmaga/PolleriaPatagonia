@@ -1,10 +1,11 @@
-// src/app/admin/questions/page.js - VERSIÓN OPTIMIZADA (Con color #F6C343)
+// src/app/admin/questions/page.js - VERSIÓN CON ACCESIBILIDAD MEJORADA
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
+import PropTypes from "prop-types";
 import {
   ChatBubbleLeftRightIcon,
   ClockIcon,
@@ -233,11 +234,15 @@ const AdminQuestionsPage = () => {
           </div>
         </div>
 
-        {/* Controles de Filtro */}
+        {/* Controles de Filtro - CON ACCESIBILIDAD MEJORADA */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
+            <label htmlFor="search-questions" className="sr-only">
+              Buscar preguntas, usuarios o productos
+            </label>
             <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
             <input
+              id="search-questions"
               type="text"
               placeholder="Buscar preguntas, usuarios o productos..."
               value={searchTerm}
@@ -251,29 +256,44 @@ const AdminQuestionsPage = () => {
                 e.target.style.borderColor = "#d1d5db";
                 e.target.style.boxShadow = "none";
               }}
+              aria-describedby="search-help"
             />
+            <div id="search-help" className="sr-only">
+              Busca por texto en preguntas, nombres de usuario o títulos de
+              productos
+            </div>
           </div>
 
-          <select
-            value={filter}
-            onChange={(e) => {
-              setFilter(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="px-4 py-2 border border-gray-300 rounded-md focus:ring-2"
-            onFocus={(e) => {
-              e.target.style.borderColor = "#F6C343";
-              e.target.style.boxShadow = `0 0 0 3px rgba(246, 195, 67, 0.1)`;
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = "#d1d5db";
-              e.target.style.boxShadow = "none";
-            }}
-          >
-            <option value="all">Todas las preguntas</option>
-            <option value="pending">Pendientes respuesta</option>
-            <option value="answered">Respondidas</option>
-          </select>
+          <div>
+            <label htmlFor="filter-questions" className="sr-only">
+              Filtrar preguntas por estado
+            </label>
+            <select
+              id="filter-questions"
+              value={filter}
+              onChange={(e) => {
+                setFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="px-4 py-2 border border-gray-300 rounded-md focus:ring-2"
+              onFocus={(e) => {
+                e.target.style.borderColor = "#F6C343";
+                e.target.style.boxShadow = `0 0 0 3px rgba(246, 195, 67, 0.1)`;
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "#d1d5db";
+                e.target.style.boxShadow = "none";
+              }}
+              aria-describedby="filter-help"
+            >
+              <option value="all">Todas las preguntas</option>
+              <option value="pending">Pendientes respuesta</option>
+              <option value="answered">Respondidas</option>
+            </select>
+            <div id="filter-help" className="sr-only">
+              Filtra las preguntas por su estado de respuesta
+            </div>
+          </div>
         </div>
       </div>
 
@@ -292,6 +312,8 @@ const AdminQuestionsPage = () => {
                   borderColor: "#F6C343",
                   borderTopColor: "transparent",
                 }}
+                role="status"
+                aria-label="Cargando preguntas"
               ></div>
               <p className="mt-2 text-gray-600">Cargando preguntas...</p>
             </div>
@@ -375,7 +397,7 @@ const AdminQuestionsPage = () => {
                     </p>
                   </div>
 
-                  {/* Respuesta existente o formulario */}
+                  {/* Respuesta existente o formulario - CON ACCESIBILIDAD MEJORADA */}
                   {question.response ? (
                     <div className="bg-green-50 border-l-4 border-green-400 p-3">
                       <div className="flex items-center mb-1">
@@ -396,10 +418,14 @@ const AdminQuestionsPage = () => {
                       {respondingTo === question._id ? (
                         <div className="space-y-3">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label
+                              htmlFor={`response-${question._id}`}
+                              className="block text-sm font-medium text-gray-700 mb-1"
+                            >
                               Tu respuesta:
                             </label>
                             <textarea
+                              id={`response-${question._id}`}
                               value={responseText}
                               onChange={(e) => setResponseText(e.target.value)}
                               rows="3"
@@ -413,10 +439,15 @@ const AdminQuestionsPage = () => {
                                 e.target.style.borderColor = "#d1d5db";
                                 e.target.style.boxShadow = "none";
                               }}
+                              aria-describedby={`response-help-${question._id}`}
+                              aria-invalid={responseText.trim().length < 10}
                             />
-                            <p className="text-xs text-gray-500 mt-1">
+                            <div
+                              id={`response-help-${question._id}`}
+                              className="text-xs text-gray-500 mt-1"
+                            >
                               Mínimo 10 caracteres ({responseText.length}/10)
-                            </p>
+                            </div>
                           </div>
                           <div className="flex space-x-2">
                             <button
@@ -447,10 +478,15 @@ const AdminQuestionsPage = () => {
                                   e.target.style.backgroundColor = "#F6C343";
                                 }
                               }}
+                              aria-describedby={`submit-help-${question._id}`}
                             >
                               {submitting ? (
                                 <>
-                                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                                  <div
+                                    className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"
+                                    role="status"
+                                    aria-label="Enviando"
+                                  ></div>
                                   Enviando...
                                 </>
                               ) : (
@@ -460,12 +496,23 @@ const AdminQuestionsPage = () => {
                                 </>
                               )}
                             </button>
+                            <div
+                              id={`submit-help-${question._id}`}
+                              className="sr-only"
+                            >
+                              {submitting
+                                ? "Enviando respuesta"
+                                : responseText.trim().length < 10
+                                ? "Necesitas escribir al menos 10 caracteres para enviar"
+                                : "Presiona para enviar tu respuesta"}
+                            </div>
                             <button
                               onClick={() => {
                                 setRespondingTo(null);
                                 setResponseText("");
                               }}
                               className="px-3 py-2 bg-gray-200 text-gray-800 text-sm font-medium rounded-md hover:bg-gray-300"
+                              aria-label="Cancelar respuesta"
                             >
                               Cancelar
                             </button>
@@ -482,6 +529,9 @@ const AdminQuestionsPage = () => {
                           onMouseLeave={(e) => {
                             e.target.style.backgroundColor = "#F6C343";
                           }}
+                          aria-label={`Responder pregunta de ${
+                            question.user?.name || "usuario"
+                          }`}
                         >
                           <ChatBubbleLeftRightIcon className="h-4 w-4 mr-2" />
                           Responder
@@ -502,13 +552,17 @@ const AdminQuestionsPage = () => {
             </div>
           )}
 
-          {/* Paginación */}
+          {/* Paginación - CON ACCESIBILIDAD MEJORADA */}
           {totalPages > 1 && (
-            <div className="flex justify-center items-center space-x-2 mt-6">
+            <nav
+              className="flex justify-center items-center space-x-2 mt-6"
+              aria-label="Paginación de preguntas"
+            >
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
                 className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Ir a página anterior"
               >
                 Anterior
               </button>
@@ -527,6 +581,8 @@ const AdminQuestionsPage = () => {
                     style={
                       currentPage === page ? { backgroundColor: "#F6C343" } : {}
                     }
+                    aria-label={`Ir a página ${page}`}
+                    aria-current={currentPage === page ? "page" : undefined}
                   >
                     {page}
                   </button>
@@ -539,15 +595,21 @@ const AdminQuestionsPage = () => {
                 }
                 disabled={currentPage === totalPages}
                 className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Ir a página siguiente"
               >
                 Siguiente
               </button>
-            </div>
+            </nav>
           )}
         </div>
       </div>
     </div>
   );
+};
+
+// Agregar PropTypes para validación
+AdminQuestionsPage.propTypes = {
+  // Este componente no recibe props, pero agregamos la definición por consistencia
 };
 
 export default AdminQuestionsPage;

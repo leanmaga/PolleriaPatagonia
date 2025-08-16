@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getProductById } from "@/lib/data";
 import ProductForm from "@/components/admin/ProductForm";
+import PropTypes from "prop-types";
 
 export async function generateMetadata({ params }) {
   const product = await getProductById(params.id);
@@ -16,6 +17,13 @@ export async function generateMetadata({ params }) {
   };
 }
 
+// Validación de props para generateMetadata
+generateMetadata.propTypes = {
+  params: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }).isRequired,
+};
+
 export default async function EditProductPage({ params }) {
   const product = await getProductById(params.id);
 
@@ -25,3 +33,10 @@ export default async function EditProductPage({ params }) {
 
   return <ProductForm product={product} />;
 }
+
+// Validación de props para el componente principal
+EditProductPage.propTypes = {
+  params: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }).isRequired,
+};
