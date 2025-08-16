@@ -19,30 +19,21 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
-// Función auxiliar para obtener el color del estado
-const getStatusColor = (status) => {
+// ✅ SOLUCIÓN: Refactorizar para retornar siempre el mismo tipo (objeto con estilos)
+const getStatusStyle = (status) => {
   switch (status) {
     case "pagado":
-      return "text-green-600";
+      return { color: "#10b981", fontWeight: "medium" }; // green-600 equivalent
     case "enviado":
-      return "text-blue-600";
+      return { color: "#2563eb", fontWeight: "medium" }; // blue-600 equivalent
     case "cancelado":
-      return "text-red-600";
+      return { color: "#dc2626", fontWeight: "medium" }; // red-600 equivalent
     case "pendiente":
     case "entregado":
-      return { color: "#F6C343" };
+      return { color: "#F6C343", fontWeight: "medium" };
     default:
-      return "text-gray-600";
+      return { color: "#4b5563", fontWeight: "medium" }; // gray-600 equivalent
   }
-};
-
-// Función auxiliar para obtener el estilo del estado
-const getStatusStyle = (status) => {
-  const colorClass = getStatusColor(status);
-  if (typeof colorClass === "object") {
-    return { ...colorClass, fontWeight: "medium" };
-  }
-  return { fontWeight: "medium" };
 };
 
 // Función auxiliar para obtener el nombre del método de pago
@@ -77,6 +68,13 @@ export async function generateMetadata({ params }) {
   };
 }
 
+// Validación de PropTypes para generateMetadata
+generateMetadata.propTypes = {
+  params: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }).isRequired,
+};
+
 export default async function OrderDetailPage({ params }) {
   // Validación inicial de parámetros
   if (!params?.id) {
@@ -89,9 +87,7 @@ export default async function OrderDetailPage({ params }) {
     notFound();
   }
 
-  const statusColor = getStatusColor(order.status);
   const statusStyle = getStatusStyle(order.status);
-  const statusClassName = typeof statusColor === "string" ? statusColor : "";
 
   return (
     <div>
@@ -138,7 +134,6 @@ export default async function OrderDetailPage({ params }) {
                     <Image
                       src={item.imageUrl}
                       alt={item.title}
-                      layout="responsive"
                       width={96}
                       height={96}
                       className="object-cover object-center"
@@ -269,10 +264,7 @@ export default async function OrderDetailPage({ params }) {
               )}
               <div>
                 <h3 className="text-sm font-medium text-gray-500">Estado</h3>
-                <p
-                  className={`font-medium ${statusClassName}`}
-                  style={typeof statusColor === "object" ? statusStyle : {}}
-                >
+                <p style={statusStyle}>
                   {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                 </p>
               </div>
