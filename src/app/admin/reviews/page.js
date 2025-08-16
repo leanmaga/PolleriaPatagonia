@@ -1,4 +1,4 @@
-// app/admin/reviews/page (Con color #F6C343)
+// app/admin/reviews/page (Con color #F6C343 y accesibilidad mejorada)
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
 import Link from "next/link";
+import PropTypes from "prop-types";
 import StarRating from "@/components/ui/StarRating";
 import {
   StarIcon,
@@ -323,10 +324,19 @@ const AdminReviewsPage = () => {
               <h3 className="text-sm font-medium text-gray-900 mb-3">
                 Distribución de Calificaciones
               </h3>
-              <div className="space-y-2">
+              <div
+                className="space-y-2"
+                role="img"
+                aria-label="Gráfico de distribución de calificaciones"
+              >
                 {[5, 4, 3, 2, 1].map((stars) => (
                   <div key={stars} className="flex items-center space-x-3">
-                    <span className="text-sm w-8">{stars} ★</span>
+                    <span
+                      className="text-sm w-8"
+                      aria-label={`${stars} estrellas`}
+                    >
+                      {stars} ★
+                    </span>
                     <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                       <div
                         className="h-full"
@@ -341,6 +351,9 @@ const AdminReviewsPage = () => {
                                 }%`
                               : "0%",
                         }}
+                        aria-label={`${
+                          stats.ratingDistribution[stars - 1]
+                        } reviews de ${stars} estrellas`}
                       />
                     </div>
                     <span className="text-sm text-gray-600 w-12 text-right">
@@ -357,7 +370,11 @@ const AdminReviewsPage = () => {
       <div className="bg-white rounded-lg shadow p-6">
         {/* Pestañas */}
         <div className="border-b border-gray-200 mb-6">
-          <nav className="-mb-px flex space-x-8">
+          <nav
+            className="-mb-px flex space-x-8"
+            role="tablist"
+            aria-label="Filtros de contenido"
+          >
             <button
               onClick={() => {
                 setActiveTab("ratings");
@@ -373,6 +390,9 @@ const AdminReviewsPage = () => {
                   ? { borderBottomColor: "#F6C343", color: "#F6C343" }
                   : {}
               }
+              role="tab"
+              aria-selected={activeTab === "ratings"}
+              aria-controls="ratings-panel"
             >
               <StarIcon className="h-4 w-4 inline mr-1" />
               Calificaciones ({stats.totalRatings || 0})
@@ -387,6 +407,9 @@ const AdminReviewsPage = () => {
                   ? "border-blue-500 text-blue-600"
                   : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
+              role="tab"
+              aria-selected={activeTab === "questions"}
+              aria-controls="questions-panel"
             >
               <ChatBubbleLeftRightIcon className="h-4 w-4 inline mr-1" />
               Preguntas ({stats.totalQuestions || 0})
@@ -406,18 +429,25 @@ const AdminReviewsPage = () => {
                   ? { borderBottomColor: "#F6C343", color: "#F6C343" }
                   : {}
               }
+              role="tab"
+              aria-selected={activeTab === "all"}
+              aria-controls="all-panel"
             >
               Todas ({stats.totalReviews || 0})
             </button>
           </nav>
         </div>
 
-        {/* Controles de Filtro */}
+        {/* Controles de Filtro - CON ACCESIBILIDAD MEJORADA */}
         <div className="flex flex-col lg:flex-row gap-4 mb-6">
           {/* Búsqueda */}
           <div className="flex-1 relative">
+            <label htmlFor="search-reviews" className="sr-only">
+              Buscar por contenido, usuario o producto
+            </label>
             <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
             <input
+              id="search-reviews"
               type="text"
               placeholder="Buscar por contenido, usuario o producto..."
               value={searchTerm}
@@ -431,16 +461,61 @@ const AdminReviewsPage = () => {
                 e.target.style.borderColor = "#d1d5db";
                 e.target.style.boxShadow = "none";
               }}
+              aria-describedby="search-help"
             />
+            <div id="search-help" className="sr-only">
+              Busca por texto en reviews, nombres de usuario o títulos de
+              productos
+            </div>
           </div>
 
           {/* Filtros */}
           <div className="flex gap-3">
             {activeTab === "ratings" && (
+              <div>
+                <label htmlFor="rating-filter" className="sr-only">
+                  Filtrar por número de estrellas
+                </label>
+                <select
+                  id="rating-filter"
+                  value={ratingFilter}
+                  onChange={(e) => {
+                    setRatingFilter(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2"
+                  onFocus={(e) => {
+                    e.target.style.borderColor = "#F6C343";
+                    e.target.style.boxShadow = `0 0 0 3px rgba(246, 195, 67, 0.1)`;
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = "#d1d5db";
+                    e.target.style.boxShadow = "none";
+                  }}
+                  aria-describedby="rating-filter-help"
+                >
+                  <option value="all">Todas las estrellas</option>
+                  <option value="5">5 estrellas</option>
+                  <option value="4">4 estrellas</option>
+                  <option value="3">3 estrellas</option>
+                  <option value="2">2 estrellas</option>
+                  <option value="1">1 estrella</option>
+                </select>
+                <div id="rating-filter-help" className="sr-only">
+                  Filtra las reviews por número de estrellas
+                </div>
+              </div>
+            )}
+
+            <div>
+              <label htmlFor="status-filter" className="sr-only">
+                Filtrar por estado de la review
+              </label>
               <select
-                value={ratingFilter}
+                id="status-filter"
+                value={statusFilter}
                 onChange={(e) => {
-                  setRatingFilter(e.target.value);
+                  setStatusFilter(e.target.value);
                   setCurrentPage(1);
                 }}
                 className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2"
@@ -452,61 +527,51 @@ const AdminReviewsPage = () => {
                   e.target.style.borderColor = "#d1d5db";
                   e.target.style.boxShadow = "none";
                 }}
+                aria-describedby="status-filter-help"
               >
-                <option value="all">Todas las estrellas</option>
-                <option value="5">5 estrellas</option>
-                <option value="4">4 estrellas</option>
-                <option value="3">3 estrellas</option>
-                <option value="2">2 estrellas</option>
-                <option value="1">1 estrella</option>
+                <option value="all">Todos los estados</option>
+                <option value="verified">Solo verificadas</option>
+                <option value="reported">Reportadas</option>
+                <option value="pending">Pendientes respuesta</option>
               </select>
-            )}
+              <div id="status-filter-help" className="sr-only">
+                Filtra las reviews por su estado de verificación
+              </div>
+            </div>
 
-            <select
-              value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2"
-              onFocus={(e) => {
-                e.target.style.borderColor = "#F6C343";
-                e.target.style.boxShadow = `0 0 0 3px rgba(246, 195, 67, 0.1)`;
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = "#d1d5db";
-                e.target.style.boxShadow = "none";
-              }}
-            >
-              <option value="all">Todos los estados</option>
-              <option value="verified">Solo verificadas</option>
-              <option value="reported">Reportadas</option>
-              <option value="pending">Pendientes respuesta</option>
-            </select>
-
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2"
-              onFocus={(e) => {
-                e.target.style.borderColor = "#F6C343";
-                e.target.style.boxShadow = `0 0 0 3px rgba(246, 195, 67, 0.1)`;
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = "#d1d5db";
-                e.target.style.boxShadow = "none";
-              }}
-            >
-              <option value="newest">Más recientes</option>
-              <option value="oldest">Más antiguas</option>
-              {activeTab === "ratings" && (
-                <>
-                  <option value="highest">Mejor calificadas</option>
-                  <option value="lowest">Peor calificadas</option>
-                </>
-              )}
-              <option value="helpful">Más útiles</option>
-            </select>
+            <div>
+              <label htmlFor="sort-filter" className="sr-only">
+                Ordenar reviews
+              </label>
+              <select
+                id="sort-filter"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2"
+                onFocus={(e) => {
+                  e.target.style.borderColor = "#F6C343";
+                  e.target.style.boxShadow = `0 0 0 3px rgba(246, 195, 67, 0.1)`;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = "#d1d5db";
+                  e.target.style.boxShadow = "none";
+                }}
+                aria-describedby="sort-filter-help"
+              >
+                <option value="newest">Más recientes</option>
+                <option value="oldest">Más antiguas</option>
+                {activeTab === "ratings" && (
+                  <>
+                    <option value="highest">Mejor calificadas</option>
+                    <option value="lowest">Peor calificadas</option>
+                  </>
+                )}
+                <option value="helpful">Más útiles</option>
+              </select>
+              <div id="sort-filter-help" className="sr-only">
+                Cambia el orden de las reviews mostradas
+              </div>
+            </div>
           </div>
         </div>
 
@@ -519,17 +584,24 @@ const AdminReviewsPage = () => {
               borderColor: "rgba(246, 195, 67, 0.3)",
               borderWidth: "1px",
             }}
+            role="region"
+            aria-label="Acciones masivas"
           >
             <div className="flex items-center justify-between">
               <span className="text-sm" style={{ color: "#E5B63C" }}>
                 {selectedReviews.size} reviews seleccionadas
               </span>
               <div className="flex items-center space-x-3">
+                <label htmlFor="bulk-action" className="sr-only">
+                  Seleccionar acción masiva
+                </label>
                 <select
+                  id="bulk-action"
                   value={bulkAction}
                   onChange={(e) => setBulkAction(e.target.value)}
                   className="px-3 py-1 border rounded text-sm"
                   style={{ borderColor: "rgba(246, 195, 67, 0.5)" }}
+                  aria-describedby="bulk-action-help"
                 >
                   <option value="">Seleccionar acción...</option>
                   <option value="delete">Eliminar</option>
@@ -537,6 +609,10 @@ const AdminReviewsPage = () => {
                   <option value="mark_reported">Marcar como reportadas</option>
                   <option value="remove_reports">Quitar reportes</option>
                 </select>
+                <div id="bulk-action-help" className="sr-only">
+                  Selecciona una acción para aplicar a todas las reviews
+                  seleccionadas
+                </div>
                 <button
                   onClick={handleBulkAction}
                   disabled={!bulkAction}
@@ -554,12 +630,19 @@ const AdminReviewsPage = () => {
                       e.target.style.backgroundColor = "#F6C343";
                     }
                   }}
+                  aria-describedby="apply-action-help"
                 >
                   Aplicar
                 </button>
+                <div id="apply-action-help" className="sr-only">
+                  {bulkAction
+                    ? `Aplicar la acción ${bulkAction} a ${selectedReviews.size} reviews seleccionadas`
+                    : "Selecciona una acción primero"}
+                </div>
                 <button
                   onClick={() => setSelectedReviews(new Set())}
                   className="px-3 py-1 border border-gray-300 text-gray-700 text-sm rounded hover:bg-gray-50"
+                  aria-label="Cancelar selección de reviews"
                 >
                   Cancelar
                 </button>
@@ -580,6 +663,7 @@ const AdminReviewsPage = () => {
             {filteredReviews.length > 0 && (
               <div className="flex items-center space-x-2">
                 <input
+                  id="select-all-reviews"
                   type="checkbox"
                   checked={selectedReviews.size === filteredReviews.length}
                   onChange={toggleSelectAll}
@@ -593,10 +677,17 @@ const AdminReviewsPage = () => {
                   onBlur={(e) => {
                     e.target.style.boxShadow = "none";
                   }}
+                  aria-describedby="select-all-help"
                 />
-                <label className="text-sm text-gray-700">
+                <label
+                  htmlFor="select-all-reviews"
+                  className="text-sm text-gray-700"
+                >
                   Seleccionar todas
                 </label>
+                <div id="select-all-help" className="sr-only">
+                  Selecciona o deselecciona todas las reviews visibles
+                </div>
               </div>
             )}
           </div>
@@ -609,6 +700,8 @@ const AdminReviewsPage = () => {
                   borderColor: "#F6C343",
                   borderTopColor: "transparent",
                 }}
+                role="status"
+                aria-label="Cargando reviews"
               ></div>
               <p className="mt-2 text-gray-600">Cargando reviews...</p>
             </div>
@@ -643,6 +736,7 @@ const AdminReviewsPage = () => {
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-start space-x-3">
                         <input
+                          id={`select-review-${review._id}`}
                           type="checkbox"
                           checked={selectedReviews.has(review._id)}
                           onChange={() => toggleSelectReview(review._id)}
@@ -656,6 +750,9 @@ const AdminReviewsPage = () => {
                           onBlur={(e) => {
                             e.target.style.boxShadow = "none";
                           }}
+                          aria-label={`Seleccionar review de ${
+                            review.user?.name || "usuario"
+                          }`}
                         />
 
                         <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
@@ -691,6 +788,7 @@ const AdminReviewsPage = () => {
                             target="_blank"
                             className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded"
                             title="Ver en producto"
+                            aria-label={`Ver review en la página del producto ${review.product?.title}`}
                           >
                             <EyeIcon className="h-4 w-4" />
                           </Link>
@@ -699,6 +797,9 @@ const AdminReviewsPage = () => {
                             onClick={() => handleDeleteReview(review._id)}
                             className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"
                             title="Eliminar"
+                            aria-label={`Eliminar review de ${
+                              review.user?.name || "usuario"
+                            }`}
                           >
                             <TrashIcon className="h-4 w-4" />
                           </button>
@@ -780,13 +881,17 @@ const AdminReviewsPage = () => {
             </div>
           )}
 
-          {/* Paginación */}
+          {/* Paginación - CON ACCESIBILIDAD MEJORADA */}
           {filteredReviews.length > itemsPerPage && (
-            <div className="flex justify-center items-center space-x-2 mt-6">
+            <nav
+              className="flex justify-center items-center space-x-2 mt-6"
+              aria-label="Paginación de reviews"
+            >
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
                 className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Ir a página anterior"
               >
                 Anterior
               </button>
@@ -806,6 +911,8 @@ const AdminReviewsPage = () => {
                         ? { backgroundColor: "#F6C343" }
                         : {}
                     }
+                    aria-label={`Ir a página ${i + 1}`}
+                    aria-current={currentPage === i + 1 ? "page" : undefined}
                   >
                     {i + 1}
                   </button>
@@ -826,15 +933,21 @@ const AdminReviewsPage = () => {
                   Math.ceil(filteredReviews.length / itemsPerPage)
                 }
                 className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Ir a página siguiente"
               >
                 Siguiente
               </button>
-            </div>
+            </nav>
           )}
         </div>
       </div>
     </div>
   );
+};
+
+// Agregar PropTypes para validación
+AdminReviewsPage.propTypes = {
+  // Este componente no recibe props, pero agregamos la definición por consistencia
 };
 
 export default AdminReviewsPage;
