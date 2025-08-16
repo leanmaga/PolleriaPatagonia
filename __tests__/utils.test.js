@@ -1,5 +1,5 @@
 // __tests__/utils.test.js
-import { formatDate, formatPrice } from "@/lib/utils";
+import { formatDate } from "../src/lib/utils";
 
 describe("Utils", () => {
   test("should format date correctly", () => {

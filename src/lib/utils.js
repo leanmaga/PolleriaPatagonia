@@ -1,5 +1,3 @@
-src / lib / utils.js;
-
 /**
  * Formatea una fecha en formato legible
  * @param {string} dateString - La fecha en formato ISO
