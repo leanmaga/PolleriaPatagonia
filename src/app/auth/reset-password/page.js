@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import PropTypes from "prop-types";
 import { sendPasswordResetEmail } from "@/lib/email-actions"; // Importar directamente la server action
 
 export default function ResetPasswordPage({
@@ -218,3 +219,10 @@ export default function ResetPasswordPage({
     </div>
   );
 }
+
+// ✅ SOLUCIÓN: Agregar PropTypes para todas las props
+ResetPasswordPage.propTypes = {
+  isInModal: PropTypes.bool,
+  onBackToLogin: PropTypes.func,
+  afterSubmit: PropTypes.func,
+};
