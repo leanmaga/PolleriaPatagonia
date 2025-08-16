@@ -25,7 +25,7 @@ export default function Home() {
               Elaboración Diaria
             </div>
             <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-4 tracking-tight">
-              Productos
+              Productos{/* */}
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-gray-600 to-gray-800">
                 Destacados
               </span>

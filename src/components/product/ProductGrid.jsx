@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import ProductCard from "./ProductCard";
 
 const ProductGrid = ({ products }) => {
@@ -8,12 +9,12 @@ const ProductGrid = ({ products }) => {
           {/* Icono de búsqueda vacía */}
           <div
             className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: "rgba(246, 195, 67, 0.1)" }}
+            style={{ backgroundColor: "rgba(139, 92, 246, 0.1)" }}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-12 w-12"
-              style={{ color: "#F6C343" }}
+              style={{ color: "#8b5cf6" }}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -36,11 +37,10 @@ const ProductGrid = ({ products }) => {
           </p>
 
           <a
-            href="https://wa.me/5491125528131?text=Hola%20Sol%20Campestre!%20Estoy%20buscando%20un%20producto%20específico,%20¿podrían%20ayudarme?"
+            href="https://wa.me/5491126907696?text=Hola%20Sol%20Campestre!%20Estoy%20buscando%20un%20producto%20específico,%20¿podrían%20ayudarme?"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
-            style={{ backgroundColor: "#F6C343" }}
+            className="inline-flex items-center gap-2 bg-purple-500 hover:bg-purple-600 px-6 py-3 text-white rounded-lg font-medium transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -71,7 +71,7 @@ const ProductGrid = ({ products }) => {
       {products.length > 0 && (
         <div
           className="mt-12 text-center py-8 px-6 rounded-lg"
-          style={{ backgroundColor: "rgba(246, 195, 67, 0.05)" }}
+          style={{ backgroundColor: "rgba(139, 92, 246, 0.05)" }}
         >
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
             ¿Necesitás más cantidad o productos personalizados?
@@ -84,8 +84,7 @@ const ProductGrid = ({ products }) => {
             href="https://wa.me/5491125528131?text=Hola%20Sol%20Campestre!%20Quisiera%20consultar%20sobre%20pedidos%20especiales%20o%20descuentos%20por%20volumen"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
-            style={{ backgroundColor: "#F6C343" }}
+            className="inline-flex items-center gap-2 bg-indigo-500 hover:bg-indigo-700 px-6 py-3 text-white rounded-lg font-medium transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -102,6 +101,24 @@ const ProductGrid = ({ products }) => {
       )}
     </>
   );
+};
+
+ProductGrid.propTypes = {
+  products: PropTypes.arrayOf(
+    PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+      title: PropTypes.string.isRequired,
+      description: PropTypes.string,
+      imageUrl: PropTypes.string.isRequired,
+      price: PropTypes.number,
+      salePrice: PropTypes.number,
+      promoPrice: PropTypes.number,
+      stock: PropTypes.number.isRequired,
+      rating: PropTypes.number,
+      numReviews: PropTypes.number,
+      variants: PropTypes.arrayOf(PropTypes.object),
+    })
+  ),
 };
 
 export default ProductGrid;

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";
 import PopularProducts from "@/components/admin/PopularProducts";
 import StatsCards from "@/components/admin/StatsCards";
@@ -23,110 +23,110 @@ export default function AdminDashboard() {
 
   const [isDataLoading, setIsDataLoading] = useState(true);
 
+  // Función para obtener las clases CSS del estado de la orden
+  const getOrderStatusStyles = (status) => {
+    const statusConfig = {
+      pagado: { className: "bg-green-100 text-green-800", style: {} },
+      pendiente: {
+        className: "text-yellow-800",
+        style: { backgroundColor: "rgba(246, 195, 67, 0.1)" },
+      },
+      enviado: { className: "bg-blue-100 text-blue-800", style: {} },
+      entregado: { className: "bg-gray-800 text-white", style: {} },
+      default: { className: "bg-red-100 text-red-800", style: {} },
+    };
+
+    return statusConfig[status] || statusConfig.default;
+  };
+
+  // Función auxiliar para hacer fetch con manejo de errores
+  const fetchWithErrorHandling = async (url, defaultValue = []) => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        console.error(`Error al cargar ${url}:`, response.status);
+        return defaultValue;
+      }
+
+      const data = await response.json();
+
+      // Para productos, extraer el array de products
+      if (url.includes("/products")) {
+        return data.products || defaultValue;
+      }
+
+      // Validar que sea un array para otros endpoints
+      return Array.isArray(data) ? data : defaultValue;
+    } catch (error) {
+      console.error(`Error al cargar ${url}:`, error);
+      return defaultValue;
+    }
+  };
+
+  // Función para calcular estadísticas
+  const calculateStats = (orders) => {
+    const totalSales = orders.reduce(
+      (sum, order) => sum + (order.totalAmount || 0),
+      0
+    );
+    const pendingOrders = orders.filter(
+      (order) => order.status === "pendiente"
+    ).length;
+    const recentOrders = orders.slice(0, 5);
+
+    return { totalSales, pendingOrders, recentOrders };
+  };
+
+  // Función para cargar todos los datos del dashboard
+  const loadDashboardData = useCallback(async () => {
+    try {
+      setIsDataLoading(true);
+
+      const [productsData, ordersData, usersData] = await Promise.all([
+        fetchWithErrorHandling("/api/products", []),
+        fetchWithErrorHandling("/api/orders", []),
+        fetchWithErrorHandling("/api/users", []),
+      ]);
+
+      const { totalSales, pendingOrders, recentOrders } =
+        calculateStats(ordersData);
+
+      setDashboardData({
+        products: productsData,
+        orders: ordersData,
+        users: usersData,
+        totalSales,
+        pendingOrders,
+        recentOrders,
+      });
+    } catch (error) {
+      console.error("Error general al cargar datos del dashboard:", error);
+      toast.error("Error al cargar datos del dashboard");
+    } finally {
+      setIsDataLoading(false);
+    }
+  }, []);
+
   // Verificar autenticación y rol de administrador
   useEffect(() => {
-    if (
-      status === "unauthenticated" ||
-      (status === "authenticated" && session?.user?.role !== "admin")
-    ) {
+    const isUnauthenticated = status === "unauthenticated";
+    const isNotAdmin =
+      status === "authenticated" && session?.user?.role !== "admin";
+
+    if (isUnauthenticated || isNotAdmin) {
       router.push("/auth/login");
     }
   }, [status, session, router]);
 
   // Cargar datos del dashboard
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      if (status !== "authenticated" || session?.user?.role !== "admin") {
-        return;
-      }
+    const isAuthenticatedAdmin =
+      status === "authenticated" && session?.user?.role === "admin";
 
-      try {
-        setIsDataLoading(true);
-
-        // Cargar productos con manejo de errores
-        let productsData = [];
-        try {
-          const productsRes = await fetch("/api/products");
-          if (productsRes.ok) {
-            const data = await productsRes.json();
-            productsData = data.products || [];
-          } else {
-            console.error("Error al cargar productos:", productsRes.status);
-          }
-        } catch (error) {
-          console.error("Error al cargar productos:", error);
-        }
-
-        // Cargar órdenes con manejo de errores
-        let ordersData = [];
-        try {
-          const ordersRes = await fetch("/api/orders");
-          if (ordersRes.ok) {
-            ordersData = await ordersRes.json();
-            // Si no es un array, manejar el caso
-            if (!Array.isArray(ordersData)) {
-              console.error("Respuesta de órdenes no es un array:", ordersData);
-              ordersData = [];
-            }
-          } else {
-            console.error("Error al cargar órdenes:", ordersRes.status);
-          }
-        } catch (error) {
-          console.error("Error al cargar órdenes:", error);
-        }
-
-        // Cargar usuarios con manejo de errores
-        let usersData = [];
-        try {
-          const usersRes = await fetch("/api/users");
-          if (usersRes.ok) {
-            usersData = await usersRes.json();
-            // Si no es un array, manejar el caso
-            if (!Array.isArray(usersData)) {
-              console.error("Respuesta de usuarios no es un array:", usersData);
-              usersData = [];
-            }
-          } else {
-            console.error("Error al cargar usuarios:", usersRes.status);
-          }
-        } catch (error) {
-          console.error("Error al cargar usuarios:", error);
-        }
-
-        // Calcular estadísticas
-        const totalSales = Array.isArray(ordersData)
-          ? ordersData.reduce((sum, order) => sum + (order.totalAmount || 0), 0)
-          : 0;
-
-        const pendingOrders = Array.isArray(ordersData)
-          ? ordersData.filter((order) => order.status === "pendiente").length
-          : 0;
-
-        // Órdenes recientes (las últimas 5)
-        const recentOrders = Array.isArray(ordersData)
-          ? ordersData.slice(0, 5)
-          : [];
-
-        setDashboardData({
-          products: productsData,
-          orders: ordersData,
-          users: usersData,
-          totalSales,
-          pendingOrders,
-          recentOrders,
-        });
-      } catch (error) {
-        console.error("Error general al cargar datos del dashboard:", error);
-        toast.error("Error al cargar datos del dashboard");
-      } finally {
-        setIsDataLoading(false);
-      }
-    };
-
-    if (status === "authenticated" && session?.user?.role === "admin") {
-      fetchDashboardData();
+    if (isAuthenticatedAdmin) {
+      loadDashboardData();
     }
-  }, [status, session]);
+  }, [status, session, loadDashboardData]);
 
   // Función para cerrar sesión
   const handleLogout = async () => {
@@ -135,12 +135,17 @@ export default function AdminDashboard() {
     router.push("/auth/login");
   };
 
+  // Verificar si debe mostrar loading
+  const shouldShowAuthLoading = () => {
+    return (
+      status === "loading" ||
+      status === "unauthenticated" ||
+      (status === "authenticated" && session?.user?.role !== "admin")
+    );
+  };
+
   // Mostrar pantalla de carga mientras se verifican permisos
-  if (
-    status === "loading" ||
-    status === "unauthenticated" ||
-    (status === "authenticated" && session?.user?.role !== "admin")
-  ) {
+  if (shouldShowAuthLoading()) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div
@@ -175,7 +180,7 @@ export default function AdminDashboard() {
           className="px-4 py-2 text-white transition rounded-md"
           style={{ backgroundColor: "#F6C343" }}
           onMouseEnter={(e) => {
-            e.target.style.backgroundColor = "#E5B63C"; // Versión más oscura
+            e.target.style.backgroundColor = "#E5B63C";
           }}
           onMouseLeave={(e) => {
             e.target.style.backgroundColor = "#F6C343";
@@ -279,29 +284,22 @@ export default function AdminDashboard() {
                       ${order.totalAmount?.toFixed(2) || "0.00"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          order.status === "pagado"
-                            ? "bg-green-100 text-green-800"
-                            : order.status === "pendiente"
-                            ? "text-yellow-800"
-                            : order.status === "enviado"
-                            ? "bg-blue-100 text-blue-800"
-                            : order.status === "entregado"
-                            ? "bg-gray-800 text-white"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                        style={
-                          order.status === "pendiente"
-                            ? { backgroundColor: "rgba(246, 195, 67, 0.1)" }
-                            : {}
-                        }
-                      >
-                        {order.status
-                          ? order.status.charAt(0).toUpperCase() +
-                            order.status.slice(1)
-                          : "N/A"}
-                      </span>
+                      {(() => {
+                        const { className, style } = getOrderStatusStyles(
+                          order.status
+                        );
+                        return (
+                          <span
+                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${className}`}
+                            style={style}
+                          >
+                            {order.status
+                              ? order.status.charAt(0).toUpperCase() +
+                                order.status.slice(1)
+                              : "N/A"}
+                          </span>
+                        );
+                      })()}
                     </td>
                   </tr>
                 ))
