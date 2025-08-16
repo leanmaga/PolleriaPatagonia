@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -23,52 +23,96 @@ export default function ProductsAdminPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState("all");
 
+  // Función para obtener el precio de forma segura
+  const getProductPrice = (product) => {
+    if (product.salePrice !== undefined) {
+      return product.salePrice;
+    }
+
+    if (product.price !== undefined) {
+      return product.price;
+    }
+
+    return 0;
+  };
+
+  // Función para obtener las clases de los botones de paginación
+  const getPaginationButtonClasses = (isDisabled, isActive = false) => {
+    const baseClasses =
+      "relative inline-flex items-center px-4 py-2 text-sm font-medium";
+
+    if (isActive) {
+      return `${baseClasses} text-white`;
+    }
+
+    if (isDisabled) {
+      return `${baseClasses} text-gray-300`;
+    }
+
+    return `${baseClasses} text-gray-700 hover:bg-gray-50`;
+  };
+
+  // Función para obtener las clases de los botones de navegación
+  const getNavigationButtonClasses = (isDisabled) => {
+    const baseClasses = "relative inline-flex items-center px-2 py-2";
+
+    return isDisabled
+      ? `${baseClasses} text-gray-300`
+      : `${baseClasses} text-gray-400 hover:bg-gray-50`;
+  };
+
+  // Función para cargar productos
+  const fetchProducts = useCallback(async () => {
+    try {
+      setLoading(true);
+      const queryParams = new URLSearchParams();
+
+      if (selectedCategory !== "all") {
+        queryParams.set("category", selectedCategory);
+      }
+
+      queryParams.set("page", currentPage);
+      queryParams.set("limit", 10);
+
+      const response = await fetch(`/api/products?${queryParams}`);
+
+      if (!response.ok) {
+        throw new Error("Error al obtener productos");
+      }
+
+      const data = await response.json();
+      setProducts(data.products);
+      setTotalPages(data.pagination.pages);
+    } catch (error) {
+      console.error("Error al cargar productos:", error);
+      toast.error("Error al cargar productos");
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedCategory, currentPage]);
+
   // Efecto para redirigir si el usuario no está autenticado o no es admin
   useEffect(() => {
-    if (
-      status === "unauthenticated" ||
-      (status === "authenticated" && session?.user?.role !== "admin")
-    ) {
+    const isUnauthenticated = status === "unauthenticated";
+    const isNotAdmin =
+      status === "authenticated" && session?.user?.role !== "admin";
+
+    if (isUnauthenticated || isNotAdmin) {
       router.push("/auth/signin?callbackUrl=/admin");
     }
   }, [status, session, router]);
 
   // Cargar productos
   useEffect(() => {
-    // Solo cargar productos si el usuario está autenticado y es admin
-    if (status === "authenticated" && session?.user?.role === "admin") {
-      const fetchProducts = async () => {
-        try {
-          setLoading(true);
-          const queryParams = new URLSearchParams();
-          if (selectedCategory !== "all") {
-            queryParams.set("category", selectedCategory);
-          }
-          queryParams.set("page", currentPage);
-          queryParams.set("limit", 10); // 10 productos por página
+    const isAuthenticatedAdmin =
+      status === "authenticated" && session?.user?.role === "admin";
 
-          const response = await fetch(`/api/products?${queryParams}`);
-
-          if (!response.ok) {
-            throw new Error("Error al obtener productos");
-          }
-
-          const data = await response.json();
-          setProducts(data.products);
-          setTotalPages(data.pagination.pages);
-        } catch (error) {
-          console.error("Error al cargar productos:", error);
-          toast.error("Error al cargar productos");
-        } finally {
-          setLoading(false);
-        }
-      };
-
+    if (isAuthenticatedAdmin) {
       fetchProducts();
     }
-  }, [selectedCategory, currentPage, status, session]);
+  }, [status, session, fetchProducts]);
 
-  // Si está cargando, mostrar spinner
+  // Verificar estados de carga y autenticación
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -80,11 +124,11 @@ export default function ProductsAdminPage() {
     );
   }
 
-  // Si no está autenticado o no es admin, no renderizar nada (la redirección ocurrirá en el useEffect)
-  if (
-    status === "unauthenticated" ||
-    (status === "authenticated" && session?.user?.role !== "admin")
-  ) {
+  const isUnauthenticated = status === "unauthenticated";
+  const isNotAdmin =
+    status === "authenticated" && session?.user?.role !== "admin";
+
+  if (isUnauthenticated || isNotAdmin) {
     return null;
   }
 
@@ -108,7 +152,6 @@ export default function ProductsAdminPage() {
         throw new Error("Error al eliminar producto");
       }
 
-      // Actualizar la lista de productos
       setProducts(products.filter((product) => product._id !== id));
       toast.success("Producto eliminado con éxito");
     } catch (error) {
@@ -126,14 +169,7 @@ export default function ProductsAdminPage() {
 
   // Función para mostrar el precio de forma segura
   const displayPrice = (product) => {
-    // Verificar si el producto tiene salePrice, si no, buscar price antiguo, y si no, usar 0
-    const priceValue =
-      product.salePrice !== undefined
-        ? product.salePrice
-        : product.price !== undefined
-        ? product.price
-        : 0;
-
+    const priceValue = getProductPrice(product);
     return priceValue.toFixed(2);
   };
 
@@ -273,7 +309,7 @@ export default function ProductsAdminPage() {
                   filteredProducts.map((product) => (
                     <tr key={product._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className=" relative">
+                        <div className="relative">
                           <Image
                             src={product.imageUrl}
                             alt={product.title}
@@ -362,22 +398,18 @@ export default function ProductsAdminPage() {
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className={`relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium ${
+                  className={`relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium ${getPaginationButtonClasses(
                     currentPage === 1
-                      ? "text-gray-300"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
+                  )}`}
                 >
                   Anterior
                 </button>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className={`relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium ${
+                  className={`relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium ${getPaginationButtonClasses(
                     currentPage === totalPages
-                      ? "text-gray-300"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
+                  )}`}
                 >
                   Siguiente
                 </button>
@@ -405,14 +437,11 @@ export default function ProductsAdminPage() {
                     <button
                       onClick={() => handlePageChange(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className={`relative inline-flex items-center rounded-l-md px-2 py-2 ${
+                      className={`rounded-l-md ${getNavigationButtonClasses(
                         currentPage === 1
-                          ? "text-gray-300"
-                          : "text-gray-400 hover:bg-gray-50"
-                      }`}
+                      )}`}
                     >
                       <span className="sr-only">Anterior</span>
-                      {/* Chevron left icon */}
                       <svg
                         className="h-5 w-5"
                         xmlns="http://www.w3.org/2000/svg"
@@ -428,36 +457,35 @@ export default function ProductsAdminPage() {
                       </svg>
                     </button>
 
-                    {Array.from({ length: totalPages }, (_, i) => (
-                      <button
-                        key={i + 1}
-                        onClick={() => handlePageChange(i + 1)}
-                        className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
-                          currentPage === i + 1
-                            ? "text-white"
-                            : "text-gray-900 hover:bg-gray-50"
-                        }`}
-                        style={
-                          currentPage === i + 1
-                            ? { backgroundColor: "#F6C343" }
-                            : {}
-                        }
-                      >
-                        {i + 1}
-                      </button>
-                    ))}
+                    {Array.from({ length: totalPages }, (_, i) => {
+                      const pageNumber = i + 1;
+                      const isCurrentPage = currentPage === pageNumber;
+
+                      return (
+                        <button
+                          key={pageNumber}
+                          onClick={() => handlePageChange(pageNumber)}
+                          className={getPaginationButtonClasses(
+                            false,
+                            isCurrentPage
+                          )}
+                          style={
+                            isCurrentPage ? { backgroundColor: "#F6C343" } : {}
+                          }
+                        >
+                          {pageNumber}
+                        </button>
+                      );
+                    })}
 
                     <button
                       onClick={() => handlePageChange(currentPage + 1)}
                       disabled={currentPage === totalPages}
-                      className={`relative inline-flex items-center rounded-r-md px-2 py-2 ${
+                      className={`rounded-r-md ${getNavigationButtonClasses(
                         currentPage === totalPages
-                          ? "text-gray-300"
-                          : "text-gray-400 hover:bg-gray-50"
-                      }`}
+                      )}`}
                     >
                       <span className="sr-only">Siguiente</span>
-                      {/* Chevron right icon */}
                       <svg
                         className="h-5 w-5"
                         xmlns="http://www.w3.org/2000/svg"
