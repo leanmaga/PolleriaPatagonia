@@ -365,7 +365,7 @@ export async function sendPaymentConfirmationToCustomer(
   try {
     const baseUrl = getBaseUrl();
     const logoUrl =
-      "https://Sol Campestre.vercel.app/_next/image?url=%2Fimages%2Flogo.jpeg&w=96&q=75";
+      "https://www.solcampestre.com/_next/image?url=%2Fimages%2Flogo.jpeg&w=96&q=75";
     const orderUrl = `${baseUrl}/profile/orders/${order._id}`;
 
     const itemsHtml = order.items
