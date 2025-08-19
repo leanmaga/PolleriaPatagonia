@@ -267,6 +267,11 @@ const OrderTable = ({ orders: initialOrders }) => {
                       <Link
                         href={`/admin/orders/${order._id}`}
                         className="text-indigo-600 hover:text-indigo-900"
+                        onClick={(e) => {
+                          console.log("🔍 Navegando a orden:", order._id);
+                          console.log("🔍 Longitud del ID:", order._id?.length);
+                          console.log("🔍 Tipo del ID:", typeof order._id);
+                        }}
                       >
                         <EyeIcon className="h-5 w-5" />
                       </Link>
