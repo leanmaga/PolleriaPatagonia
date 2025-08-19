@@ -13,10 +13,8 @@ async function fetchOrderFromAPI(id) {
   try {
     console.log("🌐 Intentando obtener orden via API:", id);
 
-    const baseUrl =
-      process.env.NEXTAUTH_URL ||
-      process.env.NEXT_PUBLIC_BASE_URL ||
-      "https://www.solcampestre.com";
+    // Usar URL absoluta para server-side
+    const baseUrl = process.env.NEXTAUTH_URL || "https://www.solcampestre.com";
     const url = `${baseUrl}/api/orders/${id}`;
 
     console.log("🌐 URL de la API:", url);
@@ -29,10 +27,16 @@ async function fetchOrderFromAPI(id) {
     });
 
     console.log("🌐 Response status:", response.status);
+    console.log("🌐 Response ok:", response.ok);
 
     if (response.status === 404) {
       console.log("🌐 Orden no encontrada (404)");
       return null;
+    }
+
+    if (response.status === 401) {
+      console.log("🌐 No autenticado (401)");
+      throw new Error("No autenticado");
     }
 
     if (response.status === 403) {
@@ -41,19 +45,27 @@ async function fetchOrderFromAPI(id) {
     }
 
     if (!response.ok) {
-      console.log("🌐 Error en la respuesta:", response.status);
+      const errorText = await response.text();
+      console.log("🌐 Error en la respuesta:", response.status, errorText);
       throw new Error(`Error ${response.status}: ${response.statusText}`);
     }
 
     const data = await response.json();
     console.log("🌐 Datos recibidos de la API:", !!data);
+    console.log("🌐 Estructura de datos:", Object.keys(data));
 
-    // La API puede devolver { order, paymentDetails } o solo la orden
+    // La API devuelve { order, paymentDetails }
     const order = data.order || data;
+    console.log("🌐 Orden extraída:", !!order);
+    console.log("🌐 ID de la orden:", order?._id);
 
     return order;
   } catch (error) {
-    console.error("🌐 Error obteniendo orden de la API:", error);
+    console.error("🌐 Error completo obteniendo orden de la API:", {
+      message: error.message,
+      stack: error.stack,
+      id: id,
+    });
     throw error;
   }
 }
@@ -130,10 +142,12 @@ export async function generateMetadata({ params }) {
 
 export default async function OrderDetailPage({ params }) {
   try {
-    console.log("🚀 OrderDetailPage iniciado con params:", params);
+    console.log("🚀 OrderDetailPage iniciado");
+    console.log("🚀 Params recibidos:", params);
 
-    // 1. Verificar autenticación
+    // 1. Verificar autenticación PRIMERO
     const session = await getServerSession(authOptions);
+    console.log("🚀 Sesión:", session ? "ENCONTRADA" : "NO ENCONTRADA");
 
     if (!session) {
       console.log("🚀 No hay sesión, redirigiendo a login");
@@ -142,6 +156,7 @@ export default async function OrderDetailPage({ params }) {
 
     if (session.user.role !== "admin") {
       console.log("🚀 Usuario no es admin, redirigiendo");
+      console.log("🚀 Rol del usuario:", session.user.role);
       redirect("/unauthorized");
     }
 
@@ -154,8 +169,17 @@ export default async function OrderDetailPage({ params }) {
     }
 
     console.log("🚀 ID recibido:", params.id);
+    console.log("🚀 Longitud del ID:", params.id.length);
 
-    // 3. Obtener la orden usando la API
+    // 3. Validar formato de ObjectId (opcional pero recomendado)
+    const objectIdPattern = /^[0-9a-fA-F]{24}$/;
+    if (!objectIdPattern.test(params.id)) {
+      console.log("🚀 ID no tiene formato de ObjectId válido:", params.id);
+      notFound();
+    }
+
+    // 4. Obtener la orden usando la API
+    console.log("🚀 Intentando obtener orden...");
     const order = await fetchOrderFromAPI(params.id);
 
     if (!order) {
@@ -163,7 +187,12 @@ export default async function OrderDetailPage({ params }) {
       notFound();
     }
 
-    console.log("🚀 Orden obtenida exitosamente:", order._id);
+    console.log("🚀 Orden obtenida exitosamente:");
+    console.log("🚀   - ID:", order._id);
+    console.log("🚀   - Status:", order.status);
+    console.log("🚀   - Cliente:", order.shippingInfo?.name);
+    console.log("🚀   - Total:", order.totalAmount);
+    console.log("🚀   - Items:", order.items?.length);
 
     const statusStyle = getStatusStyle(order.status);
 
@@ -379,14 +408,32 @@ export default async function OrderDetailPage({ params }) {
       </div>
     );
   } catch (error) {
-    console.error("🚨 Error completo en OrderDetailPage:", error);
+    console.error("🚨 Error completo en OrderDetailPage:", {
+      message: error.message,
+      stack: error.stack,
+      params: params,
+    });
 
-    // Si es un error de permisos, redirigir a unauthorized
+    // Manejar errores específicos
+    if (error.message.includes("No autenticado")) {
+      redirect("/auth/signin");
+    }
+
     if (error.message.includes("permisos")) {
       redirect("/unauthorized");
     }
 
-    // En otros casos, redirigir con error
+    // Si es un error de fetch o de red, mostrar un error más específico
+    if (
+      error.message.includes("fetch") ||
+      error.message.includes("ECONNREFUSED")
+    ) {
+      console.error("🚨 Error de conexión con la API");
+      redirect("/admin/orders?error=api-connection-failed");
+    }
+
+    // En otros casos, redirigir con error genérico
+    console.error("🚨 Error no manejado, redirigiendo con error genérico");
     redirect("/admin/orders?error=order-fetch-failed");
   }
 }
