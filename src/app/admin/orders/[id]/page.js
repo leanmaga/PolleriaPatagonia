@@ -1,4 +1,4 @@
-// app/admin/orders/[id]/page.js (ALTERNATIVA usando API)
+// src/app/admin/orders/[id]/page.js - CORREGIDO
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -8,16 +8,18 @@ import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import OrderStatusUpdate from "@/components/admin/OrderStatusUpdate";
 import PropTypes from "prop-types";
 
-// Función para obtener orden usando la API existente
+// ✅ FUNCIÓN CORREGIDA - Usar la ruta API correcta
 async function fetchOrderFromAPI(id) {
   try {
     console.log("🌐 Intentando obtener orden via API:", id);
 
     // Usar URL absoluta para server-side
     const baseUrl = process.env.NEXTAUTH_URL || "https://www.solcampestre.com";
-    const url = `${baseUrl}/api/orders/${id}`;
 
-    console.log("🌐 URL de la API:", url);
+    // ✅ CORREGIDO: Usar la ruta de admin específica
+    const url = `${baseUrl}/api/admin/orders/${id}`;
+
+    console.log("🌐 URL de la API (CORREGIDA):", url);
 
     const response = await fetch(url, {
       headers: {
@@ -70,6 +72,47 @@ async function fetchOrderFromAPI(id) {
   }
 }
 
+// ✅ ALTERNATIVA MEJORADA: Usar conexión directa a la base de datos (MÁS EFICIENTE)
+async function fetchOrderFromDB(id) {
+  try {
+    console.log("🗄️ Obteniendo orden directamente de la base de datos:", id);
+
+    // Importar las dependencias necesarias
+    const connectDB = (await import("@/lib/db")).default;
+    const Order = (await import("@/models/Order")).default;
+
+    // Validar que el ID tenga formato válido
+    const mongoose = await import("mongoose");
+    if (!mongoose.default.Types.ObjectId.isValid(id)) {
+      console.log("❌ ID no es un ObjectId válido:", id);
+      return null;
+    }
+
+    // Conectar a la base de datos
+    await connectDB();
+
+    // Buscar la orden
+    const order = await Order.findById(id).lean();
+
+    if (!order) {
+      console.log("❌ Orden no encontrada para ID:", id);
+      return null;
+    }
+
+    console.log("✅ Orden encontrada directamente de la DB:", order._id);
+
+    // Convertir a JSON serializable
+    return JSON.parse(JSON.stringify(order));
+  } catch (error) {
+    console.error("❌ Error obteniendo orden de la DB:", {
+      message: error.message,
+      stack: error.stack,
+      id: id,
+    });
+    return null;
+  }
+}
+
 // Función auxiliar para formatear fechas
 const formatDate = (dateString) => {
   try {
@@ -109,6 +152,7 @@ const getPaymentMethodName = (paymentMethod) => {
     mercadopago: "MercadoPago",
     credit_card: "Tarjeta de Crédito",
     debit_card: "Tarjeta de Débito",
+    whatsapp: "WhatsApp",
   };
   return paymentMethods[paymentMethod] || paymentMethod;
 };
@@ -121,7 +165,8 @@ export async function generateMetadata({ params }) {
   }
 
   try {
-    const order = await fetchOrderFromAPI(params.id);
+    // Usar la función de base de datos para metadata (más rápido)
+    const order = await fetchOrderFromDB(params.id);
 
     if (!order) {
       return {
@@ -178,9 +223,9 @@ export default async function OrderDetailPage({ params }) {
       notFound();
     }
 
-    // 4. Obtener la orden usando la API
+    // 4. Obtener la orden usando conexión directa a la DB (MÁS EFICIENTE)
     console.log("🚀 Intentando obtener orden...");
-    const order = await fetchOrderFromAPI(params.id);
+    const order = await fetchOrderFromDB(params.id);
 
     if (!order) {
       console.log("🚀 Orden no encontrada, mostrando 404");
@@ -237,168 +282,164 @@ export default async function OrderDetailPage({ params }) {
               <div className="divide-y divide-gray-200">
                 {order.items && order.items.length > 0 ? (
                   order.items.map((item, index) => (
-                    <div key={item._id || index} className="flex p-6">
-                      <div className="flex-shrink-0 overflow-hidden rounded-md border border-gray-200 relative">
-                        <Image
-                          src={item.imageUrl || "/placeholder-image.jpg"}
-                          alt={item.title || "Producto"}
-                          width={96}
-                          height={96}
-                          className="object-cover object-center"
-                        />
+                    <div
+                      key={index}
+                      className="px-6 py-4 flex items-center space-x-4"
+                    >
+                      {/* Imagen del producto */}
+                      <div className="flex-shrink-0 w-16 h-16 bg-gray-200 rounded-lg overflow-hidden">
+                        {item.image ? (
+                          <Image
+                            src={item.image}
+                            alt={item.name || item.title}
+                            width={64}
+                            height={64}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-300 flex items-center justify-center">
+                            <span className="text-gray-500 text-xs">
+                              Sin imagen
+                            </span>
+                          </div>
+                        )}
                       </div>
 
-                      <div className="ml-6 flex flex-1 flex-col">
-                        <div className="flex justify-between">
-                          <h3 className="text-base font-medium text-gray-900">
-                            {item.product ? (
-                              <Link
-                                href={`/products/${item.product}`}
-                                className="transition-colors"
-                                style={{ color: "inherit" }}
-                                onMouseEnter={(e) => {
-                                  e.target.style.color = "#F6C343";
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.target.style.color = "inherit";
-                                }}
-                              >
-                                {item.title}
-                              </Link>
-                            ) : (
-                              item.title
-                            )}
-                          </h3>
-                          <p className="ml-4 text-sm font-medium text-gray-900">
-                            $
-                            {((item.price || 0) * (item.quantity || 1)).toFixed(
-                              2
-                            )}
-                          </p>
-                        </div>
-                        <p className="mt-1 text-sm text-gray-500">
-                          Cantidad: {item.quantity || 1}
+                      {/* Información del producto */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-medium text-gray-900 truncate">
+                          {item.name || item.title}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          Cantidad: {item.quantity} × ${item.price}
                         </p>
-                        <p className="mt-1 text-sm text-gray-500">
-                          Precio unitario: ${(item.price || 0).toFixed(2)}
-                        </p>
+                      </div>
+
+                      {/* Subtotal */}
+                      <div className="text-sm font-medium text-gray-900">
+                        ${(item.price * item.quantity).toFixed(2)}
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="p-6 text-center text-gray-500">
+                  <div className="px-6 py-8 text-center text-gray-500">
                     No hay productos en este pedido
                   </div>
                 )}
               </div>
 
-              {/* Resumen de precios */}
-              <div className="border-t border-gray-200 px-6 py-4 space-y-2">
-                <div className="flex justify-between">
-                  <p className="text-sm text-gray-500">Subtotal</p>
-                  <p className="text-sm font-medium text-gray-900">
-                    ${(order.totalAmount || 0).toFixed(2)}
-                  </p>
-                </div>
-                <div className="flex justify-between">
-                  <p className="text-sm text-gray-500">Envío</p>
-                  <p className="text-sm font-medium text-gray-900">
-                    Por coordinar
-                  </p>
-                </div>
-                <div className="flex justify-between border-t border-gray-200 pt-2">
-                  <p className="text-base font-medium text-gray-900">Total</p>
-                  <p className="text-base font-medium text-gray-900">
-                    ${(order.totalAmount || 0).toFixed(2)}
-                  </p>
+              {/* Total */}
+              <div className="px-6 py-4 bg-gray-50 border-t">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-medium text-gray-900">
+                    Total:
+                  </span>
+                  <span className="text-lg font-bold text-gray-900">
+                    ${order.totalAmount}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Información del cliente y envío */}
+          {/* Información del pedido */}
           <div className="space-y-6">
-            {/* Información del Cliente */}
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-              <div className="px-6 py-4 border-b">
-                <h2 className="text-lg font-semibold">
-                  Información del Cliente
-                </h2>
-              </div>
-              <div className="p-6 space-y-4">
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Nombre</h3>
-                  <p>{order.shippingInfo?.name || "No especificado"}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Email</h3>
-                  <p>{order.shippingInfo?.email || "No especificado"}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">
-                    Teléfono
-                  </h3>
-                  <p>{order.shippingInfo?.phone || "No especificado"}</p>
-                </div>
+            {/* Estado */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h3 className="text-lg font-semibold mb-4">Estado del Pedido</h3>
+              <div>
+                <span
+                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                  style={{
+                    backgroundColor: `${statusStyle.color}20`,
+                    color: statusStyle.color,
+                  }}
+                >
+                  {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                </span>
               </div>
             </div>
 
-            {/* Dirección de Envío */}
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-              <div className="px-6 py-4 border-b">
-                <h2 className="text-lg font-semibold">Dirección de Envío</h2>
-              </div>
-              <div className="p-6 space-y-4">
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">
-                    Dirección
-                  </h3>
-                  <p>{order.shippingInfo?.address || "No especificada"}</p>
+            {/* Información del cliente */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h3 className="text-lg font-semibold mb-4">
+                Información del Cliente
+              </h3>
+              {order.shippingInfo ? (
+                <div className="space-y-3">
+                  <div>
+                    <span className="text-sm font-medium text-gray-500">
+                      Nombre:
+                    </span>
+                    <p className="text-sm text-gray-900">
+                      {order.shippingInfo.name}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-500">
+                      Email:
+                    </span>
+                    <p className="text-sm text-gray-900">
+                      {order.shippingInfo.email}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-500">
+                      Teléfono:
+                    </span>
+                    <p className="text-sm text-gray-900">
+                      {order.shippingInfo.phone}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-500">
+                      Dirección:
+                    </span>
+                    <p className="text-sm text-gray-900">
+                      {order.shippingInfo.address}
+                      <br />
+                      {order.shippingInfo.city}, {order.shippingInfo.state}{" "}
+                      {order.shippingInfo.zipCode}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Ciudad</h3>
-                  <p>{order.shippingInfo?.city || "No especificada"}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">
-                    Código Postal
-                  </h3>
-                  <p>{order.shippingInfo?.postalCode || "No especificado"}</p>
-                </div>
-              </div>
+              ) : (
+                <p className="text-sm text-gray-500">
+                  No hay información de cliente disponible
+                </p>
+              )}
             </div>
 
-            {/* Información de Pago */}
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-              <div className="px-6 py-4 border-b">
-                <h2 className="text-lg font-semibold">Información de Pago</h2>
-              </div>
-              <div className="p-6 space-y-4">
+            {/* Información de pago */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h3 className="text-lg font-semibold mb-4">
+                Información de Pago
+              </h3>
+              <div className="space-y-3">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">
-                    Método de Pago
-                  </h3>
-                  <p>
-                    {getPaymentMethodName(
-                      order.paymentMethod || "No especificado"
-                    )}
+                  <span className="text-sm font-medium text-gray-500">
+                    Método:
+                  </span>
+                  <p className="text-sm text-gray-900">
+                    {getPaymentMethodName(order.paymentMethod)}
                   </p>
                 </div>
                 {order.paymentId && (
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500">
-                      ID de Pago
-                    </h3>
-                    <p>{order.paymentId}</p>
+                    <span className="text-sm font-medium text-gray-500">
+                      ID de Pago:
+                    </span>
+                    <p className="text-sm text-gray-900 font-mono">
+                      {order.paymentId}
+                    </p>
                   </div>
                 )}
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Estado</h3>
-                  <p style={statusStyle}>
-                    {order.status
-                      ? order.status.charAt(0).toUpperCase() +
-                        order.status.slice(1)
-                      : "No especificado"}
+                  <span className="text-sm font-medium text-gray-500">
+                    Fecha:
+                  </span>
+                  <p className="text-sm text-gray-900">
+                    {formatDate(order.createdAt)}
                   </p>
                 </div>
               </div>
@@ -408,36 +449,32 @@ export default async function OrderDetailPage({ params }) {
       </div>
     );
   } catch (error) {
-    console.error("🚨 Error completo en OrderDetailPage:", {
-      message: error.message,
-      stack: error.stack,
-      params: params,
-    });
+    console.error("❌ Error crítico en OrderDetailPage:", error);
 
-    // Manejar errores específicos
-    if (error.message.includes("No autenticado")) {
-      redirect("/auth/signin");
-    }
-
-    if (error.message.includes("permisos")) {
-      redirect("/unauthorized");
-    }
-
-    // Si es un error de fetch o de red, mostrar un error más específico
-    if (
-      error.message.includes("fetch") ||
-      error.message.includes("ECONNREFUSED")
-    ) {
-      console.error("🚨 Error de conexión con la API");
-      redirect("/admin/orders?error=api-connection-failed");
-    }
-
-    // En otros casos, redirigir con error genérico
-    console.error("🚨 Error no manejado, redirigiendo con error genérico");
-    redirect("/admin/orders?error=order-fetch-failed");
+    // En lugar de lanzar el error, mostrar una página de error personalizada
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+            <h1 className="text-lg font-medium text-red-800 mb-2">
+              Error al cargar el pedido
+            </h1>
+            <p className="text-red-600 mb-4">{error.message}</p>
+            <Link
+              href="/admin/orders"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+            >
+              <ArrowLeftIcon className="h-4 w-4 mr-2" />
+              Volver a la lista de pedidos
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 }
 
+// Agregar PropTypes si lo necesitas
 OrderDetailPage.propTypes = {
   params: PropTypes.shape({
     id: PropTypes.string.isRequired,
