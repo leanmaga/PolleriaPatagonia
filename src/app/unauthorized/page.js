@@ -1,4 +1,4 @@
-import connectDB from "./db";
+import connectDB from "../../lib/db";
 import Product from "@/models/Product";
 import User from "@/models/User";
 import Order from "@/models/Order";
