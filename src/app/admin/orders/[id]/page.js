@@ -1,13 +1,62 @@
-// app/admin/orders/[id]/page.js (CORREGIDO)
+// app/admin/orders/[id]/page.js (ALTERNATIVA usando API)
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { getOrderById } from "@/lib/data";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import OrderStatusUpdate from "@/components/admin/OrderStatusUpdate";
 import PropTypes from "prop-types";
+
+// Función para obtener orden usando la API existente
+async function fetchOrderFromAPI(id) {
+  try {
+    console.log("🌐 Intentando obtener orden via API:", id);
+
+    const baseUrl =
+      process.env.NEXTAUTH_URL ||
+      process.env.NEXT_PUBLIC_BASE_URL ||
+      "https://www.solcampestre.com";
+    const url = `${baseUrl}/api/orders/${id}`;
+
+    console.log("🌐 URL de la API:", url);
+
+    const response = await fetch(url, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store", // No cachear para tener datos frescos
+    });
+
+    console.log("🌐 Response status:", response.status);
+
+    if (response.status === 404) {
+      console.log("🌐 Orden no encontrada (404)");
+      return null;
+    }
+
+    if (response.status === 403) {
+      console.log("🌐 Sin permisos (403)");
+      throw new Error("No tienes permisos para ver esta orden");
+    }
+
+    if (!response.ok) {
+      console.log("🌐 Error en la respuesta:", response.status);
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log("🌐 Datos recibidos de la API:", !!data);
+
+    // La API puede devolver { order, paymentDetails } o solo la orden
+    const order = data.order || data;
+
+    return order;
+  } catch (error) {
+    console.error("🌐 Error obteniendo orden de la API:", error);
+    throw error;
+  }
+}
 
 // Función auxiliar para formatear fechas
 const formatDate = (dateString) => {
@@ -19,7 +68,7 @@ const formatDate = (dateString) => {
       hour: "2-digit",
       minute: "2-digit",
     };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+    return new Date(dateString).toLocaleDateString("es-ES", options);
   } catch (error) {
     return "Fecha no válida";
   }
@@ -53,7 +102,6 @@ const getPaymentMethodName = (paymentMethod) => {
 };
 
 export async function generateMetadata({ params }) {
-  // Validación de params
   if (!params?.id) {
     return {
       title: "Pedido no encontrado | TiendaOnline",
@@ -61,7 +109,7 @@ export async function generateMetadata({ params }) {
   }
 
   try {
-    const order = await getOrderById(params.id);
+    const order = await fetchOrderFromAPI(params.id);
 
     if (!order) {
       return {
@@ -82,40 +130,40 @@ export async function generateMetadata({ params }) {
 
 export default async function OrderDetailPage({ params }) {
   try {
-    // 1. Verificar autenticación PRIMERO
+    console.log("🚀 OrderDetailPage iniciado con params:", params);
+
+    // 1. Verificar autenticación
     const session = await getServerSession(authOptions);
 
     if (!session) {
+      console.log("🚀 No hay sesión, redirigiendo a login");
       redirect("/auth/signin");
     }
 
     if (session.user.role !== "admin") {
+      console.log("🚀 Usuario no es admin, redirigiendo");
       redirect("/unauthorized");
     }
 
+    console.log("🚀 Usuario autenticado como admin:", session.user.email);
+
     // 2. Validar parámetros
     if (!params?.id) {
-      console.log("No ID provided in params");
+      console.log("🚀 No ID provided in params");
       notFound();
     }
 
-    // 3. Validar que el ID tenga formato válido de MongoDB ObjectId
-    const objectIdPattern = /^[0-9a-fA-F]{24}$/;
-    if (!objectIdPattern.test(params.id)) {
-      console.log("Invalid ObjectId format:", params.id);
-      notFound();
-    }
+    console.log("🚀 ID recibido:", params.id);
 
-    // 4. Obtener la orden
-    console.log("Fetching order with ID:", params.id);
-    const order = await getOrderById(params.id);
+    // 3. Obtener la orden usando la API
+    const order = await fetchOrderFromAPI(params.id);
 
     if (!order) {
-      console.log("Order not found for ID:", params.id);
+      console.log("🚀 Orden no encontrada, mostrando 404");
       notFound();
     }
 
-    console.log("Order found:", order._id);
+    console.log("🚀 Orden obtenida exitosamente:", order._id);
 
     const statusStyle = getStatusStyle(order.status);
 
@@ -331,19 +379,18 @@ export default async function OrderDetailPage({ params }) {
       </div>
     );
   } catch (error) {
-    console.error("Error in OrderDetailPage:", error);
+    console.error("🚨 Error completo en OrderDetailPage:", error);
 
-    // En producción, redirigir a una página de error
-    if (process.env.NODE_ENV === "production") {
-      redirect("/admin/orders?error=order-not-found");
+    // Si es un error de permisos, redirigir a unauthorized
+    if (error.message.includes("permisos")) {
+      redirect("/unauthorized");
     }
 
-    // En desarrollo, mostrar el error
-    throw error;
+    // En otros casos, redirigir con error
+    redirect("/admin/orders?error=order-fetch-failed");
   }
 }
 
-// Validación de PropTypes
 OrderDetailPage.propTypes = {
   params: PropTypes.shape({
     id: PropTypes.string.isRequired,
