@@ -86,51 +86,19 @@ export async function getProductById(id) {
   }
 }
 
+// Función para obtener una orden por ID
 export async function getOrderById(id) {
   try {
-    console.log("🔍 getOrderById llamada con ID:", id);
-
-    // Validar que el ID no esté vacío
-    if (!id) {
-      console.log("❌ ID no proporcionado");
-      return null;
-    }
-
-    // Validar que el ID tenga formato válido de MongoDB ObjectId
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      console.log("❌ ID no es un ObjectId válido:", id);
-      return null;
-    }
-
-    // Conectar a la base de datos
-    console.log("🔌 Conectando a la base de datos...");
     await connectDB();
-    console.log("✅ Conectado a la base de datos");
-
-    // Buscar la orden
-    console.log("🔍 Buscando orden con ID:", id);
-    const order = await Order.findById(id).lean(); // .lean() para mejor performance
+    const order = await Order.findById(id);
 
     if (!order) {
-      console.log("❌ Orden no encontrada para ID:", id);
       return null;
     }
 
-    console.log("✅ Orden encontrada:", order._id);
-
-    // Convertir el objeto a JSON serializable
-    const serializedOrder = JSON.parse(JSON.stringify(order));
-
-    return serializedOrder;
+    return JSON.parse(JSON.stringify(order));
   } catch (error) {
-    console.error("❌ Error completo en getOrderById:", {
-      message: error.message,
-      stack: error.stack,
-      id: id,
-    });
-
-    // En lugar de lanzar el error, retornar null
-    // Esto evita que la página se rompa
+    console.error("Error al obtener orden por ID:", error);
     return null;
   }
 }
