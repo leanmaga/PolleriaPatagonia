@@ -1,76 +1,41 @@
+// =============================================================================
+// ARCHIVO: src/lib/email-actions.js
+// ACTUALIZADO PARA USAR CONFIGURACIÓN UNIFICADA
+// =============================================================================
+
 "use server";
 
-import nodemailer from "nodemailer";
 import crypto from "crypto";
+import bcrypt from "bcryptjs";
 import User from "@/models/User";
 import connectDB from "./db";
+import { sendEmailWithRetry } from "./email-config";
 
 // Función para obtener la URL base normalizada
 function getBaseUrl() {
-  // Obtener la URL base de las variables de entorno
   const url = process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000";
-
-  // Eliminar slash final si existe
   return url.endsWith("/") ? url.slice(0, -1) : url;
 }
 
-// Función para crear un transportador de email
-async function createEmailTransporter() {
-  // Para desarrollo (pruebas locales)
-  if (process.env.NODE_ENV === "production") {
-    // Crear cuenta de prueba en Ethereal para desarrollo
-    const testAccount = await nodemailer.createTestAccount();
-
-    return nodemailer.createTransport({
-      host: "smtp.ethereal.email",
-      port: 587,
-      secure: false,
-      auth: {
-        user: testAccount.user,
-        pass: testAccount.pass,
-      },
-      // Ignorar errores de certificados en desarrollo
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
-  }
-
-  // Para producción
-  return nodemailer.createTransport({
-    service: process.env.EMAIL_SERVICE || "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-    // Solo usar en desarrollo o si confías en el servidor
-    tls: {
-      rejectUnauthorized: process.env.NODE_ENV === "production",
-    },
-  });
-}
-
-// Acción del servidor para enviar email de verificación
+// ✅ ENVIAR EMAIL DE VERIFICACIÓN
 export async function sendVerificationEmail(email) {
   try {
+    console.log("📧 Iniciando envío de email de verificación para:", email);
+
     await connectDB();
 
-    // Buscar el usuario
     const user = await User.findOne({ email });
 
     if (!user) {
       return { success: false, error: "Usuario no encontrado" };
     }
 
-    // Si el usuario ya está verificado
     if (user.isVerified) {
       return { success: false, error: "Este correo ya está verificado" };
     }
 
     // Generar token de verificación
     const verificationToken = crypto.randomBytes(32).toString("hex");
-
-    // Establecer fecha de expiración (24 horas)
     const verificationTokenExpires = new Date();
     verificationTokenExpires.setHours(verificationTokenExpires.getHours() + 24);
 
@@ -79,21 +44,11 @@ export async function sendVerificationEmail(email) {
     user.verificationTokenExpires = verificationTokenExpires;
     await user.save();
 
-    // Crear transportador
-    const transporter = await createEmailTransport();
-
-    // URL de verificación (usando la función getBaseUrl)
     const verificationUrl = `${getBaseUrl()}/auth/verify-email?token=${verificationToken}`;
-
-    // URL del logo
     const logoUrl =
       "https://solcampestre.com/_next/image?url=%2Fimages%2Flogo.jpeg&w=96&q=75";
 
-    // Enviar email con diseño mejorado
-    const info = await transporter.sendMail({
-      from: `"Sol Campestre" <${
-        process.env.EMAIL_USER || "sofiaballesta1424@gmail.com"
-      }>`,
+    const emailData = {
       to: user.email,
       subject: "Verifica tu cuenta en Sol Campestre",
       html: `
@@ -104,124 +59,81 @@ export async function sendVerificationEmail(email) {
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Verificación de Cuenta</title>
           <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+            body { margin: 0; padding: 0; font-family: Arial, sans-serif; color: #1a1a1a; background-color: #f7f7f7; }
+            .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-collapse: collapse; }
+            .header { padding: 40px 30px; text-align: center; border-bottom: 1px solid #e5e5e5; }
+            .content { padding: 40px 30px; }
+            .button { display: inline-block; background-color: #000000; color: #ffffff; text-decoration: none; padding: 15px 45px; border-radius: 2px; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+            .footer { padding: 30px; text-align: center; background-color: #f7f7f7; border-top: 1px solid #e5e5e5; }
           </style>
         </head>
-        <body style="margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1a1a1a; background-color: #f7f7f7;">
-          <!-- Main Container -->
-          <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-collapse: collapse;">
-            <!-- Header -->
+        <body>
+          <table class="container" align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
             <tr>
-               <td style="padding: 40px 30px; text-align: center; border-bottom: 1px solid #e5e5e5;">
+              <td class="header">
                 <img src="${logoUrl}" alt="Sol Campestre Logo" width="120" style="display: block; margin: 0 auto;">
               </td>
             </tr>
-            
-            <!-- Content -->
             <tr>
-              <td style="padding: 40px 30px;">
-                <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                  <tr>
-                    <td style="padding-bottom: 20px; text-align: center;">
-                      <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #000000; text-transform: uppercase; letter-spacing: 1px;">VERIFICA TU CUENTA</h1>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding-bottom: 30px; text-align: center; color: #666666; font-size: 16px; line-height: 24px;">
-                      <p>¡Gracias por registrarte en Sol Campestre! Para completar tu registro y acceder a todas las funcionalidades, por favor verifica tu dirección de correo electrónico.</p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding-bottom: 30px; text-align: center;">
-                      <p style="margin: 0; color: #666666; font-size: 16px; line-height: 24px;">Haz clic en el botón para verificar tu cuenta:</p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding-bottom: 30px; text-align: center;">
-                      <a href="${verificationUrl}" style="display: inline-block; background-color: #000000; color: #ffffff; text-decoration: none; padding: 15px 45px; border-radius: 2px; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">VERIFICAR CUENTA</a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding-bottom: 30px; text-align: center; color: #666666; font-size: 14px; line-height: 20px;">
-                      <p>Si el botón no funciona, copia y pega este enlace en tu navegador:</p>
-                      <p style="word-break: break-all; color: #999999;">${verificationUrl}</p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding-bottom: 15px; text-align: center; color: #666666; font-size: 14px; line-height: 20px;">
-                      <p style="margin: 0;">Este enlace expirará en 24 horas por razones de seguridad.</p>
-                    </td>
-                  </tr>
-                </table>
+              <td class="content">
+                <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #000000; text-transform: uppercase; letter-spacing: 1px; text-align: center;">VERIFICA TU CUENTA</h1>
+                <p style="text-align: center; color: #666666; font-size: 16px; line-height: 24px;">¡Gracias por registrarte en Sol Campestre! Para completar tu registro, por favor verifica tu dirección de correo electrónico.</p>
+                <p style="text-align: center; color: #666666; font-size: 16px; line-height: 24px;">Haz clic en el botón para verificar tu cuenta:</p>
+                <div style="text-align: center;">
+                  <a href="${verificationUrl}" class="button">VERIFICAR CUENTA</a>
+                </div>
+                <p style="text-align: center; color: #666666; font-size: 14px; line-height: 20px;">Si el botón no funciona, copia y pega este enlace en tu navegador:</p>
+                <p style="word-break: break-all; color: #999999; text-align: center;">${verificationUrl}</p>
+                <p style="text-align: center; color: #666666; font-size: 14px; line-height: 20px;">Este enlace expirará en 24 horas por razones de seguridad.</p>
               </td>
             </tr>
-            
-            <!-- Footer -->
             <tr>
-              <td style="padding: 30px; text-align: center; background-color: #f7f7f7; border-top: 1px solid #e5e5e5;">
-                <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                  <tr>
-                    <td style="padding-bottom: 20px; text-align: center;">
-                      <p style="margin: 0; font-size: 14px; color: #999999;">© ${new Date().getFullYear()} Sol Campestre. Todos los derechos reservados.</p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding-bottom: 20px; text-align: center;">
-                      
-                        href="https://www.instagram.com/patagonia_script?igsh=ZWNqemd2aGM0cWNq"
-                        style="margin: 0 10px; text-decoration: none;"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="Instagram"
-                      >
-                        <img 
-                          src="https://i.ibb.co/NNwdYSF/instagram-icon.png" 
-                          alt="Instagram" 
-                          width="20" 
-                          height="20" 
-                          style="display: inline-block; border: 0;" 
-                        />
-                      </a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="text-align: center; font-size: 12px; color: #999999;">
-                      <p>Si tienes alguna pregunta, contacta con nuestro equipo de soporte en <a href="mailto:sofiaballesta1424@gmail.com" style="color: #000000; text-decoration: none;">sofiaballesta1424@gmail.com</a></p>
-                    </td>
-                  </tr>
-                </table>
+              <td class="footer">
+                <p style="margin: 0; font-size: 14px; color: #999999;">© ${new Date().getFullYear()} Sol Campestre. Todos los derechos reservados.</p>
               </td>
             </tr>
           </table>
         </body>
         </html>
       `,
-    });
+    };
 
-    return { success: true, messageId: info.messageId };
+    // Usar la función unificada de envío
+    const result = await sendEmailWithRetry(emailData);
+
+    if (result.success) {
+      console.log("✅ Email de verificación enviado exitosamente:", {
+        email: user.email,
+        messageId: result.messageId,
+      });
+    } else {
+      console.error("❌ Error enviando email de verificación:", result.error);
+    }
+
+    return result;
   } catch (error) {
-    console.error("Error al enviar email de verificación:", error);
+    console.error("❌ Error en sendVerificationEmail:", error);
     return { success: false, error: error.message };
   }
 }
 
-// Acción del servidor para enviar email de restablecimiento de contraseña
+// ✅ ENVIAR EMAIL DE RESTABLECIMIENTO DE CONTRASEÑA
 export async function sendPasswordResetEmail(email) {
   try {
+    console.log("📧 Iniciando envío de email de reset para:", email);
+
     await connectDB();
 
-    // Buscar el usuario
     const user = await User.findOne({ email });
 
     if (!user) {
-      // Por seguridad, no revelamos si el email existe o no
+      // Por seguridad, no revelar si el email existe
       return {
         success: true,
         message: "Si el correo existe, se ha enviado un enlace de recuperación",
       };
     }
 
-    // Si el usuario usa solo Google Auth y no tiene contraseña tradicional
     if (user.googleAuth && !user.password) {
       return {
         success: false,
@@ -232,8 +144,6 @@ export async function sendPasswordResetEmail(email) {
 
     // Generar token de restablecimiento
     const resetToken = crypto.randomBytes(32).toString("hex");
-
-    // Establecer fecha de expiración (1 hora)
     const resetTokenExpires = new Date();
     resetTokenExpires.setHours(resetTokenExpires.getHours() + 1);
 
@@ -242,21 +152,11 @@ export async function sendPasswordResetEmail(email) {
     user.resetPasswordExpires = resetTokenExpires;
     await user.save();
 
-    // Crear transportador
-    const transporter = await createEmailTransport();
-
-    // URL de restablecimiento (usando la función getBaseUrl)
     const resetUrl = `${getBaseUrl()}/auth/reset-password/${resetToken}`;
-
-    // URL del logo
     const logoUrl =
       "https://solcampestre.com/_next/image?url=%2Fimages%2Flogo.jpeg&w=96&q=75";
 
-    // Enviar email
-    const info = await transporter.sendMail({
-      from: `"Sol Campestre" <${
-        process.env.EMAIL_USER || "Sol Campestre@gmail.com"
-      }>`,
+    const emailData = {
       to: user.email,
       subject: "Restablece tu contraseña",
       html: `
@@ -267,123 +167,78 @@ export async function sendPasswordResetEmail(email) {
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Restablecer Contraseña</title>
           <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+            body { margin: 0; padding: 0; font-family: Arial, sans-serif; color: #1a1a1a; background-color: #f7f7f7; }
+            .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-collapse: collapse; }
+            .header { padding: 40px 30px; text-align: center; border-bottom: 1px solid #e5e5e5; }
+            .content { padding: 40px 30px; }
+            .button { display: inline-block; background-color: #000000; color: #ffffff; text-decoration: none; padding: 15px 45px; border-radius: 2px; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+            .footer { padding: 30px; text-align: center; background-color: #f7f7f7; border-top: 1px solid #e5e5e5; }
           </style>
         </head>
-        <body style="margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1a1a1a; background-color: #f7f7f7;">
-          <!-- Main Container -->
-          <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-collapse: collapse;">
-            <!-- Header -->
+        <body>
+          <table class="container" align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
             <tr>
-               <td style="padding: 40px 30px; text-align: center; border-bottom: 1px solid #e5e5e5;">
+              <td class="header">
                 <img src="${logoUrl}" alt="Sol Campestre Logo" width="120" style="display: block; margin: 0 auto;">
               </td>
             </tr>
-            
-            <!-- Content -->
             <tr>
-              <td style="padding: 40px 30px;">
-                <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                  <tr>
-                    <td style="padding-bottom: 20px; text-align: center;">
-                      <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #000000; text-transform: uppercase; letter-spacing: 1px;">RESTABLECER CONTRASEÑA</h1>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding-bottom: 30px; text-align: center; color: #666666; font-size: 16px; line-height: 24px;">
-                      <p>Hemos recibido una solicitud para restablecer la contraseña de tu cuenta. Si no has realizado esta solicitud, puedes ignorar este mensaje.</p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding-bottom: 30px; text-align: center;">
-                      <p style="margin: 0; color: #666666; font-size: 16px; line-height: 24px;">Haz clic en el botón para crear una nueva contraseña:</p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding-bottom: 30px; text-align: center;">
-                      <a href="${resetUrl}" style="display: inline-block; background-color: #000000; color: #ffffff; text-decoration: none; padding: 15px 45px; border-radius: 2px; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">RESTABLECER</a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding-bottom: 30px; text-align: center; color: #666666; font-size: 14px; line-height: 20px;">
-                      <p>Si el botón no funciona, copia y pega este enlace en tu navegador:</p>
-                      <p style="word-break: break-all; color: #999999;">${resetUrl}</p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding-bottom: 15px; text-align: center; color: #666666; font-size: 14px; line-height: 20px;">
-                      <p style="margin: 0;">Este enlace expirará en 1 hora por razones de seguridad.</p>
-                    </td>
-                  </tr>
-                </table>
+              <td class="content">
+                <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #000000; text-transform: uppercase; letter-spacing: 1px; text-align: center;">RESTABLECER CONTRASEÑA</h1>
+                <p style="text-align: center; color: #666666; font-size: 16px; line-height: 24px;">Hemos recibido una solicitud para restablecer la contraseña de tu cuenta. Si no has realizado esta solicitud, puedes ignorar este mensaje.</p>
+                <p style="text-align: center; color: #666666; font-size: 16px; line-height: 24px;">Haz clic en el botón para crear una nueva contraseña:</p>
+                <div style="text-align: center;">
+                  <a href="${resetUrl}" class="button">RESTABLECER</a>
+                </div>
+                <p style="text-align: center; color: #666666; font-size: 14px; line-height: 20px;">Si el botón no funciona, copia y pega este enlace en tu navegador:</p>
+                <p style="word-break: break-all; color: #999999; text-align: center;">${resetUrl}</p>
+                <p style="text-align: center; color: #666666; font-size: 14px; line-height: 20px;">Este enlace expirará en 1 hora por razones de seguridad.</p>
               </td>
             </tr>
-            
-            <!-- Footer -->
             <tr>
-              <td style="padding: 30px; text-align: center; background-color: #f7f7f7; border-top: 1px solid #e5e5e5;">
-                <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                  <tr>
-                    <td style="padding-bottom: 20px; text-align: center;">
-                      <p style="margin: 0; font-size: 14px; color: #999999;">© ${new Date().getFullYear()} Sol Campestre. Todos los derechos reservados.</p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding-bottom: 20px; text-align: center;">
-                      
-                        href="https://www.instagram.com/patagonia_script?igsh=ZWNqemd2aGM0cWNq"
-                        style="margin: 0 10px; text-decoration: none;"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="Instagram"
-                      >
-                        <img 
-                          src="https://i.ibb.co/NNwdYSF/instagram-icon.png" 
-                          alt="Instagram" 
-                          width="20" 
-                          height="20" 
-                          style="display: inline-block; border: 0;" 
-                        />
-                      </a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="text-align: center; font-size: 12px; color: #999999;">
-                      <p>Si tienes alguna pregunta, contacta con nuestro equipo de soporte en <a href="mailto:sofiaballesta1424@gmail.com" style="color: #000000; text-decoration: none;">sofiaballesta1424@gmail.com</a></p>
-                    </td>
-                  </tr>
-                </table>
+              <td class="footer">
+                <p style="margin: 0; font-size: 14px; color: #999999;">© ${new Date().getFullYear()} Sol Campestre. Todos los derechos reservados.</p>
               </td>
             </tr>
           </table>
         </body>
         </html>
       `,
-    });
+    };
 
-    return { success: true, messageId: info.messageId };
+    // Usar la función unificada de envío
+    const result = await sendEmailWithRetry(emailData);
+
+    if (result.success) {
+      console.log("✅ Email de reset enviado exitosamente:", {
+        email: user.email,
+        messageId: result.messageId,
+      });
+    } else {
+      console.error("❌ Error enviando email de reset:", result.error);
+    }
+
+    return result;
   } catch (error) {
-    console.error("Error al enviar email de restablecimiento:", error);
+    console.error("❌ Error en sendPasswordResetEmail:", error);
     return { success: false, error: error.message };
   }
 }
 
-// Acción del servidor para verificar un token de email
+// ✅ VERIFICAR TOKEN DE EMAIL
 export async function verifyEmailToken(token) {
   try {
+    console.log(
+      "🔍 Verificando token de email:",
+      token?.substring(0, 8) + "..."
+    );
+
     await connectDB();
 
-    // Obtener todos los usuarios para buscar el token
-    // Esta es una solución alternativa al problema del select: false
-    const users = await User.find({}).select(
-      "+verificationToken +verificationTokenExpires"
-    );
-
-    // Buscar manualmente el usuario que coincida con el token
-    const user = users.find(
-      (u) =>
-        u.verificationToken === token && u.verificationTokenExpires > new Date()
-    );
+    const user = await User.findOne({
+      verificationToken: token,
+      verificationTokenExpires: { $gt: Date.now() },
+    });
 
     if (!user) {
       return {
@@ -398,16 +253,23 @@ export async function verifyEmailToken(token) {
     user.verificationTokenExpires = undefined;
     await user.save();
 
+    console.log("✅ Email verificado exitosamente:", user.email);
+
     return { success: true, email: user.email };
   } catch (error) {
-    console.error("Error al verificar email:", error);
+    console.error("❌ Error verificando email:", error);
     return { success: false, error: error.message };
   }
 }
 
-// Acción del servidor para actualizar la contraseña con un token
+// ✅ RESTABLECER CONTRASEÑA CON TOKEN
 export async function resetPasswordWithToken(token, password) {
   try {
+    console.log(
+      "🔐 Restableciendo contraseña con token:",
+      token?.substring(0, 8) + "..."
+    );
+
     if (!token || !password) {
       return {
         success: false,
@@ -434,15 +296,21 @@ export async function resetPasswordWithToken(token, password) {
       return { success: false, error: "Token inválido o expirado" };
     }
 
+    // Hashear la nueva contraseña
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     // Actualizar la contraseña y eliminar el token
-    user.password = password; // El hook pre-save se encargará de hashear
+    user.password = hashedPassword;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
     await user.save();
 
+    console.log("✅ Contraseña restablecida exitosamente para:", user.email);
+
     return { success: true };
   } catch (error) {
-    console.error("Error al restablecer la contraseña:", error);
+    console.error("❌ Error restableciendo contraseña:", error);
     return { success: false, error: error.message };
   }
 }

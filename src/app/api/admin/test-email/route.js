@@ -1,19 +1,16 @@
 // =============================================================================
 // ARCHIVO: src/app/api/test-email/route.js
-// API COMPLETA CON LOGO CORREGIDO - REEMPLAZA COMPLETAMENTE
+// API COMPLETA CON TODOS LOS TIPOS DE EMAIL - REEMPLAZA COMPLETAMENTE
 // =============================================================================
 
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { sendEmailWithRetry, verifyEmailConfig } from "@/lib/email-config";
-
-// ✅ FUNCIÓN PARA OBTENER URL DEL LOGO CORREGIDA
-function getLogoUrl() {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000";
-  return `${baseUrl}/images/instagram.jpg`; // ← CORREGIDO: minúscula
-}
+import {
+  sendVerificationEmail,
+  sendPasswordResetEmail,
+} from "@/lib/email-actions";
 
 // ✅ GET - Verificar configuración
 export async function GET() {
@@ -33,7 +30,6 @@ export async function GET() {
       message: "Verificación de email completada",
       timestamp: new Date().toISOString(),
       ...configResult,
-      logoUrl: getLogoUrl(), // ← AGREGAR LOGO URL PARA DEBUG
     });
   } catch (error) {
     console.error("❌ Error verificando configuración:", error);
@@ -68,7 +64,6 @@ export async function POST(request) {
     console.log("🔍 Valores extraídos:", {
       emailType,
       testEmail,
-      logoUrl: getLogoUrl(), // ← LOG PARA DEBUG
       bodyKeys: Object.keys(body),
     });
 
@@ -118,37 +113,44 @@ export async function POST(request) {
 
     // ✅ PROCESAR SEGÚN EL TIPO DE EMAIL
     switch (emailType) {
+      // Email de prueba básico
       case "test":
         console.log("📧 Enviando email de prueba básico a:", testEmail);
         result = await sendBasicTestEmail(testEmail);
         break;
 
+      // Email de verificación de cuenta
       case "verification":
         console.log("📧 Enviando email de verificación a:", testEmail);
         result = await sendVerificationTestEmail(testEmail);
         break;
 
+      // Email de reset de contraseña
       case "password-reset":
         console.log("📧 Enviando email de reset de contraseña a:", testEmail);
         result = await sendPasswordResetTestEmail(testEmail);
         break;
 
+      // Email de confirmación de orden
       case "order-confirmation":
         console.log("📧 Enviando confirmación de orden a:", testEmail);
         result = await sendOrderConfirmationTestEmail(testEmail);
         break;
 
+      // Email de notificación de nueva orden al admin
       case "admin-order-notification":
         console.log("📧 Enviando notificación de orden al admin");
         const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
         result = await sendAdminOrderNotificationTestEmail(adminEmail);
         break;
 
+      // Email de confirmación de pago
       case "payment-confirmation":
         console.log("📧 Enviando confirmación de pago a:", testEmail);
         result = await sendPaymentConfirmationTestEmail(testEmail);
         break;
 
+      // Email de notificación de pago al admin
       case "admin-payment-notification":
         console.log("📧 Enviando notificación de pago al admin");
         const adminPaymentEmail =
@@ -190,7 +192,7 @@ export async function POST(request) {
       message: result.success
         ? `Email de prueba "${emailType}" enviado exitosamente`
         : `Error enviando email: ${result.error}`,
-      result: result,
+      result: result, // Para compatibilidad con el componente
       type: emailType,
       to: testEmail,
       messageId: result.messageId,
@@ -212,7 +214,7 @@ export async function POST(request) {
 }
 
 // =============================================================================
-// FUNCIONES AUXILIARES PARA CADA TIPO DE EMAIL (TODAS COMPLETAS)
+// FUNCIONES AUXILIARES PARA CADA TIPO DE EMAIL
 // =============================================================================
 
 // 1. Email de prueba básico
@@ -229,11 +231,10 @@ async function sendBasicTestEmail(testEmail) {
   return await sendEmailWithRetry(emailData);
 }
 
-// 2. Email de verificación de cuenta
+// 2. Email de verificación de cuenta (simulado)
 async function sendVerificationTestEmail(testEmail) {
   const baseUrl =
     process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000";
-  const logoUrl = getLogoUrl();
 
   const emailData = {
     to: testEmail,
@@ -249,7 +250,6 @@ async function sendVerificationTestEmail(testEmail) {
       <body>
         <div class="container">
           <div class="header" style="background: #667eea;">
-            <img src="${logoUrl}" alt="Sol Campestre" class="logo">
             <h1>🌟 ¡Bienvenido a Sol Campestre!</h1>
           </div>
           <div class="content">
@@ -260,7 +260,6 @@ async function sendVerificationTestEmail(testEmail) {
             </div>
             <div class="test-note">
               <p><strong>📧 Email de Prueba:</strong> Este es un email de testing. El enlace no es funcional.</p>
-              <p><strong>🖼️ Logo:</strong> ${logoUrl}</p>
             </div>
           </div>
           ${getEmailFooter()}
@@ -272,11 +271,10 @@ async function sendVerificationTestEmail(testEmail) {
   return await sendEmailWithRetry(emailData);
 }
 
-// 3. Email de reset de contraseña
+// 3. Email de reset de contraseña (simulado)
 async function sendPasswordResetTestEmail(testEmail) {
   const baseUrl =
     process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000";
-  const logoUrl = getLogoUrl();
 
   const emailData = {
     to: testEmail,
@@ -292,7 +290,6 @@ async function sendPasswordResetTestEmail(testEmail) {
       <body>
         <div class="container">
           <div class="header" style="background: #f59e0b;">
-            <img src="${logoUrl}" alt="Sol Campestre" class="logo">
             <h1>🔐 Restablecimiento de Contraseña</h1>
           </div>
           <div class="content">
@@ -304,7 +301,6 @@ async function sendPasswordResetTestEmail(testEmail) {
             <p style="color: #666; font-size: 14px;">Si no solicitaste esto, ignora este email.</p>
             <div class="test-note">
               <p><strong>📧 Email de Prueba:</strong> Este es un email de testing. El enlace no es funcional.</p>
-              <p><strong>🖼️ Logo:</strong> ${logoUrl}</p>
             </div>
           </div>
           ${getEmailFooter()}
@@ -318,7 +314,6 @@ async function sendPasswordResetTestEmail(testEmail) {
 
 // 4. Email de confirmación de orden
 async function sendOrderConfirmationTestEmail(testEmail) {
-  const logoUrl = getLogoUrl();
   const sampleProducts = [
     {
       name: "Carne Premium",
@@ -379,7 +374,6 @@ async function sendOrderConfirmationTestEmail(testEmail) {
       <body>
         <div class="container">
           <div class="header" style="background: #10b981;">
-            <img src="${logoUrl}" alt="Sol Campestre" class="logo">
             <h1>📦 ¡Pedido Confirmado!</h1>
           </div>
           <div class="content">
@@ -413,9 +407,16 @@ async function sendOrderConfirmationTestEmail(testEmail) {
               <h3 style="text-align: right; color: #10b981;">Total: $${total}</h3>
             </div>
 
+            <div class="shipping-info">
+              <h3>📍 Dirección de Envío</h3>
+              <p>Juan Pérez (Cliente de Prueba)<br>
+              Av. Corrientes 1234<br>
+              Buenos Aires, 1000<br>
+              Argentina</p>
+            </div>
+
             <div class="test-note">
               <p><strong>📧 Email de Prueba:</strong> Esta es una orden de ejemplo para testing.</p>
-              <p><strong>🖼️ Logo:</strong> ${logoUrl}</p>
             </div>
           </div>
           ${getEmailFooter()}
@@ -429,8 +430,6 @@ async function sendOrderConfirmationTestEmail(testEmail) {
 
 // 5. Email de notificación de nueva orden al admin
 async function sendAdminOrderNotificationTestEmail(adminEmail) {
-  const logoUrl = getLogoUrl();
-
   const emailData = {
     to: adminEmail,
     subject: "[PRUEBA] 🚨 Nueva Orden #TEST123 - Sol Campestre",
@@ -445,7 +444,6 @@ async function sendAdminOrderNotificationTestEmail(adminEmail) {
       <body>
         <div class="container">
           <div class="header" style="background: #ef4444;">
-            <img src="${logoUrl}" alt="Sol Campestre" class="logo">
             <h1>🚨 Nueva Orden Recibida</h1>
           </div>
           <div class="content">
@@ -487,7 +485,6 @@ async function sendAdminOrderNotificationTestEmail(adminEmail) {
 
             <div class="test-note">
               <p><strong>📧 Email de Prueba:</strong> Esta es una notificación de ejemplo para testing.</p>
-              <p><strong>🖼️ Logo:</strong> ${logoUrl}</p>
             </div>
           </div>
           ${getEmailFooter()}
@@ -501,8 +498,6 @@ async function sendAdminOrderNotificationTestEmail(adminEmail) {
 
 // 6. Email de confirmación de pago
 async function sendPaymentConfirmationTestEmail(testEmail) {
-  const logoUrl = getLogoUrl();
-
   const emailData = {
     to: testEmail,
     subject: "[PRUEBA] ✅ Pago Confirmado - Pedido #TEST123",
@@ -517,7 +512,6 @@ async function sendPaymentConfirmationTestEmail(testEmail) {
       <body>
         <div class="container">
           <div class="header" style="background: #10b981;">
-            <img src="${logoUrl}" alt="Sol Campestre" class="logo">
             <h1>✅ ¡Pago Confirmado!</h1>
           </div>
           <div class="content">
@@ -557,7 +551,6 @@ async function sendPaymentConfirmationTestEmail(testEmail) {
 
             <div class="test-note">
               <p><strong>📧 Email de Prueba:</strong> Este es un email de confirmación de pago de ejemplo.</p>
-              <p><strong>🖼️ Logo:</strong> ${logoUrl}</p>
             </div>
           </div>
           ${getEmailFooter()}
@@ -571,8 +564,6 @@ async function sendPaymentConfirmationTestEmail(testEmail) {
 
 // 7. Email de notificación de pago al admin
 async function sendAdminPaymentNotificationTestEmail(adminEmail) {
-  const logoUrl = getLogoUrl();
-
   const emailData = {
     to: adminEmail,
     subject: "[PRUEBA] 💰 Pago Confirmado - Orden #TEST123",
@@ -587,7 +578,6 @@ async function sendAdminPaymentNotificationTestEmail(adminEmail) {
       <body>
         <div class="container">
           <div class="header" style="background: #10b981;">
-            <img src="${logoUrl}" alt="Sol Campestre" class="logo">
             <h1>💰 Pago Confirmado</h1>
           </div>
           <div class="content">
@@ -623,7 +613,6 @@ async function sendAdminPaymentNotificationTestEmail(adminEmail) {
 
             <div class="test-note">
               <p><strong>📧 Email de Prueba:</strong> Esta es una notificación de pago de ejemplo para testing.</p>
-              <p><strong>🖼️ Logo:</strong> ${logoUrl}</p>
             </div>
           </div>
           ${getEmailFooter()}
@@ -664,18 +653,8 @@ function getEmailStyles() {
         text-align: center;
       }
       .header h1 {
-        margin: 20px 0 0 0;
+        margin: 0;
         font-size: 24px;
-      }
-      .logo {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 3px solid white;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        display: block;
-        margin: 0 auto;
       }
       .content { 
         padding: 30px; 
@@ -710,7 +689,6 @@ function getEmailStyles() {
         border-radius: 8px;
         margin: 20px 0;
         color: #856404;
-        font-size: 12px;
       }
       .footer { 
         background: #f8f9fa; 
@@ -735,8 +713,6 @@ function getEmailFooter() {
 }
 
 function createBasicTestTemplate(title, message, color = "#4CAF50") {
-  const logoUrl = getLogoUrl();
-
   return `
     <!DOCTYPE html>
     <html lang="es">
@@ -748,7 +724,6 @@ function createBasicTestTemplate(title, message, color = "#4CAF50") {
     <body>
       <div class="container">
         <div class="header" style="background: ${color};">
-          <img src="${logoUrl}" alt="Sol Campestre" class="logo">
           <h1>${title}</h1>
         </div>
         <div class="content">
@@ -760,8 +735,6 @@ function createBasicTestTemplate(title, message, color = "#4CAF50") {
           </div>
           <div class="test-note">
             <p><strong>📧 Email de Prueba:</strong> Este es un email de testing del sistema.</p>
-            <p><strong>🖼️ Logo URL:</strong> ${logoUrl}</p>
-            <p><strong>📁 Archivo:</strong> public/images/instagram.jpg</p>
           </div>
         </div>
         ${getEmailFooter()}
